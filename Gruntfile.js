@@ -1,11 +1,30 @@
 /*global module, require */
 module.exports = function(grunt) {
+	// Load all Grunt tasks
+	require('load-grunt-tasks')(grunt);
 
-	// Load Grunt tasks
-	grunt.loadNpmTasks('grunt-postcss');
-	grunt.loadNpmTasks('grunt-sass');
-	grunt.loadNpmTasks('grunt-wp-i18n');
-	grunt.loadNpmTasks('grunt-contrib-watch');
+	// Files to exclude during build process
+	var excludeCopyFiles = [
+		'**',
+		'!npm-debug.log',
+		'!node_modules/**',
+		'!build/**',
+		'!.git/**',
+		'!Gruntfile.js',
+		'!package.json',
+		'!.gitignore',
+		'!.gitmodules',
+		'!deploy.sh',
+		'!tests/**',
+		'!tmp/**',
+		'!**/Gruntfile.js',
+		'!**/package.json',
+		'!**/README.md',
+		'!**/*~'
+	];
+
+	var excludeCopyFilesDEV = excludeCopyFiles.slice(0).concat( [ '!readme.txt' ] );
+	var excludeCopyFilesWPorg = excludeCopyFiles.slice(0).concat( [ '!includes/admin/dash-notice/**', '!changelog.txt' ] );
 
 	grunt.initConfig({
 
@@ -23,6 +42,44 @@ module.exports = function(grunt) {
 			adminassets: 'includes/admin/ui',
 			admincss: '<%= project.adminassets %>/css',
 			adminscss: '<%= project.src %>/scss/admin'
+		},
+
+		// Clean build directory
+		clean: {
+			main: ['build/']
+		},
+
+		checktextdomain: {
+			options:{
+				text_domain: 'mp',
+				keywords: [
+					'__:1,2d',
+					'_e:1,2d',
+					'_x:1,2c,3d',
+					'esc_html__:1,2d',
+					'esc_html_e:1,2d',
+					'esc_html_x:1,2c,3d',
+					'esc_attr__:1,2d',
+					'esc_attr_e:1,2d',
+					'esc_attr_x:1,2c,3d',
+					'_ex:1,2c,3d',
+					'_n:1,2,4d',
+					'_nx:1,2,4c,5d',
+					'_n_noop:1,2,3d',
+					'_nx_noop:1,2,3c,4d'
+				]
+			},
+			files: {
+				src:  [
+					'**/*.php', // Include all files
+					'!node_modules/**', // Exclude node_modules/
+					'!tests/**', // Exclude tests/
+					'!includes/admin/dash-notice/**', // Exclude WPMU DEV Shared UI
+					'!includes/wpmudev-metaboxes/**', // Exclude WPMU DEV MetaBoxes
+					'!build/**' // Exclude WPMU DEV Shared UI
+				],
+				expand: true
+			}
 		},
 
 		// PostCSS
@@ -119,6 +176,42 @@ module.exports = function(grunt) {
 			}
 		},
 
+		// Copy all the files
+		copy: {
+			main: {
+				src:  excludeCopyFilesDEV,
+				dest: 'build/<%= pkg.name %>/'
+			},
+			wporg: {
+				src:  excludeCopyFilesWPorg,
+				dest: 'build/<%= pkg.name %>-wporg/'
+			}
+		},
+
+		// Prepare zip files
+		compress: {
+			main: {
+				options: {
+					mode: 'zip',
+					archive: './build/<%= pkg.name %>-<%= pkg.version %>.zip'
+				},
+				expand: true,
+				cwd: 'build/<%= pkg.name %>/',
+				src: ['**/*'],
+				dest: '<%= pkg.name %>/'
+			},
+			wporg: {
+				options: {
+					mode: 'zip',
+					archive: './build/<%= pkg.name %>-wporg-<%= pkg.version %>.zip'
+				},
+				expand: true,
+				cwd: 'build/<%= pkg.name %>-wporg/',
+				src: ['**/*'],
+				dest: '<%= pkg.name %>-wporg/'
+			}
+		},
+
 		// Watch
 		watch: {
 			sass: {
@@ -157,6 +250,20 @@ module.exports = function(grunt) {
 		'sass:adminprod',
 		'postcss:adminprod',
 		'makepot'
+	]);
+
+	grunt.registerTask('build', [
+		'clean',
+		'checktextdomain',
+		'sass:frontprod',
+		'postcss:frontprod',
+		'sass:themeprod',
+		'postcss:themeprod',
+		'sass:adminprod',
+		'postcss:adminprod',
+		'makepot',
+		'copy:main',
+		'compress:main'
 	]);
 
 };

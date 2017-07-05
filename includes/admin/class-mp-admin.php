@@ -83,7 +83,7 @@ class MP_Admin {
 		?>
 		<div class="update-nag mp-deprecated-notice">
 		<div class="mp-notice-text">
-		<?php echo sprintf(__("The following payment gateways have been deprecated, Cubepoints, Bitpay, iDEAL, Skrill, Google Checkout. If you were using one of these gateways, please setup a new payment gateway <a href=\"%s\">here</a>.","marketpress"),admin_url('admin.php?page=store-settings-payments')) ?>
+		<?php echo sprintf(__("The following payment gateways have been deprecated, Cubepoints, Bitpay, iDEAL, Skrill, Google Checkout. If you were using one of these gateways, please setup a new payment gateway <a href=\"%s\">here</a>.","mp"),admin_url('admin.php?page=store-settings-payments')) ?>
 		</div>
 		<a href="#" class="mp-dismissed-deprecated-notice"><i class="dashicons dashicons-no-alt"></i></a>
 		</div>
@@ -215,7 +215,7 @@ class MP_Admin {
 				$m = isset( $_GET[ 'm' ] ) ? (int) $_GET[ 'm' ] : 0;
 				?>
 				<select name='m'>
-					<option<?php selected( $m, 0 ); ?> value='0'><?php _e( 'Show all dates' ); ?></option>
+					<option<?php selected( $m, 0 ); ?> value='0'><?php _e( 'Show all dates', 'mp' ); ?></option>
 					<?php
 					foreach ( $months as $arc_row ) {
 						if ( 0 == $arc_row->year )
@@ -349,16 +349,16 @@ class MP_Admin {
 
 		$messages[ $post_type ] = array(
 			0	 => '', // Unused. Messages start at index 1.
-			1	 => sprintf( __( $singular . ' updated. <a href="%s">View ' . strtolower( $singular ) . '</a>' ), esc_url( get_permalink( $post_ID ) ) ),
-			2	 => __( 'Custom field updated.' ),
-			3	 => __( 'Custom field deleted.' ),
-			4	 => __( $singular . ' updated.' ),
-			5	 => isset( $_GET[ 'revision' ] ) ? sprintf( __( $singular . ' restored to revision from %s' ), wp_post_revision_title( (int) $_GET[ 'revision' ], false ) ) : false,
-			6	 => sprintf( __( $singular . ' published. <a href="%s">View ' . strtolower( $singular ) . '</a>' ), esc_url( get_permalink( $post_ID ) ) ),
-			7	 => __( 'Page saved.' ),
-			8	 => sprintf( __( $singular . ' submitted. <a target="_blank" href="%s">Preview ' . strtolower( $singular ) . '</a>' ), esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) ),
-			9	 => sprintf( __( $singular . ' scheduled for: <strong>%1$s</strong>. <a target="_blank" href="%2$s">Preview ' . strtolower( $singular ) . '</a>' ), date_i18n( __( 'M j, Y @ G:i' ), strtotime( $post->post_date ) ), esc_url( get_permalink( $post_ID ) ) ),
-			10	 => sprintf( __( $singular . ' draft updated. <a target="_blank" href="%s">Preview ' . strtolower( $singular ) . '</a>' ), esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) ),
+			1	 => sprintf( __( $singular . ' updated. <a href="%s">View ' . strtolower( $singular ) . '</a>', 'mp' ), esc_url( get_permalink( $post_ID ) ) ),
+			2	 => __( 'Custom field updated.', 'mp' ),
+			3	 => __( 'Custom field deleted.', 'mp' ),
+			4	 => __( $singular . ' updated.', 'mp' ),
+			5	 => isset( $_GET[ 'revision' ] ) ? sprintf( __( $singular . ' restored to revision from %s', 'mp' ), wp_post_revision_title( (int) $_GET[ 'revision' ], false ) ) : false,
+			6	 => sprintf( __( $singular . ' published. <a href="%s">View ' . strtolower( $singular ) . '</a>', 'mp' ), esc_url( get_permalink( $post_ID ) ) ),
+			7	 => __( 'Page saved.', 'mp' ),
+			8	 => sprintf( __( $singular . ' submitted. <a target="_blank" href="%s">Preview ' . strtolower( $singular ) . '</a>', 'mp' ), esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) ),
+			9	 => sprintf( __( $singular . ' scheduled for: <strong>%1$s</strong>. <a target="_blank" href="%2$s">Preview ' . strtolower( $singular ) . '</a>', 'mp' ), date_i18n( 'M j, Y @ G:i', strtotime( $post->post_date ) ), esc_url( get_permalink( $post_ID ) ) ),
+			10	 => sprintf( __( $singular . ' draft updated. <a target="_blank" href="%s">Preview ' . strtolower( $singular ) . '</a>', 'mp' ), esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) ),
 		);
 
 		return $messages;

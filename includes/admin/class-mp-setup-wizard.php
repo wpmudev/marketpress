@@ -332,7 +332,7 @@ class MP_Setup_Wizard {
 				'placeholder' => __( 'Select a Country', 'mp' ),
 				'multiple'    => false,
 				'label'       => array( 'text' => __( 'Base Country', 'mp' ) ),
-				'options'     => array( '' => __( 'Select A Country' ) ) + mp_countries(),
+				'options'     => array( '' => __( 'Select A Country', 'mp' ) ) + mp_countries(),
 				'width'       => 'element',
 				'validation'  => array(
 					'required' => true,

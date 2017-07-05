@@ -714,7 +714,6 @@ class MP_Installer {
 		$default_settings = apply_filters( 'mp_default_settings', mp()->default_settings );
 		$settings         = array_replace_recursive( $default_settings, $old_settings );
 		
-		
 		// Only run the follow scripts if this not a fresh install
 		if ( ! empty( $old_version ) ) {
 			//2.1.4 update
@@ -1275,7 +1274,7 @@ class MP_Installer {
 			
 			$product  = new MP_Product( $post_id );
 			$price    = $product->get_price();
-			
+
 			if( isset( $price['lowest'] ) && ! empty( $price['lowest'] ) ) {
 				update_post_meta( $post_id, 'sort_price', sanitize_text_field( $price['lowest'] ) );
 			} else {

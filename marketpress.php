@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 3.2.3
+Version: 3.2.5
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 Plugin Authors: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonathan Cowher (Incsub), Ricardo Freitas (Incsub), Cvetan Cvetanov (Incsub), Julien Zerbib (Incsub), Sabri Bouchaala (Incsub), Emmanuel Laborin (Incsub)
  */
 
-define( 'MP_VERSION', '3.2.3' );
+define( 'MP_VERSION', '3.2.5' );
 
 class Marketpress {
 
@@ -388,7 +388,7 @@ class Marketpress {
 
 		add_action( 'admin_init', array( &$this, 'variations_admin' ) );
 
-		add_action( 'admin_init', array(&$this, 'mp_admin_init') );
+		add_action( 'admin_init', array( &$this, 'mp_admin_init' ) );
 
 		add_action( 'template_redirect', array( &$this, 'redirect_variation_singles_to_products' ) );
 
@@ -512,11 +512,7 @@ class Marketpress {
 	/**
 	 * Called from WordPress when the admin page init process is invoked.
 	 * @since 3.0
-	 *
-	 * @param none
-	 * @return unknown
 	 */
-
 	function mp_admin_init() {
 		if (is_multisite()) {
 			if (!is_super_admin()) return;
@@ -525,25 +521,26 @@ class Marketpress {
 			add_filter( 'plugin_action_links_'. basename( dirname( __FILE__ ) ) .'/'. basename( __FILE__ ),
 				array(&$this,'mp_plugin_settings_link') );
 		}
+
+		return;
 	}
 
 	/**
 	 * Adds a 'settings' link on the plugin links
 	 * @since 3.0
-	 * @param array default links for this plugin.
-	 * @return array default links including Settings link
+	 * @param array $links links for this plugin.
+	 * @return array $links links including Settings link
 	 */
 
 	function mp_plugin_settings_link( $links ) {
 		$settings_link = '<a href="' . esc_url( admin_url( 'admin.php?page=store-settings' ) ) . '">'
-			. __( 'Settings', 'marketpress' ) .'</a>';
+			. __( 'Settings', 'mp' ) .'</a>';
 		array_unshift( $links, $settings_link );
 
 		return $links;
 	}
 
 	function install_actions() {
-
 		// Install - Add pages button
 		if ( ! empty( $_GET['install_mp_pages'] ) ) {
 			$this->create_pages();
@@ -676,7 +673,9 @@ class Marketpress {
 	 * @since 3.0
 	 * @access public
 	 * @uses $wp_rewrite
+	 * @param $rewrite_rules
 	 * @filter rewrite_rules_array
+	 * @return array
 	 */
 	public function add_rewrite_rules( $rewrite_rules ) {
 		global $wp_rewrite;
@@ -734,7 +733,9 @@ class Marketpress {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @param array $vars
 	 * @filter query_vars
+	 * @return array $vars
 	 */
 	public function add_query_vars( $vars ) {
 		$vars[] = 'mp_variation_id';
@@ -751,6 +752,8 @@ class Marketpress {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @param $url
+	 * @param $post_id
 	 * @filter wp_get_attachment_url
 	 * @return string
 	 */
@@ -792,7 +795,12 @@ class Marketpress {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @param $value
+	 * @param $user_id
+	 * @param $meta_key
+	 * @param $single
 	 * @filter get_user_metadata
+	 * @return array|mixed
 	 */
 	public function get_user_billing_info( $value, $user_id, $meta_key, $single ) {
 		if ( $meta_key != 'mp_billing_info' ) {
@@ -868,6 +876,9 @@ class Marketpress {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @param $method
+	 * @param $args
+	 * @return mixed
 	 */
 	public function __call( $method, $args ) {
 		switch ( $method ) {

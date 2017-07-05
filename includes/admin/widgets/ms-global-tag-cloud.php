@@ -10,7 +10,7 @@ if ( is_multisite() ) {
 
 		function __construct() {
 			$widget_ops = array( 'classname'   => 'mp_widget mp_global_tag_cloud_widget',
-			                     'description' => __( "Displays global most used product tags in cloud format from network MarketPress stores." )
+			                     'description' => __( "Displays global most used product tags in cloud format from network MarketPress stores.", 'mp' )
 			);
 			parent::__construct( 'mp_global_tag_cloud_widget', __( 'Global Product Tag Cloud', 'mp' ), $widget_ops );
 		}
@@ -46,7 +46,7 @@ if ( is_multisite() ) {
 			                                                     'taxonomy' => 'product_tag'
 			) );
 			?>
-			<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ) ?></label>
+			<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:', 'mp' ) ?></label>
 				<input type="text" class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>"
 				       name="<?php echo $this->get_field_name( 'title' ); ?>" value="<?php
 				if ( isset( $instance['title'] ) ) {
