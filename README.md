@@ -9,6 +9,8 @@ All development for Market Press should be done in the `development` branch. Ple
 3. Execute `npm run watch` to start watching changes to CSS and JS files.
 
 ## Npm run options
-`npm run watch` &mdash; Watch for CSS and JS changes\
-`npm run release` &mdash; Prepare CSS, JS and POT files for release\
+`npm run watch` &mdash; Watch for CSS and JS changes
+
+`npm run release` &mdash; Prepare CSS, JS and POT files for release
+
 `npm run build` &mdash; Build packages for both Pro and Free versions (zip files can be found in `build` directory)
