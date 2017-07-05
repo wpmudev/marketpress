@@ -49,7 +49,7 @@ class MP_Store_Settings_Import {
 	 * a taxonomy (usually there is one for tags and categories) - we pass it on to wordpress importer. If no
 	 * texonomy is found, that means it is an attribute for a variable product and we need to add it manually.
 	 *
-	 * @since  3.2.5
+	 * @since  3.2.4
 	 * @param  array $terms  Array of WP_Term objects.
 	 * @return array $terms  Array of WP_Term objects.
 	 */
@@ -85,7 +85,7 @@ class MP_Store_Settings_Import {
 	 * During import these posts will be treated as duplicates and not be imported. We need to manually add them
 	 * to the database.
 	 *
-	 * @since  3.2.5
+	 * @since  3.2.4
 	 * @param  int   $post_exists  Post ID, or 0 if post did not exist.
 	 * @param  array $post         The post array to be inserted.
 	 * @return int   $post_exists  Post ID, or 0 if post did not exist.
@@ -104,7 +104,7 @@ class MP_Store_Settings_Import {
 	/**
 	 * Process attributes for variable products.
 	 *
-	 * @since  3.2.5
+	 * @since  3.2.4
 	 * @param  array  $metakeys  Post meta data.
 	 * @param  int    $post_id   Post ID.
 	 * @return array
@@ -522,7 +522,7 @@ function wxr_authors_list( array $post_ids = null ) {
 /**
  * Output list of market press product attributes in XML tag format
  *
- * @since 3.2.5
+ * @since 3.2.4
  */
 /*
 function wxr_product_attributes() {

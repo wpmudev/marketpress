@@ -150,9 +150,12 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 
 == Changelog ==
 
-= 3.2.5 =
+= 3.2.4 =
 * Added: Password check for password-protected products
 * Added: Settings link on the Plugins page
+* Added: Multi-file uploa field type
+* Added: Addon to enable product multiple files
+* Added: File list incase the product files are more than one
 * Fixed: When editing variable products, do not update price if it is not set
 * Fixed: Checkout page (sections not opening, inability to continue checkout without inputing zip code, notices on checkout page)
 * Fixed: Coupons could not be applied to cart when date format was set to d/m/Y
@@ -161,11 +164,6 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 * Fixed: Various small bug fixes and improvements
 * Changed: Simplify will now show message if the payment is declined
 * Updated: WePay Payment gateway to use the latest v3 API with the 'address.postal_code' attribute
-
-= 3.2.4 =
-* Added: Multi-file uploa field type
-* Added: Addon to enable product multiple files
-* Added: File list incase the product files are more than one
 * Refactored: Download code to cater for multiple files via a prameter
 
 = 3.2.3 =
