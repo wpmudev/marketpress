@@ -85,15 +85,15 @@ class MP_Public {
 			$classes[] = 'mp-tag';
 		}
 
-		if ( is_page( $settings['pages']['cart'] ) ) {
+		if ( isset( $settings['pages']['cart'] ) && is_page( $settings['pages']['cart'] ) ) {
 			$classes[] = 'mp-cart';
 		}
 
-		if ( is_page( $settings['pages']['checkout'] ) ) {
+		if ( isset( $settings['pages']['checkout'] ) && is_page( $settings['pages']['checkout'] ) ) {
 			$classes[] = 'mp-checkout';
 		}
 
-		if ( is_page( $settings['pages']['order_status'] ) ) {
+		if ( isset( $settings['pages']['order_status'] ) && is_page( $settings['pages']['order_status'] ) ) {
 			$classes[] = 'mp-order-status';
 		}
 

@@ -192,7 +192,7 @@ class MP_PDF_Invoice_Addon {
 	public function view_settings() {
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'          => 'mp-invoice-pdf-general-metabox',
-			'title'       => __( 'General Settings' ),
+			'title'       => __( 'General Settings', 'mp' ),
 			'page_slugs'  => array( 'store-settings-addons' ),
 			'option_name' => 'mp_settings',
 		) );
@@ -223,7 +223,7 @@ class MP_PDF_Invoice_Addon {
 
 		$metabox   = new WPMUDEV_Metabox( array(
 			'id'          => 'mp-invoice-pdf-template-metabox',
-			'title'       => __( 'Template Settings' ),
+			'title'       => __( 'Template Settings', 'mp' ),
 			'page_slugs'  => array( 'store-settings-addons' ),
 			'option_name' => 'mp_settings',
 		) );

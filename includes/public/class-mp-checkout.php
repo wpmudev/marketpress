@@ -1631,10 +1631,10 @@ try{
 		}
 
 		//echo or return
-		if ( $echo ) {
+		if ( $echo && isset( $js ) ) {
 			echo $js;
 		}
-		else{
+		elseif ( isset( $js ) ) {
 			return $js;
 		}
 	}

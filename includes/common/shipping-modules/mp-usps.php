@@ -281,7 +281,7 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 									?>
 									<?php _e( '@ Max', 'mp' ); ?> <input type="text" size="1"
 									                                     name="mp[shipping][usps][flat_weights][<?php echo $service; ?>]"
-									                                     value="<?php esc_attr_e( $max_weight ); ?>"/>
+									                                     value="<?php esc_attr_e( $max_weight, 'mp' ); ?>"/>
 									<?php echo $this->_get_units_weight(); ?>
 								<?php endif; ?>
 
@@ -315,7 +315,7 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 									?>
 									<?php _e( '@ Max', 'mp' ); ?> <input type="text" size="1"
 									                                     name="mp[shipping][usps][flat_weights][<?php echo $service; ?>]"
-									                                     value="<?php esc_attr_e( $max_weight ); ?>"/>
+									                                     value="<?php esc_attr_e( $max_weight, 'mp' ); ?>"/>
 									<?php echo $this->_get_units_weight(); ?>
 								<?php endif; ?>
 

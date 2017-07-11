@@ -102,7 +102,7 @@ class MP_Products_Screen {
 				'hierarchical'    => 1,
 				'show_count'      => 0,
 				'orderby'         => 'name',
-				'selected'        => $wp_query->query['cat'],
+				'selected'        => isset( $wp_query->query['cat'] ) ? $wp_query->query['cat'] : '',
 			);
 			wp_dropdown_categories( $dropdown_options );
 		}
@@ -316,8 +316,9 @@ class MP_Products_Screen {
 		if( ! empty( $sale_price_array ) && $sale_price_array > 0 && ! empty( $has_sale ) ) {
 			update_post_meta( $post_id, 'sort_price', $sale_price_array );
 		} else {
-                        $sort_price = ( 'inline-save' === $action ) ? $price : $regular_price;
-			update_post_meta( $post_id, 'sort_price', $sort_price );
+            $sort_price = ( 'inline-save' === $action ) ? $price : $regular_price;
+            if ( ! empty( $sort_price ) )
+			    update_post_meta( $post_id, 'sort_price', $sort_price );
 		}
 
 		update_post_meta( $post_id, 'featured', empty( $featured ) ? 0 : 1 );
@@ -1185,7 +1186,7 @@ class MP_Products_Screen {
 		}
 
 		if ( ! current_user_can( 'edit_products' ) )
-			wp_die( __( 'Cheatin&#8217; uh?' ) );
+			wp_die( __( 'Cheatin&#8217; uh?', 'mp' ) );
 
 
 		$variation_names     = mp_get_post_value( 'product_attributes_categories', array() );
@@ -1335,7 +1336,6 @@ class MP_Products_Screen {
 	}
 
 	public function save_product_variations_parent_data( $value, $post_id, $field ) {
-
 	}
 
 	/**
@@ -1517,7 +1517,7 @@ WHERE $delete_where"
 
 		$metabox = new WPMUDEV_Metabox( apply_filters( 'mp_metabox_array_mp-product-price-inventory-variants-metabox', array(
 			'id'        => 'mp-product-price-inventory-variants-metabox',
-			'title'     => $has_variations ? __( 'Product Variations' ) : sprintf( __( '%1$sPrice, Inventory & Variants%2$s %3$sSet price, manage inventory and create Product Variants (if appropriate for your product).%2$s', 'mp' ), '<span class="mp_meta_section_title">', '</span>', '<span class="mp_meta_bellow_desc">' ),
+			'title'     => $has_variations ? __( 'Product Variations', 'mp' ) : sprintf( __( '%1$sPrice, Inventory & Variants%2$s %3$sSet price, manage inventory and create Product Variants (if appropriate for your product).%2$s', 'mp' ), '<span class="mp_meta_section_title">', '</span>', '<span class="mp_meta_bellow_desc">' ),
 			'post_type' => MP_Product::get_post_type(),
 			'context'   => 'normal',
 		) ) );
@@ -1829,10 +1829,10 @@ WHERE $delete_where"
 				'class'       => 'mp_variations_box'
 			), $has_variations ) );
 		}
-        
+
 		//Modified: Added filter to allow for changing of the file type to multiple
 		//This is set when the multiple file type Addon is enabled
-		$metabox->add_field( apply_filters( 'mp_product_file_url_type','file' ), 
+		$metabox->add_field( apply_filters( 'mp_product_file_url_type','file' ),
 			apply_filters( 'mp_add_field_array_file_url', array(
 				'name'         	=> 'file_url',
 				'label'        	=> array( 'text' => __( 'File URL', 'mp' ) ),
@@ -1851,7 +1851,7 @@ WHERE $delete_where"
 					),
 				),
 				'class'        	=> 'mp-product-field-50 mp-blank-bg'
-			)) 
+			))
 		);
 
 		$metabox->add_field( 'text', apply_filters( 'mp_add_field_array_external_url', array(
