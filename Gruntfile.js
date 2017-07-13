@@ -227,6 +227,15 @@ module.exports = function(grunt) {
 		'watch'
 	]);
 
+	grunt.registerTask('css', [
+		'sass:frontdev',
+		'sass:themedev',
+		'sass:admindev',
+		'postcss:frontprod',
+		'postcss:themeprod',
+		'postcss:adminprod'
+	]);
+
 	// Grunt task to compress CSS files
 	grunt.registerTask('ccss', [
 		'sass:frontprod',

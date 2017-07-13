@@ -7,3 +7,4 @@ build/
 tmp/
 node_modules
 package-plugin
+package-lock.json
