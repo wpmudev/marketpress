@@ -1,14 +1,18 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 3.2.4
-Plugin URI: https://premium.wpmudev.org/project/e-commerce/
+Plugin URI:  https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
-Author: WPMU DEV
-Author URI: http://premium.wpmudev.org
+Version:     3.2.4
+Author:      WPMU DEV
+Author URI:  http://premium.wpmudev.org
 Text Domain: mp
-WDP ID: 144
+WDP ID:      144
 
+@package Marketpress
+*/
+
+/*
 Copyright 2009-2015 Incsub (http://incsub.com)
 
 This program is free software; you can redistribute it and/or modify
@@ -25,10 +29,13 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 
 Plugin Authors: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonathan Cowher (Incsub), Ricardo Freitas (Incsub), Cvetan Cvetanov (Incsub), Julien Zerbib (Incsub), Sabri Bouchaala (Incsub), Emmanuel Laborin (Incsub)
- */
+*/
 
 define( 'MP_VERSION', '3.2.4' );
 
+/**
+ * Main class Marketpress.
+ */
 class Marketpress {
 
 	/**
@@ -76,6 +83,12 @@ class Marketpress {
 	 * @var string
 	 */
 	private $_plugin_dir = null;
+
+	/**
+	 * Refers to the plugin title.
+	 *
+	 * @var string
+	 */
 	public $plugin_title = null;
 
 	/**
@@ -99,7 +112,7 @@ class Marketpress {
 	 * @since 3.0
 	 * @access private
 	 *
-	 * @param string $path (optional) Will be appended onto the base directory
+	 * @param string $path (optional) Will be appended onto the base directory.
 	 *
 	 * @return string
 	 */
@@ -113,11 +126,10 @@ class Marketpress {
 	 * @since 3.0
 	 * @access private
 	 *
-	 * @param string $path (optional) Will be appended onto the base directory
+	 * @param string $path (optional) Will be appended onto the base directory.
 	 *
 	 * @return string
 	 */
-
 	public function plugin_url( $path = '' ) {
 		return $this->_plugin_url . ltrim( $path, '/' );
 	}
@@ -133,7 +145,7 @@ class Marketpress {
 		global $wp_version;
 
 
-//! Register product_category taxonomy
+		// Register product_category taxonomy.
 		register_taxonomy( 'product_category', MP_Product::get_post_type(), apply_filters( 'mp_register_product_category', array(
 			'hierarchical'      => true,
 			'labels'            => array(
@@ -157,7 +169,7 @@ class Marketpress {
 				'manage_terms' => 'manage_product_categories',
 				'edit_terms'   => 'manage_product_categories',
 				'delete_terms' => 'manage_product_categories',
-				'assign_terms' => 'edit_products'
+				'assign_terms' => 'edit_products',
 			),
 			'show_ui'           => true,
 			'show_admin_column' => true,
@@ -167,7 +179,7 @@ class Marketpress {
 			),
 		) ) );
 
-//! Register product_tag taxonomy
+		// Register product_tag taxonomy.
 		register_taxonomy( 'product_tag', MP_Product::get_post_type(), apply_filters( 'mp_register_product_tag', array(
 			'hierarchical'      => false,
 			'labels'            => array(
@@ -191,7 +203,7 @@ class Marketpress {
 				'manage_terms' => 'manage_product_tags',
 				'edit_terms'   => 'manage_product_tags',
 				'delete_terms' => 'manage_product_tags',
-				'assign_terms' => 'edit_products'
+				'assign_terms' => 'edit_products',
 			),
 			'show_admin_column' => true,
 			'show_ui'           => true,
@@ -201,7 +213,7 @@ class Marketpress {
 			),
 		) ) );
 
-//! Register product post type
+		// Register product post type.
 		register_post_type( MP_Product::get_post_type(), apply_filters( 'mp_register_post_type', array(
 			'labels'             => array(
 				'name'               => __( 'Products', 'mp' ),
@@ -217,7 +229,7 @@ class Marketpress {
 				'search_items'       => __( 'Search Products', 'mp' ),
 				'not_found'          => __( 'No Products Found', 'mp' ),
 				'not_found_in_trash' => __( 'No Products found in Trash', 'mp' ),
-				'view'               => __( 'View Product', 'mp' )
+				'view'               => __( 'View Product', 'mp' ),
 			),
 			'description'        => __( 'Products for your e-commerce store.', 'mp' ),
 			'public'             => true,
@@ -229,7 +241,7 @@ class Marketpress {
 			'map_meta_cap'       => true,
 			'rewrite'            => array(
 				'slug'       => rtrim( mp_store_page_uri( 'products', false ), '/' ),
-				'with_front' => false
+				'with_front' => false,
 			),
 			'query_var'          => true,
 			'supports'           => array(
@@ -246,7 +258,7 @@ class Marketpress {
 			),
 		) ) );
 
-//! Register mp_order post type
+		// Register mp_order post type.
 		register_post_type( 'mp_order', apply_filters( 'mp_register_post_type_mp_order', array(
 			'labels'          => array(
 				'name'               => __( 'Orders', 'mp' ),
@@ -266,7 +278,9 @@ class Marketpress {
 			'show_ui'         => true,
 			'show_in_menu'    => false,
 			'capability_type' => array( 'store_order', 'store_orders' ),
-			'capabilities'    => array( 'create_posts' => 'do_not_allow' ), // Temporarily disable creating order from admin
+			'capabilities'    => array(
+				'create_posts' => 'do_not_allow',
+			), // Temporarily disable creating order from admin.
 			'map_meta_cap'    => true,
 			'hierarchical'    => false,
 			'rewrite'         => false,
@@ -274,12 +288,12 @@ class Marketpress {
 			'supports'        => array( '' ),
 		) ) );
 
-//! Register product_variation post type
+		// Register product_variation post type.
 		register_post_type( MP_Product::get_variations_post_type(), array(
 			'public'             => false,
 			'show_ui'            => true,
-			'show_in_nav_menus'	 => false,
-			'show_in_menu'		 => false,
+			'show_in_nav_menus'  => false,
+			'show_in_menu'       => false,
 			'show_in_admin_bar'  => false,
 			'publicly_queryable' => true,
 			'hierarchical'       => true,
@@ -288,33 +302,37 @@ class Marketpress {
 			'supports'           => array(),
 		) );
 
-//! Register custom post statuses for our orders
+		// Register custom post statuses for our orders.
 		register_post_status( 'order_received', array(
 			'label'       => __( 'Received', 'mp' ),
+			/* translators: %s: orders received */
 			'label_count' => _n_noop( 'Received <span class="count">(%s)</span>', 'Received <span class="count">(%s)</span>', 'mp' ),
 			'post_type'   => 'mp_order',
-			'public'      => false
+			'public'      => false,
 		) );
 		register_post_status( 'order_paid', array(
 			'label'       => __( 'Paid', 'mp' ),
+			/* translators: %s: paid orders */
 			'label_count' => _n_noop( 'Paid <span class="count">(%s)</span>', 'Paid <span class="count">(%s)</span>', 'mp' ),
 			'post_type'   => 'mp_order',
-			'public'      => false
+			'public'      => false,
 		) );
 		register_post_status( 'order_shipped', array(
 			'label'       => __( 'Shipped', 'mp' ),
+			/* translators: %s: shipped orders */
 			'label_count' => _n_noop( 'Shipped <span class="count">(%s)</span>', 'Shipped <span class="count">(%s)</span>', 'mp' ),
 			'post_type'   => 'mp_order',
-			'public'      => false
+			'public'      => false,
 		) );
 		register_post_status( 'order_closed', array(
 			'label'       => __( 'Closed', 'mp' ),
+			/* translators: %s: orders closed */
 			'label_count' => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>', 'mp' ),
 			'post_type'   => 'mp_order',
-			'public'      => false
+			'public'      => false,
 		) );
 
-// register product attributes
+		// Register product attributes.
 		MP_Product_Attributes::get_instance()->register();
 	}
 
@@ -325,10 +343,6 @@ class Marketpress {
 	 * @access public
 	 */
 	public function load_plugins() {
-		/* if ( mp_get_setting( 'disable_cart' ) ) {
-		  return;
-		  } */
-
 		require_once $this->plugin_dir( 'includes/common/shipping-modules/class-mp-shipping-api.php' );
 		require_once $this->plugin_dir( 'includes/common/shipping-modules/class-mp-shipping-api-calculated.php' );
 		mp_include_dir( $this->plugin_dir( 'includes/common/shipping-modules' ) );
@@ -336,9 +350,9 @@ class Marketpress {
 
 		require_once $this->plugin_dir( 'includes/common/payment-gateways/class-mp-gateway-api.php' );
 		mp_include_dir( $this->plugin_dir( 'includes/common/payment-gateways' ) );
-        
+
         do_action( 'marketpress/load_plugins/mp_include' );
-        
+
 		MP_Gateway_API::load_active_gateways();
 	}
 
@@ -349,37 +363,37 @@ class Marketpress {
 	 * @access private
 	 */
 	private function __construct() {
-// Init variables
+		// Init variables.
 		$this->_init_vars();
 
-// Include constants
+		// Include constants.
 		require_once $this->plugin_dir( 'includes/common/constants.php' );
 
-// Includes
+		// Includes.
 		add_action( 'init', array( &$this, 'includes' ), -1 );
 
-// Load gateway/shipping plugins
+		// Load gateway/shipping plugins.
 		add_action( 'init', array( &$this, 'load_plugins' ), 2 );
 
-// Register system addons
+		// Register system addons.
 		add_action( 'init', array( &$this, 'register_addons' ), 2 );
 
-// Setup custom types
+		// Setup custom types.
 		add_action( 'init', array( &$this, 'register_custom_types' ), 1 );
 
-// Maybe flush rewrites
+		// Maybe flush rewrites.
 		add_action( 'init', array( &$this, 'maybe_flush_rewrites' ), 99 );
 
-// Fix insecure images
+		// Fix insecure images.
 		add_filter( 'wp_get_attachment_url', array( &$this, 'fix_insecure_images' ), 10, 2 );
 
-// Setup rewrite rules
+		// Setup rewrite rules.
 		add_filter( 'rewrite_rules_array', array( &$this, 'add_rewrite_rules' ) );
 
-// Add custom query vars
+		// Add custom query vars.
 		add_filter( 'query_vars', array( &$this, 'add_query_vars' ) );
 
-// Filter billing info user meta
+		// Filter billing info user meta.
 		add_filter( 'get_user_metadata', array( &$this, 'get_user_billing_info' ), 10, 4 );
 
 		add_action( 'admin_print_styles', array( &$this, 'add_notices' ) );
@@ -401,14 +415,19 @@ class Marketpress {
 		$this->localization();
 	}
 
+	/**
+	 * Add menus.
+	 */
 	function add_menu_items() {
 		add_submenu_page( 'edit.php?post_type=' . MP_Product::get_post_type(), __( 'Add a Product', 'mp' ), __( 'Add a Product', 'mp' ), apply_filters( 'mp_add_new_product_capability', 'manage_options' ), 'post-new.php?post_type=' . MP_Product::get_post_type() );
 	}
 
+	/**
+	 * Localization.
+	 */
 	function localization() {
-		// Load up the localization file if we're using WordPress in a different language
-		// Place it in this plugin's "languages" folder and name it "mp-[value in wp-config].mo"
-
+		// Load up the localization file if we're using WordPress in a different language.
+		// Place it in this plugin's "languages" folder and name it "mp-[value in wp-config].mo".
 		$mu_plugins = wp_get_mu_plugins();
 		$lang_dir   = dirname( plugin_basename( $this->_plugin_file ) ) . '/languages/';
 
@@ -419,11 +438,20 @@ class Marketpress {
 		}
 	}
 
+	/**
+	 * Load widgets.
+	 */
 	function load_widgets() {
 		if ( ! function_exists( 'is_plugin_active_for_network' ) ) {
 			require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
 		}
+
 		if ( ! function_exists( 'mp_get_plugin_slug' ) ) {
+			/**
+			 * Get plugin slug.
+			 *
+			 * @return string
+			 */
 			function mp_get_plugin_slug() {
 				if ( file_exists( dirname( __FILE__ ) . '/includes/admin/dash-notice/wpmudev-dash-notification.php' ) ) {
 					return 'marketpress/marketpress.php';
@@ -432,12 +460,18 @@ class Marketpress {
 				}
 			}
 		}
+
 		if ( ! function_exists( 'mp_is_main_site' ) ) {
+			/**
+			 * Check if mp is main site.
+			 *
+			 * @return bool
+			 */
 			function mp_is_main_site() {
 				global $wpdb;
 
 				if ( MP_ROOT_BLOG !== false ) {
-					return $wpdb->blogid == MP_ROOT_BLOG;
+					return MP_ROOT_BLOG === $wpdb->blogid;
 				} else {
 					return is_main_site();
 				}
@@ -448,10 +482,10 @@ class Marketpress {
 		require_once( $this->plugin_dir( 'includes/admin/widgets/product-list.php' ) );
 		require_once( $this->plugin_dir( 'includes/admin/widgets/product-tag-cloud.php' ) );
 
-		//Multisite Widgets
+		// Multisite Widgets.
 		if ( is_multisite() && is_plugin_active_for_network( mp_get_plugin_slug() ) ) {
 			$settings = get_site_option( 'mp_network_settings', array() );
-			if ( ( isset($settings['main_blog']) && mp_is_main_site() ) || isset($settings['main_blog']) && !$settings['main_blog'] ) {
+			if ( ( isset( $settings['main_blog'] ) && mp_is_main_site() ) || isset( $settings['main_blog'] ) && ! $settings['main_blog'] ) {
 				require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-product-list.php' ) );
 				require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-tag-cloud.php' ) );
 				require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-categories.php' ) );
@@ -459,15 +493,29 @@ class Marketpress {
 		}
 	}
 
+	/**
+	 * Post thumbnail for HTML5.
+	 *
+	 * @param string $html               HTML code.
+	 * @param int    $post_id            Post ID.
+	 * @param int    $post_thumbnail_id  Post thumbnail ID.
+	 * @param int    $size               Thumbnail size.
+	 * @param mixed  $attr               Attributes.
+	 *
+	 * @return mixed
+	 */
 	function post_thumbnail_html5( $html, $post_id, $post_thumbnail_id, $size, $attr ) {
 		$post_type = get_post_type( $post_id );
-		if ( class_exists( 'MP_Product' ) && ( $post_type == MP_Product::get_post_type() || $post_type == MP_Product::get_variations_post_type() ) ) {
-			$html = str_replace( "/>", ">", $html );
+		if ( class_exists( 'MP_Product' ) && ( MP_Product::get_post_type() === $post_type || MP_Product::get_variations_post_type() === $post_type ) ) {
+			$html = str_replace( '/>', '>', $html );
 		}
 
 		return $html;
 	}
 
+	/**
+	 * Redirect variation singles to products.
+	 */
 	function redirect_variation_singles_to_products() {
 		global $post;
 		if ( ! is_singular( MP_Product::get_variations_post_type() ) ) {
@@ -475,13 +523,15 @@ class Marketpress {
 		} else {
 			$product_id = wp_get_post_parent_id( $post->ID );
 			$url        = get_permalink( $product_id );
-			wp_redirect( $url );
+			wp_safe_redirect( $url );
 			exit;
 		}
 	}
 
+	/**
+	 * Variations admin.
+	 */
 	function variations_admin() {
-
 		// Get the Post ID.
 		$post_id = isset( $_GET['post'] ) ? (int) $_GET['post'] : ( isset( $_POST['post_ID'] ) ? (int) $_POST['post_ID'] : '' );
 
@@ -489,20 +539,25 @@ class Marketpress {
 			return;
 		}
 
-		if ( get_post_type( $post_id ) == MP_Product::get_variations_post_type() ) {
+		if ( get_post_type( $post_id ) === MP_Product::get_variations_post_type() ) {
 			remove_post_type_support( MP_Product::get_variations_post_type(), 'title' );
 			add_action( 'add_meta_boxes', array( &$this, 'mp_product_variation_metaboxes' ) );
 		}
 	}
 
+	/**
+	 * Product variation metaboxes.
+	 *
+	 * @return string
+	 */
 	function mp_product_variation_metaboxes() {
 		$post_id = isset( $_GET['post'] ) ? (int) $_GET['post'] : ( isset( $_POST['post_ID'] ) ? (int) $_POST['post_ID'] : '' );
-		if ( $post_id !== '' ) {
+		if ( '' !== $post_id ) {
 			ob_start();
 			$variation_title = get_post_meta( $post_id, 'name', true );
 			?>
 			<input type="hidden" name="variation_title" id="variation_title"
-			       value="<?php echo esc_attr( $variation_title ); ?>"/>
+					value="<?php echo esc_attr( $variation_title ); ?>"/>
 			<?php
 
 			return ob_get_clean();
@@ -511,49 +566,56 @@ class Marketpress {
 
 	/**
 	 * Called from WordPress when the admin page init process is invoked.
+	 *
 	 * @since 3.0
 	 */
 	function mp_admin_init() {
-		if (is_multisite()) {
-			if (!is_super_admin()) return;
-			if (!is_network_admin()) return;
-		} else if (current_user_can( 'manage_store_settings' )) {
-			add_filter( 'plugin_action_links_'. basename( dirname( __FILE__ ) ) .'/'. basename( __FILE__ ),
-				array(&$this,'mp_plugin_settings_link') );
+		if ( is_multisite() ) {
+			if ( ! is_super_admin() || ! is_network_admin() ) {
+				return;
+			}
+		} elseif ( current_user_can( 'manage_store_settings' ) ) {
+			add_filter( 'plugin_action_links_' . basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ),
+				array( &$this,'mp_plugin_settings_link' )
+			);
 		}
-
-		return;
 	}
 
 	/**
-	 * Adds a 'settings' link on the plugin links
+	 * Adds a 'settings' link on the plugin links.
+	 *
 	 * @since 3.0
 	 * @param array $links links for this plugin.
 	 * @return array $links links including Settings link
 	 */
-
 	function mp_plugin_settings_link( $links ) {
 		$settings_link = '<a href="' . esc_url( admin_url( 'admin.php?page=store-settings' ) ) . '">'
-			. __( 'Settings', 'mp' ) .'</a>';
+			. __( 'Settings', 'mp' ) . '</a>';
 		array_unshift( $links, $settings_link );
 
 		return $links;
 	}
 
+	/**
+	 * Install actions.
+	 */
 	function install_actions() {
-		// Install - Add pages button
+		// Install - Add pages button.
 		if ( ! empty( $_GET['install_mp_pages'] ) ) {
 			$this->create_pages();
 
-			// We no longer need to install pages
+			// We no longer need to install pages.
 			update_option( 'mp_needs_pages', 0 );
 
-			// Settings redirect
-			wp_redirect( admin_url( 'admin.php?page=store-setup-wizard&quick_setup_step=2&mp_pages_created' ) );
+			// Settings redirect.
+			wp_safe_redirect( admin_url( 'admin.php?page=store-setup-wizard&quick_setup_step=2&mp_pages_created' ) );
 			exit;
 		}
 	}
 
+	/**
+	 * Create MP pages.
+	 */
 	function create_pages() {
 		$page_store_id = mp_create_store_page( 'store' );
 		//mp_create_store_page('network_store_page');
@@ -574,32 +636,40 @@ class Marketpress {
 		flush_rewrite_rules();
 	}
 
+	/**
+	 * Add notices.
+	 */
 	function add_notices() {
-		/* if ( get_option( 'mp_needs_pages', 1 ) == 1 && $_GET[ 'page' ] !== 'store-settings-presentation' && current_user_can( 'manage_options' ) ) {
-		  add_action( 'admin_notices', array( $this, 'install_notice' ) );
-		  } */
 		if ( isset( $_GET['mp_pages_created'] ) ) {
 			add_action( 'admin_notices', array( $this, 'pages_created_notice' ) );
 		}
 	}
 
+	/**
+	 * Pages created notice.
+	 */
 	function pages_created_notice() {
 		?>
 		<div id="message" class="updated mp-install-notice">
-			<p><?php _e( 'Your pages were created successfully.', 'mp' ); ?></p>
+			<p><?php esc_html_e( 'Your pages were created successfully.', 'mp' ); ?></p>
 		</div>
 		<?php
 	}
 
+	/**
+	 * Install notice.
+	 */
 	function install_notice() {
-// If we have just installed, show a message with the install pages button
-		if ( get_option( 'mp_needs_pages', 1 ) == 1 ) {
+		// If we have just installed, show a message with the install pages button.
+		if ( 1 === get_option( 'mp_needs_pages', 1 ) ) {
 			?>
 			<div id="message" class="updated mp-install-notice">
+				<?php /* translators: %s: plugin title */ ?>
 				<p><?php printf( __( '<strong>Welcome to %s</strong> &#8211; Install pages required by the plugin automatically.', 'mp' ), $this->plugin_title ); ?></p>
 
 				<p class="submit"><a
 						href="<?php echo esc_url( add_query_arg( 'install_mp_pages', 'true', admin_url( 'admin.php?page=store-settings-presentation' ) ) ); ?>"
+						<?php /* translators: %s: plugin title */ ?>
 						class="button-primary"><?php printf( __( 'Install %s Pages', 'mp' ), $this->plugin_title ); ?></a>
 				</p>
 			</div>
@@ -629,7 +699,7 @@ class Marketpress {
 				'class' => 'MP_Prosites_Addon',
 				'path'  => mp_plugin_dir( 'includes/addons/mp-prosites/class-mp-prosites-addon.php' ),
 			) );
-			//auto assign
+			// Auto assign.
 			if ( ! function_exists( 'is_plugin_active_for_network' ) ) {
 				require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
 			}
@@ -643,13 +713,13 @@ class Marketpress {
 
 		mp_register_addon( array(
 			'label'        => __( 'Invoice PDF', 'mp' ),
-			'desc'         => __( '', 'mp' ),
+			'desc'         => '',
 			'class'        => 'MP_PDF_Invoice_Addon',
 			'path'         => mp_plugin_dir( 'includes/addons/mp-pdf-invoice/class-mp-pdf-invoice-addon.php' ),
 			'has_settings' => true,
 		) );
 
-		//Multi File Addon
+		// Multi File Addon.
 		mp_register_addon( array(
 			'label'        => __( 'Multiple Downloads', 'mp' ),
 			'desc'         => __( 'Enable multiple downloads per product', 'mp' ),
@@ -668,12 +738,12 @@ class Marketpress {
 	}
 
 	/**
-	 * Add rewrite rules
+	 * Add rewrite rules.
 	 *
-	 * @since 3.0
+	 * @since  3.0
 	 * @access public
-	 * @uses $wp_rewrite
-	 * @param $rewrite_rules
+	 * @uses   $wp_rewrite
+	 * @param  array $rewrite_rules  Rewrite rules.
 	 * @filter rewrite_rules_array
 	 * @return array
 	 */
@@ -698,17 +768,17 @@ class Marketpress {
 			$rewrite_rules      = array_merge( $page_rewrite_rules, $rewrite_rules );
 		}
 
-// Product variations
+		// Product variations.
 		if ( $post_id = mp_get_setting( 'pages->products' ) ) {
 			$uri                                                = get_page_uri( $post_id );
 			$new_rules[ $uri . '/([^/]+)/variation/([^/]+)/?' ] = 'index.php?' . MP_Product::get_post_type() . '=$matches[1]&post_type=' . MP_Product::get_post_type() . '&name=$matches[1]&mp_variation_id=$matches[2]';
 		}
 
-// Order status
+		// Order status.
 		if ( $post_id = mp_get_setting( 'pages->order_status' ) ) {
 			$uri = get_page_uri( $post_id );
-			//$new_rules[ $uri . '/([^/]+)/?' ] = 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]';
-			//this rules match the default page rules, so we have to inject it before the page
+			// $new_rules[ $uri . '/([^/]+)/?' ] = 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]';
+			// This rules match the default page rules, so we have to inject it before the page.
 			$rewrite_rules = array_merge( array(
 				$uri . '/([^/]+)/?$' => 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]',
 				$uri . '/page/([^/]+)/?' => 'index.php?pagename=' . $uri . '&mp_status_pagenumber=$matches[1]',
@@ -716,12 +786,12 @@ class Marketpress {
 			), $rewrite_rules );
 		}
 
-// Order confirmation
+		// Order confirmation.
 		if ( $post_id = mp_get_setting( 'pages->checkout' ) ) {
 			$uri = get_page_uri( $post_id );
-			//$new_rules[ $uri . '/confirm/?' ]	 = 'index.php?pagename=' . $uri . '&mp_confirm_order_step=1';
+			// $new_rules[ $uri . '/confirm/?' ]	 = 'index.php?pagename=' . $uri . '&mp_confirm_order_step=1';
 			$rewrite_rules = array_merge( array(
-				$uri . '/confirm/?' => 'index.php?pagename=' . $uri . '&mp_confirm_order_step=1'
+				$uri . '/confirm/?' => 'index.php?pagename=' . $uri . '&mp_confirm_order_step=1',
 			), $rewrite_rules );
 		}
 
@@ -731,9 +801,9 @@ class Marketpress {
 	/**
 	 * Add custom query vars
 	 *
-	 * @since 3.0
+	 * @since  3.0
 	 * @access public
-	 * @param array $vars
+	 * @param  array $vars  Variables.
 	 * @filter query_vars
 	 * @return array $vars
 	 */
@@ -748,17 +818,17 @@ class Marketpress {
 	}
 
 	/**
-	 * Make sure images use https protocol when displaying content over ssl
+	 * Make sure images use https protocol when displaying content over ssl.
 	 *
-	 * @since 3.0
+	 * @since  3.0
 	 * @access public
-	 * @param $url
-	 * @param $post_id
+	 * @param  string $url      URL.
+	 * @param  int    $post_id  Post Id.
 	 * @filter wp_get_attachment_url
 	 * @return string
 	 */
 	public function fix_insecure_images( $url, $post_id ) {
-//Skip file attachments
+		// Skip file attachments.
 		if ( ! wp_attachment_is_image( $post_id ) ) {
 			return $url;
 		}
@@ -771,24 +841,23 @@ class Marketpress {
 	}
 
 	/**
-	 * Maybe flush rewrite rules
+	 * Maybe flush rewrite rules.
 	 *
 	 * @since 3.0
 	 * @access public
 	 * @action init
 	 */
-
 	public function maybe_flush_rewrites() {
 		$flush_rewrites = get_option( 'mp_flush_rewrites_30', 1 );
 
-		if ( $flush_rewrites == 1 ) {
+		if ( 1 === $flush_rewrites ) {
 			flush_rewrite_rules();
 			update_option( 'mp_flush_rewrites_30', 0 );
 		}
 	}
 
 	/**
-	 * Get user billing info
+	 * Get user billing info.
 	 *
 	 * Before 3.0 only shipping info was captured. This function will return the
 	 * shipping info if billing info doesn't exist for the given user.
@@ -796,14 +865,14 @@ class Marketpress {
 	 * @since 3.0
 	 * @access public
 	 * @param $value
-	 * @param $user_id
-	 * @param $meta_key
+	 * @param int    $user_id      User ID.
+	 * @param string $meta_key  Meta key.
 	 * @param $single
 	 * @filter get_user_metadata
 	 * @return array|mixed
 	 */
 	public function get_user_billing_info( $value, $user_id, $meta_key, $single ) {
-		if ( $meta_key != 'mp_billing_info' ) {
+		if ( 'mp_billing_info' !== $meta_key ) {
 			return $value;
 		}
 
@@ -817,10 +886,12 @@ class Marketpress {
 
 		$meta = get_user_meta( $user_id, 'mp_shipping_info', true );
 
-		/* There is a small bug in WP core with the get_user_metadata filter that
-		  will raise a PHP notice if an associative array is returned and $single is
-		  set to true. This is because WP core assumes that the returned array will
-		  be numerically indexed. */
+		/**
+		 * There is a small bug in WP core with the get_user_metadata filter that
+		 * will raise a PHP notice if an associative array is returned and $single is
+		 * set to true. This is because WP core assumes that the returned array will
+		 * be numerically indexed.
+		 */
 
 		return ( $single && is_array( $meta ) ) ? array( $meta ) : $meta;
 	}
@@ -872,7 +943,7 @@ class Marketpress {
 	}
 
 	/**
-	 * Catch deprecated functions
+	 * Catch deprecated functions.
 	 *
 	 * @since 3.0
 	 * @access public
@@ -949,7 +1020,7 @@ class Marketpress {
 				break;
 
 			case 'download_only_cart' :
-//_deprecated_function( $method, '3.0', 'MP_Cart::is_download_only' );
+				//_deprecated_function( $method, '3.0', 'MP_Cart::is_download_only' );
 				$cart = MP_Cart::get_instance();
 				$cart->set_id( $args[0] );
 				$is_download_only = $cart->is_download_only();
@@ -1015,13 +1086,13 @@ class Marketpress {
 	 * @access private
 	 */
 	private function _init_vars() {
-//setup proper directories
+		// Setup proper directories.
 		$this->_plugin_file = __FILE__;
 		$this->_plugin_dir  = plugin_dir_path( __FILE__ );
 		$this->_plugin_url  = plugin_dir_url( __FILE__ );
 		$this->plugin_title = __( 'MarketPress', 'mp' );
 
-//load data structures
+		// Load data structures.
 		require_once $this->plugin_dir( 'includes/common/data.php' );
 
 		/**
