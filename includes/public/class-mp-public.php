@@ -235,7 +235,7 @@ class MP_Public {
 
 	public function frontend_styles() {
 		//Display styles for all pages
-
+		wp_enqueue_style( 'dashicons' );
 		wp_enqueue_style( 'jquery-ui', mp_plugin_url( 'ui/css/jquery-ui.min.css' ), false, MP_VERSION );
 		wp_enqueue_style( 'mp-select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
 		wp_enqueue_style( 'mp-base', mp_plugin_url( 'ui/css/marketpress.css' ), false, MP_VERSION );
