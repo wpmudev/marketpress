@@ -1133,6 +1133,15 @@ function mp_plugin_uninstall() {
 	$table_attr_terms = $wpdb->prefix . 'mp_product_attributes_terms';
 	$sql_attr_terms = "DROP TABLE IF EXISTS $table_attr_terms;";
     $wpdb->query( $sql_attr_terms );
+
+    delete_site_option( 'mp_deprecated_gateway_notice_showed' );
+	delete_site_option( 'mp_flush_rewrites' );
+	delete_site_option( 'mp_flush_rewrites_30' );
+	delete_site_option( 'mp_needs_pages' );
+	delete_site_option( 'mp_needs_quick_setup' );
+	delete_site_option( 'mp_plugin_do_activation_redirect' );
+	delete_site_option( 'mp_settings' );
+	delete_site_option( 'mp_version' );
 }
 
 function mp_plugin_redirect() {
