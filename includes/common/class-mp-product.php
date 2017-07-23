@@ -1481,7 +1481,7 @@ class MP_Product {
 				$tax_rate = mp_get_setting( 'tax->rate', '' );
 			}
 
-			if ( mp_get_setting( 'tax->tax_digital' ) && ! $this->is_download() ) {
+			if ( ! $this->is_download() ) {
 				//Price with Tax added
 				if( $tax_inclusive != 1 && $include_tax_to_price == 1 ) {
 					if( $special_fixed_tax ) {
