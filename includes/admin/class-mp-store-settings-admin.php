@@ -72,6 +72,8 @@ class MP_Store_Settings_Admin {
 			// Product attributes list.
 			add_action( 'store-settings_page_store-settings-productattributes', array( 'MP_Product_Attributes_Admin', 'display_product_attributes' ) );
 		}
+        
+        add_action( 'wpmudev_metabox/after_settings_metabox_saved/mp-settings-presentation-pages-slugs', array( $this, 'reset_store_pages_cache' ) );
 	}
 
 	/**
@@ -294,6 +296,30 @@ class MP_Store_Settings_Admin {
 			</div>
 		</div>
 		<?php
+	}
+    
+    /**
+	 * Resets the store pages ids in wp cache
+	 *
+	 * @since 3.2.5
+	 * @access public
+	 */
+    public function reset_store_pages_cache( $metabox ){
+
+		if( ! $metabox instanceof WPMUDEV_Metabox ){
+			return;
+		}
+
+		$store_pages_ids = array();
+
+		foreach ( $metabox->fields as $field ) {
+			$field_key 			= $field->get_post_key( $field->args['name'] );
+			$value    			= $field->get_post_value( $field_key );
+			$store_pages_ids[] 	= $value;
+		}
+
+		wp_cache_set( 'store_pages_ids', $store_pages_ids, 'marketpress' );
+
 	}
 
 }
