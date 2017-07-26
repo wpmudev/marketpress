@@ -116,7 +116,7 @@ class MP_Store_Settings_General {
 	 * @return string
 	 */
 	public function format_tax_rate_value( $value, $field ) {
-		return ( intval( $value ) * 100);
+		return ( (float)$value * 100 );
 	}
 
 	/**

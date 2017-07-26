@@ -150,6 +150,14 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 
 == Changelog ==
 
+= 3.2.5 =
+* Changed: Removed @import directives for better compatibility with Hummingbird
+* Fixed: Issue with Upfront navigation on single product pages
+* Fixed: Tax rate resetting to 0%
+* Fixed: PHP notices on product pages
+* Fixed: Styles in admin interface
+* Fixed: MarketPress disabling front-end page comments
+
 = 3.2.4 =
 * Added: Password check for password-protected products
 * Added: Settings link on the Plugins page

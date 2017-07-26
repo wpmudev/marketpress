@@ -1704,6 +1704,7 @@ class MP_Product {
 				'start_date' => false,
 				'end_date'   => false,
 				'days_left'  => false,
+				'percentage' => false,
 			),
 		);
 
@@ -1759,6 +1760,7 @@ class MP_Product {
 				'start_date' => $this->get_meta( 'sale_price_start_date', false ),
 				'end_date'   => $this->get_meta( 'sale_price_end_date', false ),
 				'days_left'  => $days_left,
+				'percentage' => $this->get_meta( 'sale_price_percentage', false ),
 			);
 		}
 
