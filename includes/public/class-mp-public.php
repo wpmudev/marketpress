@@ -1,6 +1,17 @@
 <?php
 
 class MP_Public {
+    
+    
+	/**
+	 * Refers to the store page types that MarketPress uses
+	 *
+	 * @since 3.2.5
+	 * @access public
+	 * @var array
+	 */
+
+	public static $supported_store_pages_types = array( 'store', 'products', 'cart', 'checkout', 'order_status' );
 
 	/**
 	 * Refers to a single instance of the class
@@ -121,7 +132,7 @@ class MP_Public {
 	 * @access public
 	 */
 	public function disable_comments_on_store_pages( $open, $post_id ) {
-		if ( get_post_type( $post_id ) == MP_Product::get_post_type() || get_post_meta( $post_id, '_mp_store_page', true ) != '' ) {
+		if( $this->page_in_store_pages( $post_id ) ){
 			$open = false;
 		}
 
@@ -168,6 +179,69 @@ class MP_Public {
 
 			return ( in_array( get_post_meta( get_the_ID(), '_mp_store_page', true ), $page ) );
 		}
+	}
+    
+    /**
+	 * Checks if page is a Product or one of the Store Pages
+	 *
+	 * @since 3.2.5
+	 * @access public
+	 *
+	 * @param int/WP_Post $page
+	 *
+	 * @return bool
+	 */
+	public function page_in_store_pages( $page ){
+
+		$page_id = ! is_null( $page ) ? $page : get_the_ID();
+		
+		if( ! is_numeric( $page_id ) ){
+			if ( $page instanceof WP_Post ) {
+				$page_id = $page->ID;
+			}
+			else{
+				//TODO : Perhaps we should check for slug
+				return false;	
+			}
+		}
+
+		//Consider products as store pages
+		if( get_post_type( $page_id ) == MP_Product::get_post_type() ){
+			return true;
+		}
+
+		//Check if page id exists in store_pages_ids cache
+		if( $store_pages_ids = wp_cache_get( 'store_pages_ids', 'marketpress' ) ){
+			return in_array( $page_id, $store_pages_ids );
+		}
+
+		$store_pages_settings = mp_get_setting( 'pages' );
+		$is_store_page = false;
+		$store_pages_ids = array();
+
+		foreach ( $store_pages_settings as $store_page => $store_page_id ) {
+
+			//We need to check if the page type ( $store_page ) is included in the supported 
+			//store pages types ( 'store', 'products', 'cart', 'checkout', 'order_status' ). 
+			//It is possible that the pages array in the settings to contain a page id with key "none"
+			if( ! in_array( $store_page, self::$supported_store_pages_types ) ){
+				continue;
+			}
+
+			if( $page_id == $store_page_id ){
+				$is_store_page = true;
+			}
+
+			//Set the $store_pages_ids to store in cache
+			$store_pages_ids[] = $store_page_id;
+
+		}
+
+		//Store $store_pages_ids in cache
+		wp_cache_set( 'store_pages_ids', $store_pages_ids, 'marketpress' );
+
+		return $is_store_page;
+
 	}
 
 	/**
