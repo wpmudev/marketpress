@@ -137,7 +137,7 @@ class MP_Public {
 	 * @return string
 	 */
 	public function hide_single_product_title( $title, $id = false, $is_nav = false ) {
-		if ( in_the_loop() && is_main_query() && ! $is_nav ) {
+		if ( ! $is_nav && in_the_loop() && is_single( $id ) ) {
 			$title = '';
 		}
 
@@ -362,7 +362,7 @@ class MP_Public {
 				if ( $variation_id = get_query_var( 'mp_variation_id' ) ) {
 					$variation = new MP_Product( $variation_id );
 
-// Make sure variation actually exists, otherwise trigger a 404 error
+					// Make sure variation actually exists, otherwise trigger a 404 error.
 					if ( ! $variation->exists() ) {
 						$ok = false;
 						$wp_query->set_404();
@@ -373,7 +373,7 @@ class MP_Public {
 					}
 				}
 
-				if ( $ok ) {
+				if ( $ok && $wp_query->is_main_query() ) {
 					add_filter( 'the_title', array( &$this, 'hide_single_product_title' ), 10, 3 );
 					add_filter( 'the_content', array( &$this, 'single_product_content' ) );
 				}
@@ -718,7 +718,7 @@ class MP_Public {
 	 * @return string
 	 */
 	public function single_product_content( $content ) {
-		if ( is_main_query() && in_the_loop() ) {
+		if ( in_the_loop() ) {
 			remove_filter( 'get_post_metadata', array( &$this, 'remove_product_post_thumbnail' ), 999, 4 );
 			remove_filter( 'the_content', array( &$this, 'single_product_content' ) );
 

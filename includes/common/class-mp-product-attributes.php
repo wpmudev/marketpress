@@ -97,7 +97,7 @@ class MP_Product_Attributes {
 		if ( ! empty($where) ) {
 			$where = " WHERE $where";
 		}
-		
+
 		$this->_atts = $wpdb->get_results('SELECT * FROM ' . $this->get_table_name() . $where);
 		return $this->_atts;
 	}
