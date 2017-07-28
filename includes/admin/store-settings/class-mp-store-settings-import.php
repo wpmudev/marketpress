@@ -330,7 +330,7 @@ class MP_Store_Settings_Import {
 			<p>
 				<?php esc_html_e( 'The import process uses the WordPress importer plugin.', 'mp' ); ?>
 			</p>
-			<?php echo $this::get_importer(); ?>
+			<?php echo self::get_importer(); ?>
 			<input type="submit" class="button" name="mp-store-export-products" id="mp-store-export-products" value="<?php esc_attr_e( 'Export products to file', 'mp' ); ?>">
 		</form>
 		<?php

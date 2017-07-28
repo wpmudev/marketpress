@@ -2,16 +2,16 @@
 # This file is distributed under the same license as the MarketPress package.
 msgid ""
 msgstr ""
-"Project-Id-Version: MarketPress 3.2.4\n"
+"Project-Id-Version: MarketPress 3.2.5-beta.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2017-07-05 13:18:33+00:00\n"
+"POT-Creation-Date: 2017-07-26 07:57:37+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2017-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"X-Generator: grunt-wp-i18n 0.5.4\n"
+"X-Generator: grunt-wp-i18n1.0.0\n"
 
 #: includes/addons/class-mp-addons-list-table.php:20
 #: includes/admin/class-mp-product-attributes-admin.php:129
@@ -30,7 +30,7 @@ msgstr ""
 
 #: includes/addons/class-mp-addons-list-table.php:21
 #: includes/admin/class-mp-products-admin.php:2297
-#: includes/common/class-mp-product.php:3026
+#: includes/common/class-mp-product.php:3028
 msgid "Description"
 msgstr ""
 
@@ -76,7 +76,7 @@ msgid_plural "%s add-ons disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/addons/class-mp-addons-list-table.php:128 marketpress.php:537
+#: includes/addons/class-mp-addons-list-table.php:128 marketpress.php:593
 msgid "Settings"
 msgstr ""
 
@@ -275,7 +275,7 @@ msgstr ""
 
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:668
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:679
-#: marketpress.php:208
+#: marketpress.php:220
 msgid "Product"
 msgstr ""
 
@@ -327,7 +327,7 @@ msgstr ""
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:897
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:996
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:999
-#: includes/admin/class-mp-dashboard-widgets.php:305 marketpress.php:618
+#: includes/admin/class-mp-dashboard-widgets.php:305 marketpress.php:688
 msgid "Coupons"
 msgstr ""
 
@@ -365,7 +365,7 @@ msgstr ""
 
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:1003
 #: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-variations.php:258
-#: marketpress.php:214
+#: marketpress.php:226
 msgid "Edit"
 msgstr ""
 
@@ -530,8 +530,8 @@ msgstr ""
 #: includes/admin/class-mp-orders-admin.php:1012
 #: includes/admin/class-mp-products-admin.php:1975
 #: includes/admin/class-mp-products-admin.php:2215
-#: includes/admin/class-mp-store-settings-admin.php:112
-#: includes/admin/class-mp-store-settings-admin.php:228
+#: includes/admin/class-mp-store-settings-admin.php:114
+#: includes/admin/class-mp-store-settings-admin.php:230
 #: includes/common/class-mp-cart.php:712 includes/common/helpers.php:168
 #: includes/common/payment-gateways/_ideal.php:137
 #: includes/common/payment-gateways/_payway.php:116
@@ -677,7 +677,7 @@ msgstr ""
 #: includes/admin/class-mp-orders-admin.php:1041
 #: includes/admin/class-mp-orders-admin.php:1062
 #: includes/common/class-mp-order.php:985
-#: includes/common/payment-gateways/payfast.php:244 marketpress.php:293
+#: includes/common/payment-gateways/payfast.php:244 marketpress.php:307
 msgid "Received"
 msgstr ""
 
@@ -697,7 +697,7 @@ msgstr ""
 #: includes/common/payment-gateways/pin.php:258
 #: includes/common/payment-gateways/simplify.php:181
 #: includes/common/payment-gateways/stripe.php:368
-#: includes/common/payment-gateways/wepay.php:269 marketpress.php:299
+#: includes/common/payment-gateways/wepay.php:269 marketpress.php:314
 msgid "Paid"
 msgstr ""
 
@@ -706,7 +706,7 @@ msgstr ""
 #: includes/admin/class-mp-orders-admin.php:950
 #: includes/admin/class-mp-orders-admin.php:1049
 #: includes/admin/class-mp-orders-admin.php:1064
-#: includes/common/class-mp-order.php:992 marketpress.php:305
+#: includes/common/class-mp-order.php:992 marketpress.php:321
 msgid "Shipped"
 msgstr ""
 
@@ -715,7 +715,7 @@ msgstr ""
 #: includes/admin/class-mp-orders-admin.php:951
 #: includes/admin/class-mp-orders-admin.php:1053
 #: includes/admin/class-mp-orders-admin.php:1065
-#: includes/common/class-mp-order.php:1009 marketpress.php:311
+#: includes/common/class-mp-order.php:1009 marketpress.php:328
 msgid "Closed"
 msgstr ""
 
@@ -1095,7 +1095,7 @@ msgid "Manage"
 msgstr ""
 
 #: includes/admin/class-mp-dashboard-widgets.php:301
-#: includes/admin/class-mp-orders-admin.php:989 marketpress.php:252
+#: includes/admin/class-mp-orders-admin.php:989 marketpress.php:264
 msgid "Orders"
 msgstr ""
 
@@ -1103,8 +1103,8 @@ msgstr ""
 #: includes/common/template-functions.php:173
 #: includes/common/template-functions.php:179
 #: includes/common/template-functions.php:902
-#: includes/multisite/template-functions.php:82 marketpress.php:207
-#: marketpress.php:210
+#: includes/multisite/template-functions.php:82 marketpress.php:219
+#: marketpress.php:222
 msgid "Products"
 msgstr ""
 
@@ -1124,8 +1124,8 @@ msgid "Configure"
 msgstr ""
 
 #: includes/admin/class-mp-dashboard-widgets.php:313
-#: includes/admin/class-mp-store-settings-admin.php:110
-#: includes/admin/class-mp-store-settings-admin.php:220
+#: includes/admin/class-mp-store-settings-admin.php:112
+#: includes/admin/class-mp-store-settings-admin.php:222
 msgid "Presentation"
 msgstr ""
 
@@ -1144,7 +1144,7 @@ msgid "Payment Gateways"
 msgstr ""
 
 #: includes/admin/class-mp-dashboard-widgets.php:317
-#: includes/admin/class-mp-store-settings-admin.php:117
+#: includes/admin/class-mp-store-settings-admin.php:119
 msgid "User Capabilities"
 msgstr ""
 
@@ -1428,17 +1428,17 @@ msgid "You can choose to make this page one of the following core store pages."
 msgstr ""
 
 #: includes/admin/class-mp-product-attributes-admin.php:48
-#: includes/admin/class-mp-store-settings-admin.php:114
+#: includes/admin/class-mp-store-settings-admin.php:116
 msgid "Product Attributes"
 msgstr ""
 
 #: includes/admin/class-mp-product-attributes-admin.php:48
-#: includes/admin/class-mp-store-settings-admin.php:248
+#: includes/admin/class-mp-store-settings-admin.php:250
 msgid "Add Attribute"
 msgstr ""
 
 #: includes/admin/class-mp-product-attributes-admin.php:69
-#: includes/admin/class-mp-store-settings-admin.php:248
+#: includes/admin/class-mp-store-settings-admin.php:250
 msgid "Add Product Attribute"
 msgstr ""
 
@@ -1599,7 +1599,7 @@ msgid "Changes saved successfully"
 msgstr ""
 
 #: includes/admin/class-mp-products-admin.php:1434
-#: includes/common/class-mp-product.php:3010
+#: includes/common/class-mp-product.php:3012
 msgid "Related Products"
 msgstr ""
 
@@ -1732,8 +1732,8 @@ msgstr ""
 
 #: includes/admin/class-mp-products-admin.php:1962
 #: includes/admin/class-mp-products-admin.php:2202
-#: includes/admin/class-mp-store-settings-admin.php:109
-#: includes/admin/class-mp-store-settings-admin.php:264
+#: includes/admin/class-mp-store-settings-admin.php:111
+#: includes/admin/class-mp-store-settings-admin.php:266
 msgid "General"
 msgstr ""
 
@@ -1842,8 +1842,8 @@ msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:304
 #: includes/admin/class-mp-setup-wizard.php:312
-#: includes/admin/class-mp-store-settings-admin.php:127
-#: includes/admin/class-mp-store-settings-admin.php:260
+#: includes/admin/class-mp-store-settings-admin.php:129
+#: includes/admin/class-mp-store-settings-admin.php:262
 msgid "Quick Setup"
 msgstr ""
 
@@ -2713,113 +2713,113 @@ msgstr ""
 msgid "Select a Product"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:108
-#: includes/admin/class-mp-store-settings-admin.php:216
+#: includes/admin/class-mp-store-settings-admin.php:110
+#: includes/admin/class-mp-store-settings-admin.php:218
 msgid "Store Settings"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:109
+#: includes/admin/class-mp-store-settings-admin.php:111
 msgid "Store Settings: General"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:110
+#: includes/admin/class-mp-store-settings-admin.php:112
 msgid "Store Settings: Presentation"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:111
+#: includes/admin/class-mp-store-settings-admin.php:113
 msgid "Store Settings: Notifications"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:111
-#: includes/admin/class-mp-store-settings-admin.php:224
+#: includes/admin/class-mp-store-settings-admin.php:113
+#: includes/admin/class-mp-store-settings-admin.php:226
 msgid "Notifications"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:112
+#: includes/admin/class-mp-store-settings-admin.php:114
 msgid "Store Settings: Shipping"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:113
+#: includes/admin/class-mp-store-settings-admin.php:115
 msgid "Store Settings: Payments"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:113
-#: includes/admin/class-mp-store-settings-admin.php:232
+#: includes/admin/class-mp-store-settings-admin.php:115
+#: includes/admin/class-mp-store-settings-admin.php:234
 msgid "Payments"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:114
+#: includes/admin/class-mp-store-settings-admin.php:116
 msgid "Store Settings: Product Attributes"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:115
+#: includes/admin/class-mp-store-settings-admin.php:117
 msgid "Store Settings: Product Categories"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:115
+#: includes/admin/class-mp-store-settings-admin.php:117
 #: includes/admin/widgets/categories.php:8
 #: includes/admin/widgets/categories.php:18
 #: includes/multisite/class-mp-admin-multisite.php:539
 msgid "Product Categories"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:116
+#: includes/admin/class-mp-store-settings-admin.php:118
 msgid "Store Settings: Product Tags"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:116
+#: includes/admin/class-mp-store-settings-admin.php:118
 #: includes/admin/widgets/product-tag-cloud.php:46
 #: includes/multisite/class-mp-admin-multisite.php:548
 msgid "Product Tags"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:117
+#: includes/admin/class-mp-store-settings-admin.php:119
 msgid "Store Settings: Capabilities"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:121
+#: includes/admin/class-mp-store-settings-admin.php:123
 #: includes/admin/store-settings/class-mp-store-settings-addons.php:121
 msgid "Store Settings: Add Ons"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:121
+#: includes/admin/class-mp-store-settings-admin.php:123
 msgid "Add Ons"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:201
+#: includes/admin/class-mp-store-settings-admin.php:203
 msgid "Product attribute added successfully."
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:202
+#: includes/admin/class-mp-store-settings-admin.php:204
 msgid "Product attribute updated successfully."
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:205
+#: includes/admin/class-mp-store-settings-admin.php:207
 msgid "An appropriate message for key \"%s\" could not be found."
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:236
+#: includes/admin/class-mp-store-settings-admin.php:238
 msgid "Short Codes"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:240
+#: includes/admin/class-mp-store-settings-admin.php:242
 msgid "Importers"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:244
+#: includes/admin/class-mp-store-settings-admin.php:246
 msgid "Exporters"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:248
+#: includes/admin/class-mp-store-settings-admin.php:250
 msgid "Edit Product Attribute %s"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:252
+#: includes/admin/class-mp-store-settings-admin.php:254
 #: includes/admin/store-settings/class-mp-store-settings-capabilities.php:56
 msgid "Capabilities"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:256
+#: includes/admin/class-mp-store-settings-admin.php:258
 msgid "Import/Export"
 msgstr ""
 
@@ -3245,7 +3245,7 @@ msgstr ""
 #: includes/admin/store-settings/class-mp-store-settings-notifications.php:60
 #: includes/admin/store-settings/class-mp-store-settings-notifications.php:91
 #: includes/admin/store-settings/class-mp-store-settings-notifications.php:124
-#: marketpress.php:257
+#: marketpress.php:269
 msgid "New Order"
 msgstr ""
 
@@ -4314,47 +4314,47 @@ msgstr ""
 msgid "(tax incl.)"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1927
+#: includes/common/class-mp-product.php:1929
 msgid ""
 "<p class=\"mp_related_products_empty_message\">There are no related "
 "products for this item.</p>"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2158
+#: includes/common/class-mp-product.php:2160
 msgid "View Larger Image &raquo;"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2423
+#: includes/common/class-mp-product.php:2425
 msgid "Low Product Inventory Notification"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2424
+#: includes/common/class-mp-product.php:2426
 msgid ""
 "This message is being sent to notify you of low stock of a product in your "
 "online store according to your preferences.<br /><br />"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2426
+#: includes/common/class-mp-product.php:2428
 msgid "Product: %s"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2427
+#: includes/common/class-mp-product.php:2429
 msgid "Current Inventory: %s"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2428
+#: includes/common/class-mp-product.php:2430
 msgid "Link: %s<br /><br />"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2430
+#: includes/common/class-mp-product.php:2432
 msgid "Edit Product: %s"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2431
+#: includes/common/class-mp-product.php:2433
 msgid "Notification Preferences: %s"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2808
+#: includes/common/class-mp-product.php:2810
 msgid "Tweet"
 msgstr ""
 
@@ -7326,7 +7326,7 @@ msgid "The Stripe Token was not generated correctly. Please go back and try agai
 msgstr ""
 
 #: includes/common/payment-gateways/stripe.php:332
-#: includes/common/template-functions.php:872 marketpress.php:209
+#: includes/common/template-functions.php:872 marketpress.php:221
 msgid "Store"
 msgstr ""
 
@@ -8702,21 +8702,21 @@ msgstr ""
 msgid "Continue"
 msgstr ""
 
-#: includes/public/class-mp-public.php:510
+#: includes/public/class-mp-public.php:584
 msgid "Sorry, the link is invalid for this download."
 msgstr ""
 
-#: includes/public/class-mp-public.php:515
+#: includes/public/class-mp-public.php:589
 msgid "Sorry, your order has been marked as unpaid."
 msgstr ""
 
-#: includes/public/class-mp-public.php:564
+#: includes/public/class-mp-public.php:638
 msgid ""
 "Sorry, our records show you've downloaded this file %d out of %d times "
 "allowed. Please contact us if you still need help."
 msgstr ""
 
-#: includes/public/class-mp-public.php:621
+#: includes/public/class-mp-public.php:695
 msgid ""
 "Whoops, there was a problem loading up this file for your download. Please "
 "contact us for help."
@@ -9075,241 +9075,247 @@ msgstr ""
 msgid "Please fix the %s1 and then try submitting the form again."
 msgstr ""
 
-#: marketpress.php:142
+#: marketpress.php:154
 msgid "All Product Categories"
 msgstr ""
 
-#: marketpress.php:143
+#: marketpress.php:155
 msgid "Edit Product Category"
 msgstr ""
 
-#: marketpress.php:144
+#: marketpress.php:156
 msgid "View Product Category"
 msgstr ""
 
-#: marketpress.php:145
+#: marketpress.php:157
 msgid "Update Product Category"
 msgstr ""
 
-#: marketpress.php:146
+#: marketpress.php:158
 msgid "Add New Product Category"
 msgstr ""
 
-#: marketpress.php:147
+#: marketpress.php:159
 msgid "New Product Category Name"
 msgstr ""
 
-#: marketpress.php:148
+#: marketpress.php:160
 msgid "Parent Product Category"
 msgstr ""
 
-#: marketpress.php:149
+#: marketpress.php:161
 msgid "Parent Product Category:"
 msgstr ""
 
-#: marketpress.php:150
+#: marketpress.php:162
 msgid "Search Product Categories"
 msgstr ""
 
-#: marketpress.php:151
+#: marketpress.php:163
 msgid "Separate product categories with commas"
 msgstr ""
 
-#: marketpress.php:152
+#: marketpress.php:164
 msgid "Add or remove product categories"
 msgstr ""
 
-#: marketpress.php:153
+#: marketpress.php:165
 msgid "Choose from the most used product categories"
 msgstr ""
 
-#: marketpress.php:154
+#: marketpress.php:166
 msgid "No product categories found"
 msgstr ""
 
-#: marketpress.php:176
+#: marketpress.php:188
 msgid "All Product Tags"
 msgstr ""
 
-#: marketpress.php:177
+#: marketpress.php:189
 msgid "Edit Product Tag"
 msgstr ""
 
-#: marketpress.php:178
+#: marketpress.php:190
 msgid "View Product Tag"
 msgstr ""
 
-#: marketpress.php:179
+#: marketpress.php:191
 msgid "Update Product Tag"
 msgstr ""
 
-#: marketpress.php:180
+#: marketpress.php:192
 msgid "Add New Product Tag"
 msgstr ""
 
-#: marketpress.php:181
+#: marketpress.php:193
 msgid "New Product Tag Name"
 msgstr ""
 
-#: marketpress.php:182
+#: marketpress.php:194
 msgid "Parent Product Tag"
 msgstr ""
 
-#: marketpress.php:183
+#: marketpress.php:195
 msgid "Parent Product Tag:"
 msgstr ""
 
-#: marketpress.php:184
+#: marketpress.php:196
 msgid "Search Product Tags"
 msgstr ""
 
-#: marketpress.php:185
+#: marketpress.php:197
 msgid "Separate product tags with commas"
 msgstr ""
 
-#: marketpress.php:186
+#: marketpress.php:198
 msgid "Add or remove product tags"
 msgstr ""
 
-#: marketpress.php:187
+#: marketpress.php:199
 msgid "Choose from the most used product tags"
 msgstr ""
 
-#: marketpress.php:188
+#: marketpress.php:200
 msgid "No product tags found"
 msgstr ""
 
-#: marketpress.php:211 marketpress.php:212
+#: marketpress.php:223 marketpress.php:224
 msgid "Add New Product"
 msgstr ""
 
-#: marketpress.php:213
+#: marketpress.php:225
 msgid "Edit Product"
 msgstr ""
 
-#: marketpress.php:215
+#: marketpress.php:227
 msgid "New Product"
 msgstr ""
 
-#: marketpress.php:216 marketpress.php:220
+#: marketpress.php:228 marketpress.php:232
 msgid "View Product"
 msgstr ""
 
-#: marketpress.php:217
+#: marketpress.php:229
 msgid "Search Products"
 msgstr ""
 
-#: marketpress.php:218
+#: marketpress.php:230
 msgid "No Products Found"
 msgstr ""
 
-#: marketpress.php:219
+#: marketpress.php:231
 msgid "No Products found in Trash"
 msgstr ""
 
-#: marketpress.php:222
+#: marketpress.php:234
 msgid "Products for your e-commerce store."
 msgstr ""
 
-#: marketpress.php:253
+#: marketpress.php:265
 msgid "Order"
 msgstr ""
 
-#: marketpress.php:255
+#: marketpress.php:267
 msgid "Add New Order"
 msgstr ""
 
-#: marketpress.php:256
+#: marketpress.php:268
 msgid "Edit Order"
 msgstr ""
 
-#: marketpress.php:258
+#: marketpress.php:270
 msgid "View Order"
 msgstr ""
 
-#: marketpress.php:259
+#: marketpress.php:271
 msgid "Search Orders"
 msgstr ""
 
-#: marketpress.php:260
+#: marketpress.php:272
 msgid "No orders found"
 msgstr ""
 
-#: marketpress.php:261
+#: marketpress.php:273
 msgid "No orders found in trash"
 msgstr ""
 
-#: marketpress.php:262
+#: marketpress.php:274
 msgid "Parent Order"
 msgstr ""
 
-#: marketpress.php:264
+#: marketpress.php:276
 msgid "Orders from your e-commerce store."
 msgstr ""
 
-#: marketpress.php:294
+#: marketpress.php:309
+#. translators: %s: orders received
 msgid "Received <span class=\"count\">(%s)</span>"
 msgid_plural "Received <span class=\"count\">(%s)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: marketpress.php:300
+#: marketpress.php:316
+#. translators: %s: paid orders
 msgid "Paid <span class=\"count\">(%s)</span>"
 msgid_plural "Paid <span class=\"count\">(%s)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: marketpress.php:306
+#: marketpress.php:323
+#. translators: %s: shipped orders
 msgid "Shipped <span class=\"count\">(%s)</span>"
 msgid_plural "Shipped <span class=\"count\">(%s)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: marketpress.php:312
+#: marketpress.php:330
+#. translators: %s: orders closed
 msgid "Closed <span class=\"count\">(%s)</span>"
 msgid_plural "Closed <span class=\"count\">(%s)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: marketpress.php:405
+#: marketpress.php:422
 msgid "Add a Product"
 msgstr ""
 
-#: marketpress.php:589
+#: marketpress.php:654
 msgid "Your pages were created successfully."
 msgstr ""
 
-#: marketpress.php:599
+#: marketpress.php:668
+#. translators: %s: plugin title
 msgid ""
 "<strong>Welcome to %s</strong> &#8211; Install pages required by the plugin "
 "automatically."
 msgstr ""
 
-#: marketpress.php:603
+#: marketpress.php:673
+#. translators: %s: plugin title
 msgid "Install %s Pages"
 msgstr ""
 
-#: marketpress.php:619
+#: marketpress.php:689
 msgid "Offer and accept coupon codes"
 msgstr ""
 
-#: marketpress.php:627
+#: marketpress.php:697
 msgid "Pro Sites"
 msgstr ""
 
-#: marketpress.php:628
+#: marketpress.php:698
 msgid "Grant access to themes and gateways depending on the user's Pro Site level"
 msgstr ""
 
-#: marketpress.php:645
+#: marketpress.php:715
 msgid "Invoice PDF"
 msgstr ""
 
-#: marketpress.php:654
+#: marketpress.php:724
 msgid "Multiple Downloads"
 msgstr ""
 
-#: marketpress.php:655
+#: marketpress.php:725
 msgid "Enable multiple downloads per product"
 msgstr ""
 
@@ -9337,27 +9343,27 @@ msgstr ""
 msgid "http://premium.wpmudev.org"
 msgstr ""
 
-#: marketpress.php:140
+#: marketpress.php:152
 msgctxt "product_category"
 msgid "Product Categories"
 msgstr ""
 
-#: marketpress.php:141
+#: marketpress.php:153
 msgctxt "product_category"
 msgid "Product Category"
 msgstr ""
 
-#: marketpress.php:174
+#: marketpress.php:186
 msgctxt "product_tag"
 msgid "Product Tags"
 msgstr ""
 
-#: marketpress.php:175
+#: marketpress.php:187
 msgctxt "product_tag"
 msgid "Product Tag"
 msgstr ""
 
-#: marketpress.php:254
+#: marketpress.php:266
 msgctxt "mp_order"
 msgid "Add New"
 msgstr ""
