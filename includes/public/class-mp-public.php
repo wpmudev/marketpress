@@ -219,6 +219,10 @@ class MP_Public {
 		$is_store_page = false;
 		$store_pages_ids = array();
 
+		if ( ! isset( $store_pages_settings ) ) {
+			return false;
+		}
+
 		foreach ( $store_pages_settings as $store_page => $store_page_id ) {
 
 			//We need to check if the page type ( $store_page ) is included in the supported 
