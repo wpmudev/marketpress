@@ -1,7 +1,7 @@
 {
   "name": "marketpress",
   "private": true,
-  "version": "3.2.5-beta.2",
+  "version": "3.2.5-beta.3",
   "main": "marketpress.php",
   "author": "WPMU DEV",
   "license": "GPL-2.0",

@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the MarketPress package.
 msgid ""
 msgstr ""
-"Project-Id-Version: MarketPress 3.2.5-beta.2\n"
+"Project-Id-Version: MarketPress 3.2.5-beta.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2017-07-28 06:01:57+00:00\n"
+"POT-Creation-Date: 2017-08-02 08:37:01+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -8702,21 +8702,21 @@ msgstr ""
 msgid "Continue"
 msgstr ""
 
-#: includes/public/class-mp-public.php:584
+#: includes/public/class-mp-public.php:588
 msgid "Sorry, the link is invalid for this download."
 msgstr ""
 
-#: includes/public/class-mp-public.php:589
+#: includes/public/class-mp-public.php:593
 msgid "Sorry, your order has been marked as unpaid."
 msgstr ""
 
-#: includes/public/class-mp-public.php:638
+#: includes/public/class-mp-public.php:642
 msgid ""
 "Sorry, our records show you've downloaded this file %d out of %d times "
 "allowed. Please contact us if you still need help."
 msgstr ""
 
-#: includes/public/class-mp-public.php:695
+#: includes/public/class-mp-public.php:699
 msgid ""
 "Whoops, there was a problem loading up this file for your download. Please "
 "contact us for help."
