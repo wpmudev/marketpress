@@ -3,7 +3,7 @@
 Plugin Name: MarketPress
 Plugin URI:  https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
-Version:     3.2.5-beta.3
+Version:     3.2.5-beta.4
 Author:      WPMU DEV
 Author URI:  http://premium.wpmudev.org
 Text Domain: mp
@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 Plugin Authors: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonathan Cowher (Incsub), Ricardo Freitas (Incsub), Cvetan Cvetanov (Incsub), Julien Zerbib (Incsub), Sabri Bouchaala (Incsub), Emmanuel Laborin (Incsub)
 */
 
-define( 'MP_VERSION', '3.2.5-beta.3' );
+define( 'MP_VERSION', '3.2.5-beta.4' );
 
 /**
  * Main class Marketpress.
@@ -906,11 +906,11 @@ class Marketpress {
 		require_once $this->plugin_dir( 'includes/wpmudev-metaboxes/wpmudev-metabox.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-mailer.php' );
 		require_once $this->plugin_dir( 'includes/common/helpers.php' );
+		require_once $this->plugin_dir( 'includes/common/class-mp-installer.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-product-attributes.php' );
 		require_once $this->plugin_dir( 'includes/addons/class-mp-addons.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-order.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-product.php' );
-		require_once $this->plugin_dir( 'includes/common/class-mp-installer.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-cart.php' );
 		require_once $this->plugin_dir( 'includes/common/template-functions.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-backward-compatibility.php' );
