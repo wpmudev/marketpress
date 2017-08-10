@@ -151,12 +151,15 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 == Changelog ==
 
 = 3.2.5 =
-* Changed: Removed @import directives for better compatibility with Hummingbird
+* Enhance: Removed @import directives for better compatibility with Hummingbird
+* Enhance: Better support for older PHP versions (5.2 and 5.3)
 * Fixed: Issue with Upfront navigation on single product pages
 * Fixed: Tax rate resetting to 0%
 * Fixed: PHP notices on product pages
+* Fixed: PHP warning during quick setup
 * Fixed: Styles in admin interface
 * Fixed: MarketPress disabling front-end page comments
+* Fixed: Some orders were not changing status to Paid with Stripe payment gateway
 
 = 3.2.4 =
 * Added: Password check for password-protected products
