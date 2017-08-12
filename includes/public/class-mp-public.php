@@ -314,10 +314,11 @@ class MP_Public {
 		wp_enqueue_style( 'mp-select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
 		wp_enqueue_style( 'mp-base', mp_plugin_url( 'ui/css/marketpress.css' ), false, MP_VERSION );
 
-		if ( mp_get_setting( 'store_theme' ) == 'default' ) {
-			$theme_url = mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' );
-		} elseif ( mp_get_setting( 'store_theme' ) != 'none' ){
-			$theme_url = content_url( 'marketpress-styles/' . mp_get_setting( 'store_theme' ) . '.css' );
+		$store_theme = mp_get_setting( 'store_theme' );
+		if ( $store_theme == 'default' ) {
+			$theme_url = mp_plugin_url( 'ui/themes/' . $store_theme . '.css' );
+		} elseif ( $store_theme != 'none' && !empty( $store_theme ) ){
+			$theme_url = content_url( 'marketpress-styles/' . $store_theme . '.css' );
 		}
 
 		if( ! empty($theme_url) ){
