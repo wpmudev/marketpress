@@ -2,7 +2,7 @@
 Contributors: WPMUDEV
 Tags: E-commerce, ecommerce, storefront, sell, store, shopping, cart, payment gateways, digital downloads, online store
 Requires at least: 3.7
-Tested up to: 4.8.0
+Tested up to: 4.8.1
 Stable tag: trunk
 
 Full-power ecommerce marketplace for WordPress and Multisite. 100% free and no extensions required.

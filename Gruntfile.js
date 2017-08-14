@@ -19,6 +19,7 @@ module.exports = function(grunt) {
 		'!tmp/**',
 		'!**/Gruntfile.js',
 		'!**/package.json',
+		'!**/package-lock.json',
 		'!**/README.md',
 		'!**/*~'
 	];
