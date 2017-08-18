@@ -355,7 +355,10 @@ class MP_Coupons_Addon {
 			$total = $total + $this->get_total_discount_amt();
 		}
 
-		$total = ( $total + (float) $cart->tax_total() + (float) $cart->shipping_total() );
+		if ( ! mp_get_setting( 'tax->tax_inclusive' ) ) {		
+			$total = ( $total + (float) $cart->tax_total()  );
+		}														
+		$total = ( $total + (float) $cart->shipping_total());
 
 		return floatval( $total );
 	}
@@ -371,7 +374,12 @@ class MP_Coupons_Addon {
 		}
 
 		$tax_rate   = mp_tax_rate();
-		$cart_price = $total_pre * ( 1 + $tax_rate );
+		if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
+			$cart_price = $total_pre;					
+			$total_pre = $total_pre / (1 + $tax_rate);		
+		} else {											
+			$cart_price = $total_pre * ( 1 + $tax_rate );
+		}
 
 		$tax_amount = (float) $cart_price - (float) $total_pre;
 
