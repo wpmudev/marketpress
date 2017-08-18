@@ -801,9 +801,12 @@ class MP_Store_Settings_Presentation {
 
 		$metabox->add_field( 'radio_group', array(
 			'name'    => 'store_theme',
-			'desc'    => sprintf( __( 'This option changes the built-in css styles for store pages. For a custom css style, save your css file with the <strong>/* MarketPress Style: Your CSS Theme Name Here */</strong> header line in the <strong>"%s"</strong> folder and it will appear in this list so you may select it. You can also select "None" and create custom theme templates and css to make your own completely unique store design. More information on that <a target="_blank" href="%s">here &raquo;</a>.', 'mp' ), trailingslashit( WP_CONTENT_DIR ) . 'marketpress-styles/', mp_plugin_url( 'ui/themes/Theming_MarketPress.txt' ) ),
+			'desc'    => sprintf( __( 'This option changes the built-in css styles for store pages. For a custom css style, save your css file with the <strong>/* MarketPress Style: Your CSS Theme Name Here */</strong> header line in the <strong>"%s"</strong> folder and it will appear in this list so you may select it. You can also select "None" and no one special CSS-file won\'t apply. More information on that <a target="_blank" href="%s">here &raquo;</a>.', 'mp' ), trailingslashit( WP_CONTENT_DIR ) . 'marketpress-styles/', mp_plugin_url( 'ui/themes/Theming_MarketPress.txt' ) ),
 			'label'   => array( 'text' => __( 'Store Style', 'mp' ) ),
-			'options' => mp_get_theme_list() + array( 'none' => __( 'None - Custom Theme Template', 'mp' ) ),
+			'options' => mp_get_theme_list() + array(
+				'default' => __( 'Default - Using Default CSS-styles', 'mp' ),
+				'none' => __( 'None - Without Special CSS-styles', 'mp' ),
+				),
 			'width'   => '50%',
 		) );
 		/*$metabox->add_field( 'checkbox', array(
