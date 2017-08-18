@@ -615,7 +615,7 @@ class WPMUDEV_Metabox {
 	 */
 	public function admin_enqueue_scripts() {
 		if ( isset( $_GET['page'] ) ) {
-			$page = isset( $_GET['page'] );
+			$page = $_GET['page'];
 		} else {
 			$page = '';
 		}
