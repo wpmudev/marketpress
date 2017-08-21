@@ -40,7 +40,7 @@ class MP_Installer {
 		add_action( 'wp_ajax_mp_update_product_postmeta', array( &$this, 'update_product_postmeta' ) );
 		add_action( 'admin_enqueue_scripts', array(
 			&$this,
-			'enqueue_db_update_scripts'
+			'enqueue_db_update_scripts',
 		) );
 	}
 
@@ -85,7 +85,6 @@ class MP_Installer {
 		$default_value = ''
 	) {
 
-
 		if ( 'mp_shipping->extra_cost' == $post_meta_name ) {
 			$value = get_post_meta( $post_id, 'mp_shipping', false );
 			if ( isset( $value['extra_cost'] ) ) {
@@ -119,7 +118,6 @@ class MP_Installer {
 
 		$variation_values = null;
 		$variation_values = get_post_meta( $post_id, 'mp_var_name', true );
-		//$variation_name		 = 'Variation'; //default variation category / attribute name
 		$variation_names[0] = 'Variation';
 		$data               = array();
 
@@ -128,6 +126,7 @@ class MP_Installer {
 			update_post_meta( $post_id, 'has_variations', 1 );
 
 			$i = 0;
+			$data_original = array();
 
 			foreach ( $variation_names as $variation_name ) {
 
@@ -151,18 +150,19 @@ class MP_Installer {
 
 				global $variations_single_data;
 
-				if( !function_exists( 'term_object_array_filter' ) ){
-					function term_object_array_filter ( $e ) {
+				if ( ! function_exists( 'term_object_array_filter' ) ) {
+					function term_object_array_filter( $e ) {
 						global $variations_single_data;
 
-						return $e->slug == sanitize_key( trim( $variations_single_data ) ); //compare slug-like variation name against the existent ones in the db
+						//compare slug-like variation name against the existent ones in the db.
+						return sanitize_key( trim( $variations_single_data ) ) == $e->slug;
 					}
 				}
 
 				foreach ( $variations_data as $variations_single_data ) {
 
 					/* Check if the term ($variations_single_data ie red, blue, green etc) for the given taxonomy already exists */
-					$term_object = array_filter($terms, 'term_object_array_filter' );
+					$term_object = array_filter( $terms, 'term_object_array_filter' );
 
 					reset( $term_object );
 					$data[ $i ][]          = $variation_name . '=' . ( ( ! empty( $term_object ) ) ? $term_object[ key( $term_object ) ]->slug : $variations_single_data ); //add taxonomy + term_id (if exists), if not leave the name of the term we'll create later
@@ -170,7 +170,7 @@ class MP_Installer {
 				}
 
 				$i ++;
-			}
+			} // End foreach().
 
 			$combinations          = $this->possible_product_combinations( $data );
 			$combinations_original = $this->possible_product_combinations( $data_original );
@@ -278,11 +278,11 @@ class MP_Installer {
 					//we need to check, if term is numeric, treat it
 					if ( is_numeric( $variation_term_vals[1] ) ) {
 						//usually this is the term name, check if not exist, we will create with a prefix on slug,
-						//to force it to string, as when wordpress using the term_exist, it will priority the ID than slug, which can cause wrong import
+						//to force it to string, as when WordPress using the term_exist, it will priority the ID than slug, which can cause wrong import
 						$slug = $variation_term_vals[1] . '_mp_attr';
 						if ( ! term_exists( $slug ) ) {
 							$tid = wp_insert_term( $variation_term_vals[1], $variation_term_vals[0], array(
-								'slug' => $slug
+								'slug' => $slug,
 							) );
 							wp_set_post_terms( $variation_id, $tid['term_id'], $variation_term_vals[0], true );
 						}
@@ -299,7 +299,7 @@ class MP_Installer {
 				$combination_index ++;
 
 				do_action( 'mp_update/variation', $variation_id );
-			}
+			} // End foreach().
 
 			wp_suspend_cache_addition( false );
 			wp_defer_term_counting( false );
@@ -307,13 +307,7 @@ class MP_Installer {
 
 			$wpdb->query( 'COMMIT;' );
 			$wpdb->query( 'SET autocommit = 1;' );
-
-
-			//}
-			//exit;
-		} else {
-			//do nothing
-		}
+		} // End if().
 	}
 
 	public function post_meta_transition( $post_id, $old_post_meta_name, $new_post_meta_name ) {
@@ -324,7 +318,7 @@ class MP_Installer {
 			$old_value = array_shift( $old_value );
 		}
 
-		if ( $new_post_meta_name == 'special_tax_rate' ) {
+		if ( 'special_tax_rate' == $new_post_meta_name ) {
 			if ( $old_value > 0 ) {
 				update_post_meta( $post_id, 'charge_tax', '1' );
 			} else {
@@ -333,7 +327,7 @@ class MP_Installer {
 			$old_value = $old_value * 100; //20% was marked as 0.2 in the previous version
 		}
 
-		if ( $old_post_meta_name == 'mp_shipping' ) {
+		if ( 'mp_shipping' == $old_post_meta_name ) {
 			$old_value = get_post_meta( $post_id, $old_post_meta_name, true );
 			if ( isset( $old_value ) && is_array( $old_value ) && count( $old_value ) ) {
 				$old_value = $old_value['extra_cost'];
@@ -345,10 +339,6 @@ class MP_Installer {
 				update_post_meta( $post_id, 'charge_shipping', '1' );
 			}
 		}
-
-		/* if($old_post_meta_name == 'mp_shipping->extra_cost'){
-
-		  } */
 
 		update_post_meta( $post_id, $new_post_meta_name, $old_value );
 	}
@@ -379,11 +369,11 @@ class MP_Installer {
 		$total_count = wp_count_posts( MP_Product::get_post_type() );
 		$total_count = $total_count->publish + $total_count->draft + $total_count->private + $total_count->pending;
 
-		if ( $total_count == 0 ) {
+		if ( 0 == $total_count ) {
 			//nothing to update here
 			wp_send_json_success( array(
 				'is_done' => true,
-				'updated' => 100
+				'updated' => 100,
 			) );
 		}
 
@@ -404,7 +394,7 @@ class MP_Installer {
 
 			$variations = get_post_meta( $post_id, 'mp_var_name', true );
 			//var_dump( $post_id );
-			if ( $variations && is_array( $variations ) && $update_fix_needed == true ) {//need update since it used mp_var_name post meta which is not used in the 3.0 version
+			if ( $variations && is_array( $variations ) && true == $update_fix_needed ) {//need update since it used mp_var_name post meta which is not used in the 3.0 version
 				if ( count( $variations ) > 1 ) {
 					//It's a variation product
 
@@ -413,7 +403,7 @@ class MP_Installer {
 
 					if ( ! empty( $mp_file ) ) {
 						$product_type = 'digital';
-					} else if ( ! empty( $mp_product_link ) ) {
+					} elseif ( ! empty( $mp_product_link ) ) {
 						$product_type = 'external';
 					} else {
 						$product_type = 'physical';
@@ -439,7 +429,7 @@ class MP_Installer {
 
 					if ( ! empty( $mp_file ) ) {
 						$product_type = 'digital';
-					} else if ( ! empty( $mp_product_link ) ) {
+					} elseif ( ! empty( $mp_product_link ) ) {
 						$product_type = 'external';
 					} else {
 						$product_type = 'physical';
@@ -471,12 +461,12 @@ class MP_Installer {
 
 					$this->post_meta_transition( $post_id, 'mp_file', 'file_url' ); //If not empty then mark it as digital product
 					$this->post_meta_transition( $post_id, 'mp_product_link', 'external_url' ); //If not empty then mark it as external product
-				}
+				} // End if().
 
 				//Update sales count
 				$this->update_sales_count( $post_id );
 
-			} else {//update for 3.0 and 3.0.0.1
+			} else { //update for 3.0 and 3.0.0.1
 				$post_thumbnail = get_post_thumbnail_id( $post_id );
 				if ( is_numeric( $post_thumbnail ) ) {
 					update_post_meta( $post_id, 'mp_product_images', $post_thumbnail );
@@ -485,10 +475,10 @@ class MP_Installer {
 				//Update sales count
 				$this->update_sales_count( $post_id );
 
-			}
+			} // End if().
 
 			do_action( 'mp_update/product', $post_id );
-		}
+		} // End while().
 
 		$response = array(
 			'updated' => round( $updated / $total_count, 2 ) * 100,
@@ -537,7 +527,7 @@ class MP_Installer {
 		if ( get_option( 'mp_db_update_required' ) || mp_get_get_value( 'force_upgrade', 0 ) == 1 ) {
 			add_submenu_page( 'store-settings', __( 'Update Data', 'mp' ), __( 'Update Data', 'mp' ), 'activate_plugins', 'mp-db-update', array(
 				&$this,
-				'db_update_page'
+				'db_update_page',
 			) );
 		}
 	}
@@ -551,7 +541,7 @@ class MP_Installer {
 	public function update_sales_count( $post_id ) {
 		$sales_count = get_post_meta( $post_id, 'mp_sales_count', true );
 
-		if ( $sales_count == "" ) {
+		if ( '' == $sales_count ) {
 			update_post_meta( $post_id, 'mp_sales_count', 0 );
 		}
 	}
@@ -568,8 +558,8 @@ class MP_Installer {
 
 		$result = $wpdb->query( "SHOW COLUMNS FROM $wpdb->terms LIKE 'term_order'" );
 
-		if ( $result == 0 ) {
-			$result = $wpdb->query( "ALTER TABLE $wpdb->terms ADD `term_order` SMALLINT UNSIGNED NULL DEFAULT '0' AFTER `term_group`" );
+		if ( 0 == $result ) {
+			$wpdb->query( "ALTER TABLE $wpdb->terms ADD `term_order` SMALLINT UNSIGNED NULL DEFAULT '0' AFTER `term_group`" );
 		}
 	}
 
@@ -585,11 +575,11 @@ class MP_Installer {
 
 		$table_product = $wpdb->base_prefix . 'mp_products';
 
-		if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_product ) ) == $table_product ) {
+		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_product ) ) == $table_product ) {
 			$result = $wpdb->query( "SHOW COLUMNS FROM {$wpdb->base_prefix}mp_products LIKE 'post_status'" );
 
-			if ( $result == 0 ) {
-				$result = $wpdb->query( "ALTER TABLE {$wpdb->base_prefix}mp_products ADD `post_status` varchar(20) NOT NULL DEFAULT 'publish' AFTER `post_permalink`" );
+			if ( 0 == $result ) {
+				$wpdb->query( "ALTER TABLE {$wpdb->base_prefix}mp_products ADD `post_status` varchar(20) NOT NULL DEFAULT 'publish' AFTER `post_permalink`" );
 			}
 		}
 	}
@@ -643,7 +633,7 @@ class MP_Installer {
 					<input type="hidden" name="action" value="mp_update_product_postmeta"/>
 					<input type="hidden" name="page" value="1"/>
 					<input type="hidden" name="force_upgrade"
-					       value="<?php echo mp_get_get_value( 'force_upgrade', 0 ) ?>"/>
+						   value="<?php echo mp_get_get_value( 'force_upgrade', 0 ) ?>"/>
 
 					<p class="mp-important">
 						<strong><?php _e( 'Depending on the amount of products you have, this update could take quite some time. Please keep this window open while the update completes. If you have products with multiple variations, the progress bar may move slower, please don\'t exit the window.', 'mp' ); ?></strong>
@@ -658,13 +648,13 @@ class MP_Installer {
 					}
 					?>
 					<p class="submit"><input class="button-primary" type="submit"
-					                         value="<?php _e( 'Perform Update', 'mp' ); ?>"></p>
+											 value="<?php _e( 'Perform Update', 'mp' ); ?>"></p>
 				</form>
 				<?php
 			} else {
 				_e( 'MarketPress performed a quick automatic update successfully!', 'mp' );
 				delete_option( 'mp_db_update_required' );
-			}
+			} // End if().
 			?>
 		</div>
 		<?php
@@ -698,47 +688,52 @@ class MP_Installer {
 
 		// Add "post_status" to $wpdb->mp_products table
 		$this->add_post_status_column();
-		
+
 		// Create/update product attributes table
 		$this->create_product_attributes_table();
 
 		//If current MP version equals to old version skip importer
-		if ( $old_version == MP_VERSION && $force_upgrade == 0 ) {
+		if ( MP_VERSION == $old_version && 0 == $force_upgrade ) {
 			return;
 		}
 
 		$old_settings = get_option( 'mp_settings', array() );
-		
+
 
 		// Filter default settings
 		$default_settings = apply_filters( 'mp_default_settings', mp()->default_settings );
 		$settings         = array_replace_recursive( $default_settings, $old_settings );
-		
+
 		// Only run the follow scripts if this not a fresh install
 		if ( ! empty( $old_version ) ) {
 			//2.1.4 update
-			if ( version_compare( $old_version, '2.1.4', '<' ) || ( $force_version !== false && version_compare( $force_version, '2.1.4', '<' ) ) ) {
+			if ( version_compare( $old_version, '2.1.4', '<' ) || ( false !== $force_version && version_compare( $force_version, '2.1.4', '<' ) ) ) {
 				$this->update_214();
 			}
 
 			//2.9.2.3 update
-			if ( version_compare( $old_version, '2.9.2.3', '<' ) || ( $force_version !== false && version_compare( $force_version, '2.9.2.3', '<' ) ) ) {
+			if ( version_compare( $old_version, '2.9.2.3', '<' ) || ( false !== $force_version && version_compare( $force_version, '2.9.2.3', '<' ) ) ) {
 				$this->update_2923();
 			}
 
 			//3.0 update
-			if ( version_compare( $old_version, '3.0.0.2', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.0.0.2', '<' ) ) ) {
+			if ( version_compare( $old_version, '3.0.0.2', '<' ) || ( false !== $force_version && version_compare( $force_version, '3.0.0.2', '<' ) ) ) {
 				$settings = $this->update_3000( $settings );
 			}
-			
+
 			//3.0 update
-			if ( version_compare( $old_version, '3.0.0.8', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.0.0.8', '<' ) ) ) {
+			if ( version_compare( $old_version, '3.0.0.8', '<' ) || ( false !== $force_version && version_compare( $force_version, '3.0.0.8', '<' ) ) ) {
 				$settings = $this->update_3007( $settings );
 			}
 
 			//3.0 update
-			if ( version_compare( $old_version, '3.1.3', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.1.3', '<' ) ) ) {
+			if ( version_compare( $old_version, '3.1.3', '<' ) || ( false !== $force_version && version_compare( $force_version, '3.1.3', '<' ) ) ) {
 				$settings = $this->update_312( $settings );
+			}
+
+			// 3.2.5 update.
+			if ( version_compare( $old_version, '3.2.6', '<' ) || ( false !== $force_version && version_compare( $force_version, '3.2.6', '<' ) ) ) {
+				$this->update_326();
 			}
 		}
 
@@ -747,7 +742,7 @@ class MP_Installer {
 		if ( ! empty( $old_version ) ) {
 			$settings = get_option( 'mp_settings' );
 			//3.0.0.3 need data from 3.0
-			if ( ( version_compare( $old_version, '3.0.0.3', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.0.0.3', '<' ) ) ) ) {
+			if ( ( version_compare( $old_version, '3.0.0.3', '<' ) || ( false !== $force_version && version_compare( $force_version, '3.0.0.3', '<' ) ) ) ) {
 				$settings = $this->update_3003( $settings );
 				update_option( 'mp_settings', $settings );
 				//we will remove the mp_db_update_required, so user can re run the wizard
@@ -787,7 +782,7 @@ class MP_Installer {
 
 		// Create mp_product_attributes table
 		$table_name = $wpdb->prefix . 'mp_product_attributes';
-		if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name ) ) == $table_name ) {
+		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) ) == $table_name ) {
 			return;
 		}
 		$sql = "CREATE TABLE IF NOT EXISTS $table_name (
@@ -827,6 +822,8 @@ class MP_Installer {
 	 * @access public
 	 *
 	 * @param array $settings
+	 *
+	 * @return mixed
 	 */
 	public function update_presentation_settings( $settings ) {
 		if ( $height = mp_get_setting( 'list_img_height' ) ) {
@@ -859,6 +856,8 @@ class MP_Installer {
 	 * @access public
 	 *
 	 * @param array $settings
+	 *
+	 * @return mixed
 	 */
 	public function update_notification_settings( $settings ) {
 		if ( $subject = mp_get_setting( 'email->new_order_subject' ) ) {
@@ -914,9 +913,9 @@ class MP_Installer {
 	public function add_admin_store_caps() {
 		$role       = get_role( 'administrator' );
 		$store_caps = mp_get_store_caps();
-		
+
 		// We've had few error reports that $role is not an object, lets check
-		if( is_object( $role ) ) {
+		if ( is_object( $role ) ) {
 			foreach ( $store_caps as $cap ) {
 				$role->add_cap( $cap );
 			}
@@ -947,7 +946,6 @@ class MP_Installer {
 					$can_update_shipping = true;
 				}
 			}
-
 		}
 
 		if ( $can_update_shipping ) {
@@ -1008,11 +1006,10 @@ class MP_Installer {
 						default:
 							mp_push_to_array( $settings, 'shipping->' . $use_30, $data[ $use ] );
 							break;
-					}
-
-				}
-			}
-		}
+					} // End switch().
+				} // End if().
+			} // End foreach().
+		} // End if().
 		//now the gateway setting
 		$old_gateways = mp_arr_get_value( 'gateways->allowed', $legacy_settings );
 		if ( ! is_array( $old_gateways ) ) {
@@ -1035,7 +1032,7 @@ class MP_Installer {
 		foreach ( $old_gateways as $gateway ) {
 			$gateway_30 = str_replace( '-', '_', $gateway );
 
-			if ( ( isset( $current_gateways[ $gateway_30 ] ) || isset( $current_gateways[ $gateway ] ) ) && $current_gateways[ $gateway_30 ] != 1 ) {
+			if ( ( isset( $current_gateways[ $gateway_30 ] ) || isset( $current_gateways[ $gateway ] ) ) && 1 != $current_gateways[ $gateway_30 ] ) {
 				//this mean the current gateway doesn't updated, but it having data from old
 				switch ( $gateway_30 ) {
 					case 'paypal_express':
@@ -1044,7 +1041,7 @@ class MP_Installer {
 						$creds                   = array(
 							'username'  => mp_arr_get_value( 'api_user', $old_data ),
 							'password'  => mp_arr_get_value( 'api_pass', $old_data ),
-							'signature' => mp_arr_get_value( 'api_sig', $old_data )
+							'signature' => mp_arr_get_value( 'api_sig', $old_data ),
 						);
 						$data['api_credentials'] = $creds;
 						unset( $old_data['api_user'] );
@@ -1061,7 +1058,7 @@ class MP_Installer {
 						$data                    = mp_arr_get_value( 'gateways->stripe', $settings );
 						$creds                   = array(
 							'secret_key'      => mp_arr_get_value( 'private_key', $old_data ),
-							'publishable_key' => mp_arr_get_value( 'publishable_key', $old_data )
+							'publishable_key' => mp_arr_get_value( 'publishable_key', $old_data ),
 						);
 						$data['api_credentials'] = $creds;
 						unset( $old_data['private_key'] );
@@ -1075,7 +1072,7 @@ class MP_Installer {
 						$data                    = mp_arr_get_value( 'gateways->authorizenet_aim', $settings );
 						$creds                   = array(
 							'api_user' => mp_arr_get_value( 'api_user', $old_data ),
-							'api_key'  => mp_arr_get_value( 'api_key', $old_data )
+							'api_key'  => mp_arr_get_value( 'api_key', $old_data ),
 						);
 						$data['api_credentials'] = $creds;
 						unset( $old_data['api_key'] );
@@ -1091,7 +1088,7 @@ class MP_Installer {
 							'user'     => mp_arr_get_value( 'api_user', $old_data ),
 							'vendor'   => mp_arr_get_value( 'api_vendor', $old_data ),
 							'partner'  => mp_arr_get_value( 'api_partner', $old_data ),
-							'password' => mp_arr_get_value( 'api_pwd', $old_data )
+							'password' => mp_arr_get_value( 'api_pwd', $old_data ),
 						);
 						$data['api_credentials'] = $creds;
 						unset( $old_data['api_user'] );
@@ -1114,7 +1111,7 @@ class MP_Installer {
 						$data                    = mp_arr_get_value( 'gateways->2checkout', $settings );
 						$creds                   = array(
 							'sid'         => mp_arr_get_value( 'sid', $old_data ),
-							'secret_word' => mp_arr_get_value( 'secret_word', $old_data )
+							'secret_word' => mp_arr_get_value( 'secret_word', $old_data ),
 						);
 						$data['api_credentials'] = $creds;
 						unset( $old_data['sid'] );
@@ -1128,7 +1125,7 @@ class MP_Installer {
 						$data                    = mp_arr_get_value( 'gateways->eway', $settings );
 						$creds                   = array(
 							'UserName'   => mp_arr_get_value( 'UserName', $old_data ),
-							'CustomerID' => mp_arr_get_value( 'CustomerID', $old_data )
+							'CustomerID' => mp_arr_get_value( 'CustomerID', $old_data ),
 						);
 						$data['api_credentials'] = $creds;
 						unset( $old_data['UserName'] );
@@ -1143,12 +1140,12 @@ class MP_Installer {
 						$creds                   = array(
 							'live'    => array(
 								'api_key'      => mp_arr_get_value( 'UserAPIKeyLive', $old_data ),
-								'api_password' => mp_arr_get_value( 'UserPasswordLive', $old_data )
+								'api_password' => mp_arr_get_value( 'UserPasswordLive', $old_data ),
 							),
 							'sandbox' => array(
 								'api_key'      => mp_arr_get_value( 'UserAPIKeySandbox', $old_data ),
-								'api_password' => mp_arr_get_value( 'UserPasswordSandbox', $old_data )
-							)
+								'api_password' => mp_arr_get_value( 'UserPasswordSandbox', $old_data ),
+							),
 						);
 						$data['api_credentials'] = $creds;
 						unset( $old_data['UserAPIKeyLive'] );
@@ -1164,7 +1161,7 @@ class MP_Installer {
 						$data                    = mp_arr_get_value( 'gateways->paymill', $settings );
 						$creds                   = array(
 							'private_key' => mp_arr_get_value( 'private_key', $old_data ),
-							'public_key'  => mp_arr_get_value( 'public_key', $old_data )
+							'public_key'  => mp_arr_get_value( 'public_key', $old_data ),
 						);
 						$data['api_credentials'] = $creds;
 						unset( $old_data['private_key'] );
@@ -1178,7 +1175,7 @@ class MP_Installer {
 						$data                    = mp_arr_get_value( 'gateways->pin', $settings );
 						$creds                   = array(
 							'private_key' => mp_arr_get_value( 'private_key', $old_data ),
-							'public_key'  => mp_arr_get_value( 'public_key', $old_data )
+							'public_key'  => mp_arr_get_value( 'public_key', $old_data ),
 						);
 						$data['api_credentials'] = $creds;
 						unset( $old_data['private_key'] );
@@ -1192,7 +1189,7 @@ class MP_Installer {
 						$data                    = mp_arr_get_value( 'gateways->simplify', $settings );
 						$creds                   = array(
 							'private_key' => mp_arr_get_value( 'private_key', $old_data ),
-							'public_key'  => mp_arr_get_value( 'public_key', $old_data )
+							'public_key'  => mp_arr_get_value( 'public_key', $old_data ),
 						);
 						$data['api_credentials'] = $creds;
 						unset( $old_data['private_key'] );
@@ -1208,7 +1205,7 @@ class MP_Installer {
 							'client_id'     => mp_arr_get_value( 'client_id', $old_data ),
 							'client_secret' => mp_arr_get_value( 'client_secret', $old_data ),
 							'access_token'  => mp_arr_get_value( 'access_token', $old_data ),
-							'account_id'    => mp_arr_get_value( 'account_id', $old_data )
+							'account_id'    => mp_arr_get_value( 'account_id', $old_data ),
 						);
 						$data['api_credentials'] = $creds;
 						unset( $old_data['client_id'] );
@@ -1219,21 +1216,20 @@ class MP_Installer {
 						mp_push_to_array( $settings, 'gateways->wepay', $data );
 						mp_push_to_array( $settings, 'gateways->allowed->wepay', 1 );
 						break;
-				}
-			}
-		}
+				} // End switch().
+			} // End if().
+		} // End foreach().
 
 		return $settings;
 	}
-	
+
 	/**
 	 * Alter multisite table columns, add blog_id and public columns
 	 *
 	 * @since 3.0
 	 * @access public
 	 */
-	public function alter_mp_term_relationships_table(){
-	
+	public function alter_mp_term_relationships_table() {
 		global $wpdb;
 
 		$term_relationships_table = "CREATE TABLE `{$wpdb->base_prefix}mp_term_relationships` (
@@ -1246,8 +1242,7 @@ class MP_Installer {
 		) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
 
 		dbDelta( $term_relationships_table );
-
-	}	
+	}
 
 	/**
 	 * Update sort_price if silently on version check
@@ -1255,7 +1250,6 @@ class MP_Installer {
 	 * @since 3.0
 	 * @access public
 	 */
-	
 	public function update_sort_price( $settings ) {
 		ini_set( 'max_execution_time', 0 );
 		set_time_limit( 0 );
@@ -1271,11 +1265,11 @@ class MP_Installer {
 		while ( $query->have_posts() ) {
 			$query->the_post();
 			$post_id = get_the_ID();
-			
+
 			$product  = new MP_Product( $post_id );
 			$price    = $product->get_price();
 
-			if( isset( $price['lowest'] ) && ! empty( $price['lowest'] ) ) {
+			if ( isset( $price['lowest'] ) && ! empty( $price['lowest'] ) ) {
 				update_post_meta( $post_id, 'sort_price', sanitize_text_field( $price['lowest'] ) );
 			} else {
 				update_post_meta( $post_id, 'sort_price', sanitize_text_field( $price['regular'] ) );
@@ -1290,6 +1284,8 @@ class MP_Installer {
 	 * @access public
 	 *
 	 * @param array $settings
+	 *
+	 * @return mixed
 	 */
 	public function update_312( $settings ) {
 		$this->alter_mp_term_relationships_table();
@@ -1304,6 +1300,8 @@ class MP_Installer {
 	 * @access public
 	 *
 	 * @param array $settings
+	 *
+	 * @return mixed
 	 */
 	public function update_3007( $settings ) {
 		$this->update_sort_price( $settings );
@@ -1318,6 +1316,8 @@ class MP_Installer {
 	 * @access public
 	 *
 	 * @param array $settings
+	 *
+	 * @return array|mixed
 	 */
 	public function update_3000( $settings ) {
 		$this->_db_update_required();
@@ -1345,7 +1345,9 @@ class MP_Installer {
 	 */
 	public function update_2923() {
 		global $wpdb;
-		$wpdb->delete( $wpdb->postmeta, array( 'meta_key' => 'mp_stock_email_sent' ), array( '%s' ) );
+		$wpdb->delete( $wpdb->postmeta, array(
+			'meta_key' => 'mp_stock_email_sent',
+		), array( '%s' ) );
 	}
 
 	/**
@@ -1364,19 +1366,49 @@ class MP_Installer {
 			//unserialize
 			foreach ( $meta as $key => $val ) {
 				$meta[ $key ] = maybe_unserialize( $val[0] );
-				if ( ! is_array( $meta[ $key ] ) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link" && $key != "mp_file" && $key != "mp_price_sort" ) {
+				if ( ! is_array( $meta[ $key ] ) && 'mp_is_sale' != $key && 'mp_track_inventory' != $key && 'mp_product_link' != $key && 'mp_file' != $key && 'mp_price_sort' != $key ) {
 					$meta[ $key ] = array( $meta[ $key ] );
 				}
 			}
 
 			//fix price sort field if missing
-			if ( empty( $meta["mp_price_sort"] ) && is_array( $meta["mp_price"] ) ) {
-				if ( $meta["mp_is_sale"] && $meta["mp_sale_price"][0] ) {
-					$sort_price = $meta["mp_sale_price"][0];
+			if ( empty( $meta['mp_price_sort'] ) && is_array( $meta['mp_price'] ) ) {
+				if ( $meta['mp_is_sale'] && $meta['mp_sale_price'][0] ) {
+					$sort_price = $meta['mp_sale_price'][0];
 				} else {
-					$sort_price = $meta["mp_price"][0];
+					$sort_price = $meta['mp_price'][0];
 				}
 				update_post_meta( $post_id, 'mp_price_sort', $sort_price );
+			}
+		}
+	}
+
+	/**
+	 * Update to version 3.2.6.
+	 *
+	 * Fixes problem with sorting variable products and missing sort_price.
+	 *
+	 * @since 3.2.6
+	 * @access private
+	 */
+	private function update_326() {
+		global $wpdb;
+
+		$products = $wpdb->get_col( "SELECT ID FROM {$wpdb->posts} WHERE post_type = 'product'" );
+
+		foreach ( $products as $product_id ) {
+			$sort_price = get_post_meta( $product_id, 'sort_price', true );
+
+			// Skip products with correct sort price.
+			if ( ! empty( $sort_price ) && ! is_array( $sort_price ) ) {
+				continue;
+			}
+
+			$product  = new MP_Product( $product_id );
+			$price = $product->get_price( 'lowest' );
+
+			if ( isset( $price ) ) {
+				update_post_meta( $product_id, 'sort_price', $price );
 			}
 		}
 	}
