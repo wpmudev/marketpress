@@ -1368,7 +1368,7 @@ class MP_Product {
 				}
 			} elseif ( mp_get_setting( 'tax->tax_digital' ) && $this->is_download() ) {
 				//Calculate price when special price & download product
-				if( $tax_inclusive != 1 && $include_tax_to_price == 1 ) {
+				if( $tax_inclusive != 1 ) {
 					if( $special_fixed_tax ) {
 						$price = $price + $tax_rate;
 					} else {
