@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * Class MP_Products_Screen
+ */
 class MP_Products_Screen {
 
 	/**
@@ -34,31 +36,23 @@ class MP_Products_Screen {
 	 */
 	private function __construct() {
 		add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_styles_scripts' ) );
-// Remove add-new submenu item from store admin menu
+		// Remove add-new submenu item from store admin menu.
 		add_action( 'admin_menu', array( &$this, 'remove_menu_items' ), 999 );
-// Hide featured image for variable products
+		// Hide featured image for variable products.
 		add_action( 'wpmudev_field/print_scripts/has_variations', array( &$this, 'maybe_hide_core_metaboxes' ) );
-// Product variations save/get value
-
+		// Product variations save/get value.
 		add_action( 'init', array( &$this, 'save_init_product_variations' ) );
-//add_action( 'admin_init', array( &$this, 'hide_main_content_editor_for_variations' ) );
 		add_action( 'wp_ajax_save_inline_post_data', array( &$this, 'save_inline_variation_post_data' ) );
 		add_action( 'wp_ajax_edit_variation_post_data', array( &$this, 'edit_variation_post_data' ) );
-
 		add_action( 'wp_ajax_save_inventory_threshhold', array( &$this, 'save_inventory_threshhold' ) );
-//add_action( 'wp_ajax_save_init_product_variations', array( &$this, 'save_init_product_variations' ) );
-//add_filter( 'wpmudev_field/save_value/variations', array( &$this, 'save_product_variations_parent_data' ), 10, 3 );
-//add_filter( 'wpmudev_field/before_get_value/variations', array( &$this, 'get_product_variations_old' ), 10, 4 );
-// Custom product columns
+		// Custom product columns.
 		add_filter( 'manage_product_posts_columns', array( &$this, 'product_columns_head' ) );
 		add_filter( 'manage_mp_product_posts_columns', array( &$this, 'product_columns_head' ) );
 		add_action( 'manage_product_posts_custom_column', array( &$this, 'product_columns_content' ), 10, 2 );
 		add_action( 'manage_mp_product_posts_custom_column', array( &$this, 'product_columns_content' ), 10, 2 );
-
-		//add_filter( 'the_title', array( &$this, 'product_admin_title' ), 10, 2 );
-// Add metaboxes
+		// Add metaboxes.
 		add_action( 'init', array( &$this, 'init_metaboxes' ) );
-// Add quick/bulk edit capability for product fields
+		// Add quick/bulk edit capability for product fields.
 		add_action( 'quick_edit_custom_box', array( &$this, 'quick_edit_custom_box' ), 10, 2 );
 		add_action( 'bulk_edit_custom_box', array( &$this, 'bulk_edit_custom_box' ), 10, 2 );
 		add_action( 'admin_print_scripts-edit.php', array( &$this, 'enqueue_bulk_quick_edit_js' ) );
@@ -67,21 +61,20 @@ class MP_Products_Screen {
 		add_action( 'save_post', array( &$this, 'force_flush_rewrites' ), 10, 2 );
 		add_action( 'updated_postmeta', array( &$this, 'maybe_purge_variations_transient' ), 10, 2 );
 		add_action( 'delete_post', array( $this, 'delete_variations' ), 10 );
-// Product screen scripts
+		// Product screen scripts.
 		add_action( 'in_admin_footer', array( &$this, 'toggle_product_attributes_js' ) );
-// Add category filter
+		// Add category filter.
 		add_action( 'restrict_manage_posts', array( $this, 'filter_by_category' ) );
 		add_filter( 'parse_query', array( $this, 'parse_category_filter_query' ) );
-// Product attributes save/get value
+		// Product attributes save/get value.
 		$mp_product_atts = MP_Product_Attributes::get_instance();
 		$atts            = $mp_product_atts->get();
 		foreach ( $atts as $att ) {
 			add_filter( 'wpmudev_field/save_value/' . $mp_product_atts->generate_slug( $att->attribute_id ), array(
 				&$this,
-				'save_product_attribute'
+				'save_product_attribute',
 			), 10, 3 );
 		}
-
 		add_filter( 'enter_title_here', array( &$this, 'custom_placeholder_title' ), 10, 2 );
 		add_action( 'admin_menu', array( &$this, 'remove_metaboxes' ) );
 	}
@@ -114,7 +107,7 @@ class MP_Products_Screen {
 	 * @since   3.2.3
 	 * @param   object $query Query object.
 	 */
-	public function parse_category_filter_query( $query ){
+	public function parse_category_filter_query( $query ) {
 		global $pagenow;
 		$qv = &$query->query_vars;
 
@@ -149,8 +142,8 @@ class MP_Products_Screen {
 	 * @action in_admin_footer
 	 */
 	public function toggle_product_attributes_js() {
-		if ( get_current_screen()->id != MP_Product::get_post_type() ) {
-// not product screen - bail
+		if ( get_current_screen()->id !== MP_Product::get_post_type() ) {
+			// not product screen - bail.
 			return;
 		}
 		?>
@@ -159,7 +152,6 @@ class MP_Products_Screen {
 				var $inputs = $('input[name="tax_input[product_category][]"]');
 
 				var toggleProductAttributes = function () {
-					var selectors = [];
 					var $subfield = $('.wpmudev-subfield');
 
 					if ($inputs.filter(':checked').length == 0) {
@@ -187,13 +179,13 @@ class MP_Products_Screen {
 	}
 
 	/**
-	 * Maybe hide some core metaboxes
+	 * Maybe hide some core metaboxes.
 	 *
 	 * @since 3.0
 	 * @access public
 	 * @action wpmudev_field/print_scripts/has_variations
 	 */
-	public function maybe_hide_core_metaboxes( $field ) {
+	public function maybe_hide_core_metaboxes() {
 		?>
 		<script type="text/javascript">
 			jQuery(document).ready(function ($) {
@@ -214,74 +206,65 @@ class MP_Products_Screen {
 		<?php
 	}
 
-
 	/**
 	 * Set mp_flush_rewrites_30 to 1 after saving/publishing new product.
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
+	 * @param int     $post_id   Post ID.
+	 * @param WP_Post $post Post ID or post object.
+	 *
+	 * @return mixed
 	 */
-
-	public function force_flush_rewrites($post_id, $post) {
-		if ( empty( $_POST ) ) {
-			return $post_id;
-		}
-
-		if ( mp_doing_autosave() ) {
-			return $post_id;
-		}
-
-		if ( wp_is_post_revision( $post ) ) {
-			return $post_id;
-		}
-
-		if ( $post->post_type != MP_Product::get_post_type() ) {
+	public function force_flush_rewrites( $post_id, $post ) {
+		if ( empty( $_POST ) || mp_doing_autosave() || wp_is_post_revision( $post ) || MP_Product::get_post_type() !== $post->post_type ) {
 			return $post_id;
 		}
 
 		update_option( 'mp_flush_rewrites_30', 1 );
 	}
 
-
+	/**
+	 * Save post quantity.
+	 *
+	 * @param int     $post_id   Post ID.
+	 * @param WP_Post $post Post ID or post object.
+	 *
+	 * @return mixed
+	 */
 	public function save_post_quantity_fix( $post_id, $post ) {
-		if ( empty( $_POST ) ) {
-			return $post_id;
-		}
-
-		if ( mp_doing_autosave() ) {
-			return $post_id;
-		}
-
-		if ( wp_is_post_revision( $post ) ) {
-			return $post_id;
-		}
-
-		if ( $post->post_type != MP_Product::get_post_type() ) {
+		if ( empty( $_POST ) || mp_doing_autosave() || wp_is_post_revision( $post ) || MP_Product::get_post_type() !== $post->post_type ) {
 			return $post_id;
 		}
 
 		$quantity = mp_get_post_value( 'inv->inventory', '' );
-		if( is_numeric( $quantity ) ){
-			update_post_meta( $post_id, 'inventory', (int)$quantity );
+		if ( is_numeric( $quantity ) ) {
+			update_post_meta( $post_id, 'inventory', (int) $quantity );
 		}
 
-		//Check if sales count is empty string and set to 0
+		// Check if sales count is empty string and set to 0.
 		$sale_count = get_post_meta( $post_id, 'mp_sales_count', true );
 
-		if ( $sale_count == "" ) {
+		if ( '' === $sale_count ) {
 			update_post_meta( $post_id, 'mp_sales_count', 0 );
 		}
 	}
 
 	/**
-	 * Save the custom quick edit form fields
+	 * Save the custom quick edit form fields.
 	 *
 	 * @since 3.0
 	 * @access public
 	 * @action save_post
+	 *
+	 * @param int     $post_id   Post ID.
+	 * @param WP_Post $post Post ID or post object.
+	 *
+	 * @return mixed
 	 */
 	public function save_quick_edit( $post_id, $post ) {
-		if ( empty( $_POST ) ) {
+		if ( empty( $_POST ) || mp_doing_autosave() || wp_is_post_revision( $post ) || MP_Product::get_post_type() !== $post->post_type ) {
 			return $post_id;
 		}
 
@@ -289,36 +272,25 @@ class MP_Products_Screen {
 			return $post_id;
 		}
 
-		if ( mp_doing_autosave() ) {
-			return $post_id;
-		}
-
-		if ( wp_is_post_revision( $post ) ) {
-			return $post_id;
-		}
-
-		if ( $post->post_type != MP_Product::get_post_type() ) {
-			return $post_id;
-		}
-
 		$price      = mp_get_post_value( 'product_price', '' );
 		$action     = mp_get_post_value( 'action', '' );
 		$sale_price = mp_get_post_value( 'product_sale_price', '' );
 
-		$price = filter_var( $price, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND );
+		$price      = filter_var( $price, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND );
 		$sale_price = filter_var( $sale_price, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND );
 		$featured   = mp_get_post_value( 'featured' );
 
 		$sale_price_array = mp_get_post_value( 'sale_price->amount', '' );
-		$regular_price 	  = mp_get_post_value( 'regular_price', '' );
-		$has_sale		  = mp_get_post_value( 'has_sale', '');
+		$regular_price    = mp_get_post_value( 'regular_price', '' );
+		$has_sale         = mp_get_post_value( 'has_sale', '' );
 
-		if( ! empty( $sale_price_array ) && $sale_price_array > 0 && ! empty( $has_sale ) ) {
+		if ( ! empty( $sale_price_array ) && $sale_price_array > 0 && ! empty( $has_sale ) ) {
 			update_post_meta( $post_id, 'sort_price', $sale_price_array );
 		} else {
-            $sort_price = ( 'inline-save' === $action ) ? $price : $regular_price;
-            if ( ! empty( $sort_price ) )
-			    update_post_meta( $post_id, 'sort_price', $sort_price );
+			$sort_price = ( 'inline-save' === $action ) ? $price : $regular_price;
+			if ( ! empty( $sort_price ) ) {
+				update_post_meta( $post_id, 'sort_price', $sort_price );
+			}
 		}
 
 		update_post_meta( $post_id, 'featured', empty( $featured ) ? 0 : 1 );
@@ -326,7 +298,6 @@ class MP_Products_Screen {
 		update_post_meta( $post_id, 'sale_price_amount', $sale_price );
 
 		if ( isset( $_POST['mp_product_images_indexes'] ) ) {
-
 			$mp_product_images_indexes = $_POST['mp_product_images_indexes'];
 			$mp_product_images         = explode( ',', $mp_product_images_indexes );
 
@@ -351,19 +322,20 @@ class MP_Products_Screen {
 	 * @since 3.0
 	 * @access public
 	 * @action save_post
+	 *
+	 * @param int $meta_id Meta ID.
+	 * @param int $post_id Post ID.
+	 *
+	 * @return int
 	 */
 	public function maybe_purge_variations_transient( $meta_id, $post_id ){
 		$post = get_post( $post_id );
 
-		if ( mp_doing_autosave() ) {
+		if ( mp_doing_autosave() || wp_is_post_revision( $post ) ) {
 			return $post_id;
 		}
 
-		if ( wp_is_post_revision( $post ) ) {
-			return $post_id;
-		}
-
-		if ( $post->post_type != MP_Product::get_post_type() && $post->post_type != MP_Product::get_variations_post_type() ) {
+		if ( MP_Product::get_post_type() !== $post->post_type &&MP_Product::get_variations_post_type() !== $post->post_type ) {
 			return $post_id;
 		}
 
@@ -374,27 +346,32 @@ class MP_Products_Screen {
 			$post_id = $parent->ID;
 		}
 
-		delete_transient( 'mp-get-variations-'.$post_id );
+		delete_transient( 'mp-get-variations-' . $post_id );
 	}
 
 	/**
-	 * Delete variations when deleteing a product
+	 * Delete variations when deleting a product
 	 *
 	 * @since 3.1.3
 	 * @access public
 	 * @action delete_post
+	 *
+	 * @param int $post_id Post ID.
 	 */
-	public function delete_variations( $post_id ){
+	public function delete_variations( $post_id ) {
 		$args = array(
 			'post_parent' => $post_id,
-	        	'post_type' => MP_Product::get_variations_post_type()
+			'post_type'   => MP_Product::get_variations_post_type(),
 		);
 		$variations = get_posts( $args );
 
-	    	if( empty( $variations ) ) return;
+		if ( empty( $variations ) ) {
+			return;
+		}
 
-		foreach( $variations as $variation ){
-			wp_delete_post( $variation->ID, true ); // Skip trash and remove directly
+		foreach ( $variations as $variation ) {
+			// Skip trash and remove directly.
+			wp_delete_post( $variation->ID, true );
 		}
 	}
 
@@ -406,13 +383,13 @@ class MP_Products_Screen {
 	 * @action admin_print_scripts-edit.php
 	 */
 	public function enqueue_bulk_quick_edit_js() {
-		if ( get_current_screen()->post_type != MP_Product::get_post_type() ) {
+		if ( MP_Product::get_post_type() !== get_current_screen()->post_type ) {
 			return;
 		}
 
 		wp_enqueue_script( 'mp-bulk-quick-edit-product', mp_plugin_url( 'includes/admin/ui/js/bulk-quick-edit-product.js' ), array(
 			'jquery',
-			'inline-edit-post'
+			'inline-edit-post',
 		), MP_VERSION, true );
 	}
 
@@ -422,9 +399,12 @@ class MP_Products_Screen {
 	 * @since 3.0
 	 * @access public
 	 * @action quick_edit_custom_box
+	 *
+	 * @param string $column_name Column name.
+	 * @param string $post_type   Post type.
 	 */
 	public function quick_edit_custom_box( $column_name, $post_type ) {
-		if ( $post_type != MP_Product::get_post_type() || $column_name != 'product_price' ) {
+		if ( MP_Product::get_post_type() !== $post_type || 'product_price' !== $column_name ) {
 			return;
 		}
 		?>
@@ -440,9 +420,12 @@ class MP_Products_Screen {
 	 * @since 3.0
 	 * @access public
 	 * @action bulk_edit_custom_box
+	 *
+	 * @param string $column_name Column name.
+	 * @param string $post_type   Post type.
 	 */
 	public function bulk_edit_custom_box( $column_name, $post_type ) {
-		if ( $post_type != MP_Product::get_post_type() || $column_name != 'product_price' ) {
+		if ( MP_Product::get_post_type() !== $post_type || 'product_price' !== $column_name ) {
 			return;
 		}
 		?>
@@ -450,12 +433,12 @@ class MP_Products_Screen {
 			<div class="inline-edit-col clearfix">
 				<label class="alignleft"><span class="title"><?php _e( 'Price', 'mp' ); ?></span><span
 						class="input-text-wrap"><input type="text" name="product_price"
-				                                       style="width:100px"/></span></label>
+													   style="width:100px"/></span></label>
 				<label class="alignleft" style="margin-left:15px"><span
 						class="title"><?php _e( 'Sale Price', 'mp' ); ?></span><span class="input-text-wrap"><input
 							type="text" name="product_sale_price" style="width:100px"/></span></label>
 				<input type="hidden" name="bulk_edit_products_nonce"
-				       value="<?php echo wp_create_nonce( 'bulk_edit_products' ); ?>"/>
+					   value="<?php echo wp_create_nonce( 'bulk_edit_products' ); ?>"/>
 			</div>
 		</fieldset>
 		<?php
@@ -469,7 +452,7 @@ class MP_Products_Screen {
 	 * @filter manage_product_posts_columns, manage_mp_product_posts_columns
 	 * @return array
 	 */
-	public function product_columns_head( $columns ) {
+	public function product_columns_head() {
 		return array(
 			'cb'                        => '<input type="checkbox" />',
 			'title'                     => __( 'Product Name', 'mp' ),
@@ -484,13 +467,6 @@ class MP_Products_Screen {
 			'product_image'             => __( 'Img', 'mp' ),
 		);
 	}
-
-	/* public function product_admin_title( $title, $id ) {
-	  if ( MP_Product::get_post_type() == get_post_type( $id ) ) {
-	  $title = $id;
-	  }
-	  return $title;
-	  } */
 
 	/**
 	 * Display data for each product admin column
@@ -549,7 +525,7 @@ class MP_Products_Screen {
 
 			case 'product_sku' :
 				if ( $product->has_variations() ) {
-					$skus = array();
+					//$skus = array();
 					/* foreach ( $variations as $variation ) {
 					  $skus[] = $variation->get_meta( 'sku', '&mdash;' );
 					  } */
@@ -613,8 +589,6 @@ class MP_Products_Screen {
 					</div>
 				</div>';
 
-
-
 				break;
 
 			case 'product_stock' :
@@ -623,7 +597,7 @@ class MP_Products_Screen {
 					foreach ( $variations as $variation ) {
 						$stock_val = $variation->get_meta( 'inventory', '&mdash;' );
 						if ( is_numeric( $stock_val ) ) {
-							$stock = $stock + $variation->get_meta( 'inventory', '&mdash;' );
+							$stock = $stock + $stock_val;
 						} else {
 							$stock = '&mdash;';
 						}
