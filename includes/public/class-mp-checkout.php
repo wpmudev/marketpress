@@ -1236,7 +1236,7 @@ class MP_Checkout {
 
 			$html .= '
 				</div><!-- end mp-checkout-column-billing-info -->
-					<div id="mp-checkout-column-shipping-info" class="mp_checkout_column"' . (( $enable_shipping_address ) ? '' : ' style="display:none"') . '>
+					<div id="mp-checkout-column-shipping-info" class="mp_checkout_column fullwidth"' . (( $enable_shipping_address ) ? '' : ' style="display:none"') . '>
 						<h3 class="mp_sub_title">' . __( 'Shipping', 'mp' ) . '</h3>' .
 			$this->address_fields( 'shipping' ) . '';
 
