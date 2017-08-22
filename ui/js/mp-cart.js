@@ -25,6 +25,7 @@ var mp_cart = { };
         },
         "ignore": "",
         "submitHandler": function( form ) {
+            va
             var $form = $( form );
             var qty = $form.find( '[name="product_quantity"]' ).val();
             var product_id = $form.find( '[name="product_id"]' ).val();
@@ -227,12 +228,12 @@ var mp_cart = { };
         url = mp_cart_i18n.ajaxurl + '?action=mp_product_update_attributes';
 
         marketpress.loadingOverlay( 'show' );
-        
+
         var form_data = $form.serializeArray();
 
         // Change siblings attr name to "other_'attr_name'" instead of just not sending them
         // Used to get the current variation selected and check it's stock
-        
+
         //$this.parents( '.mp_product_options_att' ).siblings( '.mp_product_options_att' ).find( '[name^="product_attr_"]' ).val( '' );
 
         $this.parents( '.mp_product_options_att' ).siblings( '.mp_product_options_att' ).find( '[name^="product_attr_"]' ).each(function(i, el) {
@@ -304,7 +305,7 @@ var mp_cart = { };
 					$container.find( '#mp_product_options_att_quantity' ).replaceWith( resp.data.product_input );
 						if ( typeof( resp.data.in_stock ) !== 'undefined' ) {
                 			$container.find( '#mp_product_options_att_quantity' ).trigger('blur');
-                		}    
+                		}
                 }
 
                 $.each( resp.data, function( index, value ) {
@@ -346,7 +347,7 @@ var mp_cart = { };
     mp_cart.checkProductQuantity = function() {
     	var $this = $( this );
 
-    	if( $this.attr( 'max' ) > 0 && parseInt( $this.val() ) > parseInt( $this.attr( 'max' ) ) ) { 
+    	if( $this.attr( 'max' ) > 0 && parseInt( $this.val() ) > parseInt( $this.attr( 'max' ) ) ) {
     		$this.trigger('blur');
     		// Delay before fixing input value to give time to validator to process.
     		setTimeout(function(){$this.val($this.attr( 'max' ))}, 50);
@@ -442,7 +443,7 @@ var mp_cart = { };
 					mp_cart.update_widget( resp.data.widgetcart );
 					mp_cart.update_product_input( resp.data.product_input, $form );
 					mp_cart.update_product_buttons( resp.data.out_of_stock, $form );
-					
+
 					//Init button listeners when ajax loaded
 					mp_cart.initCartButtonListeners();
 
@@ -604,7 +605,7 @@ var mp_cart = { };
 		else {
 			$form.find( '.mp_button' ).attr( 'disabled' , false );
 		}
-    };    
+    };
 
     /**
      * Update an item's qty

@@ -81,48 +81,66 @@ class MP_Short_Codes {
 	 * @access public
 	 */
 	public function shortcodes_frontend_styles_scripts() {
-
 		wp_enqueue_script( 'lightslider', mp_plugin_url( 'ui/lightslider/js/lightslider.js' ), array( 'jquery' ), MP_VERSION );
 		wp_enqueue_style( 'lightslider', mp_plugin_url( 'ui/lightslider/css/lightslider.css' ), array(), MP_VERSION );
 		wp_enqueue_script( 'lightgallery', mp_plugin_url( 'ui/lightgallery/js/lightgallery.js' ), array( 'jquery' ), MP_VERSION );
 		wp_enqueue_style( 'lightgallery', mp_plugin_url( 'ui/lightgallery/css/lightgallery.css' ), array(), MP_VERSION );
-// CSS
+		// CSS.
 		wp_register_style( 'jquery-ui', mp_plugin_url( 'ui/css/jquery-ui.min.css' ), false, MP_VERSION );
 		wp_enqueue_style( 'mp-base', mp_plugin_url( 'ui/css/marketpress.css' ), false, MP_VERSION );
 
 		if ( mp_get_setting( 'store_theme' ) == 'default' ) {
 			wp_enqueue_style( 'mp-theme', mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' ), array(), MP_VERSION );
-		} elseif ( mp_get_setting( 'store_theme' ) != 'none' ){
+		} elseif ( mp_get_setting( 'store_theme' ) != 'none' ) {
 			wp_enqueue_style( 'mp-theme', content_url( 'marketpress-styles/' . mp_get_setting( 'store_theme' ) . '.css' ), array(), MP_VERSION );
 		}
 
 		wp_enqueue_style( 'mp-select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
 
-// JS
+		// JS.
 		wp_register_script( 'hover-intent', mp_plugin_url( 'ui/js/hoverintent.min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_register_script( 'mp-select2', mp_plugin_url( 'ui/select2/select2.min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_register_script( 'colorbox', mp_plugin_url( 'ui/js/jquery.colorbox-min.js' ), array( 'jquery' ), MP_VERSION, true );
-		wp_enqueue_script( 'mp-frontend', mp_plugin_url( 'ui/js/frontend.js' ), array( 'jquery-ui-tooltip', 'colorbox', 'hover-intent', 'mp-select2' ), MP_VERSION, true );
-		
+		wp_enqueue_script( 'mp-frontend', mp_plugin_url( 'ui/js/frontend.js' ), array( 'jquery-ui-tooltip', 'colorbox', 'hover-intent', 'mp-select2', 'jquery-validate' ), MP_VERSION, true );
+
 		$grid_with_js = apply_filters('mp-do_grid_with_js', true);
-		
-		if ( $grid_with_js == "true" ) {
-			wp_enqueue_script( 'mp-equal-height', mp_plugin_url( 'ui/js/mp-equal-height.js' ), array('jquery'), MP_VERSION );
+
+		if ( 'true' == $grid_with_js ) {
+			wp_enqueue_script( 'mp-equal-height', mp_plugin_url( 'ui/js/mp-equal-height.js' ), array( 'jquery' ), MP_VERSION );
 		}
 
-// Get product category links
-		$terms	 = get_terms( 'product_category' );
-		$cats	 = array();
+		// Get product category links.
+		$terms = get_terms( 'product_category' );
+		$cats  = array();
 		foreach ( $terms as $term ) {
 			$cats[ $term->term_id ] = get_term_link( $term );
 		}
 
-// Localize js
+		// Localize js.
 		wp_localize_script( 'mp-frontend', 'mp_i18n', array(
-			'ajaxurl'		 => mp_get_ajax_url(),
-			'loadingImage'	 => mp_plugin_url( 'ui/images/loading.gif' ),
-			'productsURL'	 => mp_store_page_url( 'products', false ),
-			'productCats'	 => $cats,
+			'ajaxurl'      => mp_get_ajax_url(),
+			'loadingImage' => mp_plugin_url( 'ui/images/loading.gif' ),
+			'productsURL'  => mp_store_page_url( 'products', false ),
+			'productCats'  => $cats,
+			'validation'   => array(
+				'required'    => __( 'This field is required.', 'mp' ),
+				'remote'      => __( 'Please fix this field.', 'mp' ),
+				'email'       => __( 'Please enter a valid email address.', 'mp' ),
+				'url'         => __( 'Please enter a valid URL.', 'mp' ),
+				'date'        => __( 'Please enter a valid date.', 'mp' ),
+				'dateISO'     => __( 'Please enter a valid date (ISO).', 'mp' ),
+				'number'      => __( 'Please enter a valid number.', 'mp' ),
+				'digits'      => __( 'Please enter only digits.', 'mp' ),
+				'creditcard'  => __( 'Please enter a valid credit card number.', 'mp' ),
+				'equalTo'     => __( 'Please enter the same value again.', 'mp' ),
+				'accept'      => __( 'Please enter a value with a valid extension.', 'mp' ),
+				'maxlength'   => __( 'Please enter no more than {0} characters.', 'mp' ),
+				'minlength'   => __( 'Please enter at least {0} characters.', 'mp' ),
+				'rangelength' => __( 'Please enter a value between {0} and {1} characters long.', 'mp' ),
+				'range'       => __( 'Please enter a value between {0} and {1}.', 'mp' ),
+				'max'         => __( 'Please enter a value less than or equal to {0}.', 'mp' ),
+				'min'         => __( 'Please enter a value greater than or equal to {0}.', 'mp' ),
+			),
 		) );
 
 		// Styles
@@ -130,6 +148,10 @@ class MP_Short_Codes {
 
 		// Scripts
 		wp_register_script( 'jquery-validate', mp_plugin_url( 'ui/js/jquery.validate.min.js' ), array( 'jquery' ), MP_VERSION, true );
+		wp_localize_script( 'jquery-validate', 'messages', array(
+			'required' => __( 'AAA', 'mp' ),
+		));
+
 		wp_register_script( 'jquery-validate-methods', mp_plugin_url( 'ui/js/jquery.validate.methods.min.js' ), array( 'jquery-validate' ), MP_VERSION, true );
 		wp_register_script( 'ajaxq', mp_plugin_url( 'ui/js/ajaxq.min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_register_script( 'colorbox', mp_plugin_url( 'ui/js/jquery.colorbox-min.js' ), array( 'jquery' ), MP_VERSION, true );
@@ -140,7 +162,7 @@ class MP_Short_Codes {
 			'ajaxurl'                  => mp_get_ajax_url(),
 			'ajax_loader'              => '<span class="mp_ajax_loader"><img src="' . mp_plugin_url( 'ui/images/ajax-loader.gif' ) . '" alt=""> ' . __( 'Adding...', 'mp' ) . '</span>',
 			'cart_updated_error_limit' => __( 'Cart update notice: this item has a limit per order or you have reached the stock limit.', 'mp' ),
-			'is_cart_page'             => mp_is_shop_page( 'cart' )
+			'is_cart_page'             => mp_is_shop_page( 'cart' ),
 		) );
 	}
 

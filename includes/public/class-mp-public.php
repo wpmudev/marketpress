@@ -381,6 +381,25 @@ class MP_Public {
 			'loadingImage' => mp_plugin_url( 'ui/images/loading.gif' ),
 			'productsURL'  => mp_store_page_url( 'products', false ),
 			'productCats'  => $cats,
+			'validation'   => array(
+				'required'    => __( 'This field is required.', 'mp' ),
+				'remote'      => __( 'Please fix this field.', 'mp' ),
+				'email'       => __( 'Please enter a valid email address.', 'mp' ),
+				'url'         => __( 'Please enter a valid URL.', 'mp' ),
+				'date'        => __( 'Please enter a valid date.', 'mp' ),
+				'dateISO'     => __( 'Please enter a valid date (ISO).', 'mp' ),
+				'number'      => __( 'Please enter a valid number.', 'mp' ),
+				'digits'      => __( 'Please enter only digits.', 'mp' ),
+				'creditcard'  => __( 'Please enter a valid credit card number.', 'mp' ),
+				'equalTo'     => __( 'Please enter the same value again.', 'mp' ),
+				'accept'      => __( 'Please enter a value with a valid extension.', 'mp' ),
+				'maxlength'   => __( 'Please enter no more than {0} characters.', 'mp' ),
+				'minlength'   => __( 'Please enter at least {0} characters.', 'mp' ),
+				'rangelength' => __( 'Please enter a value between {0} and {1} characters long.', 'mp' ),
+				'range'       => __( 'Please enter a value between {0} and {1}.', 'mp' ),
+				'max'         => __( 'Please enter a value less than or equal to {0}.', 'mp' ),
+				'min'         => __( 'Please enter a value greater than or equal to {0}.', 'mp' ),
+			),
 		) );
 	}
 
