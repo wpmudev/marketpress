@@ -615,7 +615,7 @@ class WPMUDEV_Metabox {
 	 */
 	public function admin_enqueue_scripts() {
 		if ( isset( $_GET['page'] ) ) {
-			$page = isset( $_GET['page'] );
+			$page = $_GET['page'];
 		} else {
 			$page = '';
 		}
@@ -781,9 +781,13 @@ class WPMUDEV_Metabox {
 			}
 
 		if ( self::$did_metabox_count == 0 ) :
+        
+            $current_screen = get_current_screen();
+			$current_screen_id_part = explode( '_page_', $current_screen->id );
+			$current_screen_id = $current_screen->parent_base . '_page_' . end( $current_screen_id_part );
 			?>
 			<div id="poststuff">
-			<div class="meta-box-sortables <?php echo esc_attr( get_current_screen()->id ); ?>">
+			<div class="meta-box-sortables <?php echo esc_attr( $current_screen_id ); ?>">
 		<?php endif;
 			?>
 			<?php $this->before_settings_metabox(); ?>

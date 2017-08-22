@@ -33,7 +33,7 @@ class MP_Admin {
 	 */
 	private function __construct() {
 		$this->_init_dash_notices();
-		add_action('init',array(&$this,'_includes'),1);
+		add_action( 'init',array( &$this, '_includes' ), 1 );
 
 		//save orders screen options
 		add_filter( 'set-screen-option', array( &$this, 'save_orders_screen_options' ), 10, 3 );
@@ -44,13 +44,23 @@ class MP_Admin {
 
 		add_action( 'admin_head', array( &$this, 'admin_head' ) );
 		//add a notice for deprecated gateway
-		if(get_option( 'mp_deprecated_gateway_notice_showed' ) != 1 ){
+		if ( '1' !== get_option( 'mp_deprecated_gateway_notice_showed' ) ) {
 			add_action( 'admin_notices', array( &$this, 'deprecated_gateway_notice' ) );
 			add_action( 'admin_footer', array( &$this, 'print_deprecated_notice_scripts' ) );
 			add_action( 'wp_ajax_mp_dismissed_deprecated_message', array( &$this, 'dismissed_deprecated_messag' ) );
 		}
-		
-		if ( get_option( 'mp_needs_quick_setup', 1 ) == 1 && current_user_can( 'manage_options' ) && ( ( isset( $_GET[ 'quick_setup_step' ]) && $_GET[ 'quick_setup_step' ] != 3 ) || !isset( $_GET[ 'quick_setup_step' ] ) ) ) {
+
+		// Show notice to run setup wizard.
+		if ( '1' === get_option( 'mp_needs_quick_setup', 1 ) && ( ( isset( $_GET['quick_setup_step'] ) && '3' !== $_GET['quick_setup_step'] ) || ! isset( $_GET['quick_setup_step'] ) ) ) {
+			if ( ! current_user_can( 'manage_options' ) ) {
+				return;
+			}
+
+			// Do not show notice if user skipped.
+			if ( isset( $_GET['quick_setup_step'] ) && 'skip' === $_GET['quick_setup_step'] ) {
+				return;
+			}
+
 			add_action( 'admin_notices', array( &$this, 'display_quick_setup_notice' ) );
 		}
 	}

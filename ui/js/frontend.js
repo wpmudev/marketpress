@@ -24,6 +24,27 @@
             }
         } );
     };
+
+	$.extend($.validator.messages, {
+		required: mp_i18n.validation.required,
+		remote: mp_i18n.validation.remote,
+		email: mp_i18n.validation.email,
+		url: mp_i18n.validation.url,
+		date: mp_i18n.validation.date,
+		dateISO: mp_i18n.validation.dateISO,
+		number: mp_i18n.validation.number,
+		digits: mp_i18n.validation.digits,
+		creditcard: mp_i18n.validation.creditcard,
+		equalTo: mp_i18n.validation.equalTo,
+		accept: mp_i18n.validation.accept,
+		maxlength: jQuery.validator.format( mp_i18n.validation.maxlength ),
+		minlength: jQuery.validator.format( mp_i18n.validation.minlength ),
+		rangelength: jQuery.validator.format( mp_i18n.validation.rangelength ),
+		range: jQuery.validator.format( mp_i18n.validation.range ),
+		max: jQuery.validator.format( mp_i18n.validation.max ),
+		min: jQuery.validator.format( mp_i18n.validation.min )
+	});
+
 }( jQuery ) );
 var marketpress = { };
 ( function( $ ) {

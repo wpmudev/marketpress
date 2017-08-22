@@ -486,13 +486,13 @@ var mp_checkout;
             var $billingInfo = $( '#mp-checkout-column-billing-info' );
 
             if ( $cb.prop( 'checked' ) ) {
-                $billingInfo.removeClass( 'fullwidth' );
+                //$billingInfo.removeClass( 'fullwidth' );
                 setTimeout( function() {
                     $shippingInfo.fadeIn( 500 );
                 }, 550 );
             } else {
                 $shippingInfo.fadeOut( 500, function() {
-                    $billingInfo.addClass( 'fullwidth' );
+                    //$billingInfo.addClass( 'fullwidth' );
                 } );
             }
         },

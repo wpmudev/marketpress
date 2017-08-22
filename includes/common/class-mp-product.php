@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class MP_Product
+ */
 class MP_Product {
 
 	/**
@@ -128,162 +131,21 @@ class MP_Product {
 		$product_id = mp_get_get_value( 'product_id' );
 		$product    = new MP_Product( $product_id );
 
-		/* $image	 = 'single';
-		  $title	 = true;
-		  $content = 'full';
-		  $meta	 = true;
+		if ( 0 == 0 ) {
+			ob_start();
+			do_action( 'mp_public/before_variations_lightbox_form', $product_id, $product ); ?>
 
-		  if ( !$product->exists() ) {
-		  die( __( 'The product specified could not be found', 'mp' ) );
-		  }
-
-		  $variation = false;
-
-		  if ( $variation_id = $product->ID ) {
-		  $variation = new MP_Product( $variation_id );
-		  if ( !$variation->exists() ) {
-		  $variation = false;
-		  }
-		  }
-
-		  $has_image = false;
-		  if ( !$product->has_variations() ) {
-		  $values = get_post_meta( $product->ID, 'mp_product_images', true );
-		  if ( $values ) {
-		  $has_image = true;
-		  }
-		  } else {
-		  $post_thumbnail_id = get_post_thumbnail_id( $product->ID );
-		  if ( $post_thumbnail_id ) {
-		  $has_image = true;
-		  }
-		  }
-
-		  $image_alignment = mp_get_setting( 'image_alignment_single' );
-		  ?>
-		  <!-- MP Product Lightbox -->
-		  <?php
-		  $return			 = '
-		  <!-- MP Single Product -->
-		  <section id="mp-single-product" itemscope itemtype="http://schema.org/Product">
-		  <div class="mp_product mp_single_product' . ($has_image ? ' mp_single_product-has-image mp_single_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'aligncenter') . '' : '') . ($product->has_variations() ? ' mp_single_product-has-variations' : '') . '">';
-
-		  $content = 'full';
-		  $values	 = get_post_meta( $product->ID, 'mp_product_images', true );
-
-		  if ( mp_get_setting( 'list_img_size' ) == 'custom' ) {
-		  $size = array( mp_get_setting( 'list_img_size_custom->width' ), mp_get_setting( 'list_img_size_custom->height' ) );
-		  } else {
-		  $size = mp_get_setting( 'list_img_size' );
-		  }
-
-		  if ( !$product->has_variations() ) {
-
-
-		  if ( $values ) {
-		  $return .= '<div class="mp_single_product_images">';
-
-		  $return .= "<script>
-		  jQuery(document).ready(function() {
-		  jQuery('#mp-product-gallery').lightSlider({
-		  gallery:true,
-		  item:1,
-		  loop:true,
-		  thumbItem:5,
-		  slideMargin:0,
-		  enableDrag: true,
-		  currentPagerPosition:'left',
-		  onSliderLoad: function(el) {
-		  el.lightGallery({
-		  selector: '#mp-product-gallery .lslide'
-		  });
-		  }
-		  });
-		  });
-		  </script>";
-
-		  $return .= '<ul id="mp-product-gallery" class="mp_product_gallery">';
-
-		  $values = explode( ',', $values );
-
-		  foreach ( $values as $value ) {
-		  $img_url = wp_get_attachment_image_src( $value, $size );
-		  $return .= '<li data-thumb="' . $img_url[ 0 ] . '" data-src ="' . $img_url[ 0 ] . '"><img src="' . $img_url[ 0 ] . '"></li>';
-		  }
-
-		  $return .= '</ul><!-- end mp_product_gallery -->';
-
-		  $return .= '</div><!-- end mp_single_product_images -->';
-		  }
-		  } else {
-		  $return .= '<div class="mp_single_product_images">';
-		  $return .= ( $variation ) ? $variation->image( false, $image ) : $product->image( false, $image );
-		  $return .= '</div><!-- end mp_single_product_images -->';
-		  }
-
-		  $return .= '<div class="mp_single_product_details">';
-
-		  $return .= '<span style="display:none" class="date updated">' . get_the_time( $product->ID ) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
-
-		  $return .= '<div class="mp_product_meta">';
-
-		  if ( $title ) {
-		  $return .= ' <h1 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
-		  }
-
-		  // Price
-		  $return .= ( $variation ) ? $variation->display_price( false ) : $product->display_price( false );
-
-		  // Excerpt
-		  if ( !$variation ) {
-		  $return .= '<div class="mp_product_excerpt">';
-		  $return .= mp_get_the_excerpt( $product_id, apply_filters( 'mp_get_the_excerpt_length', 18 ) );
-		  $return .= '</div><!-- end mp_product_excerpt -->';
-		  } else {
-		  $return .= '<div class="mp_product_excerpt mp_product_excerpt-variation">';
-		  $return .= mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true );
-		  $return .= '</div><!-- end mp_product_excerpt -->';
-		  }
-
-		  $return .= '</div><!-- end mp_product_meta-->';
-
-		  // Callout
-		  $return .= '<div class="mp_product_callout">';
-
-		  // Button
-		  $selected_atts = array();
-
-		  if ( $variation ) {
-		  $atts = $variation->get_attributes();
-		  foreach ( $atts as $slug => $att ) {
-		  $selected_atts[ $slug ] = key( $att[ 'terms' ] );
-		  }
-		  }
-
-		  $return .= $product->buy_button( false, 'single', $selected_atts );
-
-		  $return .= '</div><!-- end mp_product_callout-->';
-
-		  $return .= '</div><!-- end mp_single_product_details-->';
-
-		  $return .= '
-		  </div><!-- end mp_product/mp_single_product -->
-		  </section><!-- end mp-single-product -->';
-		  echo $return;
-
-		 */
-		?>
-		<?php if ( 0 == 0 ) { ?>
-			<?php ob_start(); ?>
-			<?php do_action( 'mp_public/before_variations_lightbox_form', $product_id, $product ); ?>
 			<section id="mp-product-<?php echo $product->ID; ?>-lightbox" itemscope
-			         itemtype="http://schema.org/Product">
+					 itemtype="http://schema.org/Product">
 				<div class="mp_product mp_product_options mp_product_lightbox">
 
 					<?php do_action( 'mp_public/before_variation_fields_lightbox_form', $product_id, $product ); ?>
 
 					<div class="mp_product_options_image">
-						<?php $product->image_custom( true, 'medium', array( 'class' => 'mp_product_options_thumb' ) ); ?>
+						<?php
+						$product->image_custom( true, 'medium', array(
+							'class' => 'mp_product_options_thumb',
+						) ); ?>
 					</div>
 					<!-- end mp_product_options_image -->
 
@@ -301,20 +163,20 @@ class MP_Product {
 						<div class="mp_product_options_callout">
 
 							<form id="mp-product-options-callout-form"
-							      class="mp_form mp_form-mp-product-options-callout" method="post"
-							      data-ajax-url="<?php echo mp_get_ajax_url( 'admin-ajax.php?action=mp_update_cart' ); ?>"
-							      action="<?php echo get_permalink( mp_get_setting( 'pages->cart' ) ); ?>">
+								  class="mp_form mp_form-mp-product-options-callout" method="post"
+								  data-ajax-url="<?php echo mp_get_ajax_url( 'admin-ajax.php?action=mp_update_cart' ); ?>"
+								  action="<?php echo get_permalink( mp_get_setting( 'pages->cart' ) ); ?>">
 								<input type="hidden" name="product_id" value="<?php echo $product->ID; ?>">
 								<input type="hidden" name="product_qty_changed" value="0">
 								<?php $product->display_price(); ?>
 								<?php $product->attribute_fields(); ?>
 								<?php if ( mp_get_setting( 'product_button_type' ) == 'addcart' ) : ?>
 									<button class="mp_button mp_button-addcart" type="submit"
-									        name="addcart"><?php _e( 'Add To Cart', 'mp' ); ?></button>
+											name="addcart"><?php _e( 'Add To Cart', 'mp' ); ?></button>
 								<?php elseif ( mp_get_setting( 'product_button_type' ) == 'buynow' ) :
 									?>
 									<button class="mp_button mp_button-buynow" type="submit"
-									        name="buynow"><?php _e( 'Buy Now', 'mp' ); ?></button>
+											name="buynow"><?php _e( 'Buy Now', 'mp' ); ?></button>
 								<?php endif; ?>
 							</form>
 							<!-- end mp-product-options-callout-form -->
@@ -330,14 +192,12 @@ class MP_Product {
 				</div>
 				<!-- end mp_product_options -->
 			</section><!-- end mp-product-<?php echo $product->ID; ?>-lightbox -->
-			<?php do_action( 'mp_public/after_variations_lightbox_form', $product_id, $product ); ?>
-			<?php
+			<?php do_action( 'mp_public/after_variations_lightbox_form', $product_id, $product );
 
 			$html = ob_get_clean();
 
 			echo apply_filters( 'mp_display_variations_lightbox', $html, $product_id, $product );
-
-		}
+		} // End if().
 
 		die;
 	}
@@ -402,7 +262,7 @@ class MP_Product {
 				$json['status'] = 'variation loop';
 				foreach ( $filtered_atts as $tax_slug ) {
 					$terms = get_the_terms( $variation->ID, $tax_slug );
-					if( ! empty( $terms ) ) {
+					if ( ! empty( $terms ) ) {
 						foreach ( $terms as $term ) {
 							if ( $variation->in_stock( $qty ) ) {
 
@@ -439,33 +299,33 @@ class MP_Product {
 			$terms             = $product_atts->sort( $terms, false );
 			foreach ( $terms as $term ) {
 				$checked  = ( mp_get_post_value( $tax_slug ) == $term->term_id || mp_get_post_value( 'other_' . $tax_slug ) == $term->term_id ) ? true : false;
-				$required = ( $index == 0 ) ? true : false;
+				$required = ( 0 == $index ) ? true : false;
 				$json[ $tax_slug ] .= self::attribute_option( $term->term_id, $term->name, $tax_slug, $required, $checked );
 				$index ++;
 			}
 		}
 
 		//Attempt to get a unique product variation depending on user selection
-		foreach ($attributes_including_others as $attr_name => $attr_value) {
-			if( isset( $filtered_terms[$attr_name] ) ){
-				if( !in_array( $attr_value, array_keys( $filtered_terms[$attr_name] ) ) ){
-						$attributes_including_others[$attr_name] = reset( array_keys( $filtered_terms[$attr_name] ) ) . '';
+		foreach ( $attributes_including_others as $attr_name => $attr_value ) {
+			if ( isset( $filtered_terms[ $attr_name ] ) ) {
+				if ( ! in_array( $attr_value, array_keys( $filtered_terms[ $attr_name ] ) ) ) {
+						$attributes_including_others[ $attr_name ] = reset( array_keys( $filtered_terms[ $attr_name ] ) ) . '';
 				}
 			}
 		}
 
 		$selected_variation = $product->get_variations_by_attributes( $attributes_including_others );
 
-		if(	isset( $selected_variation ) && is_array( $selected_variation ) && isset( $selected_variation[0] ) ) {
+		if ( isset( $selected_variation ) && is_array( $selected_variation ) && isset( $selected_variation[0] ) ) {
 			$selected_variation = $selected_variation[0];
-			$json['product_input']	= $selected_variation->attribute_input_fields( true, $qty );
-			$json['in_stock']		= $selected_variation->in_stock( $qty );
-			$json['out_of_stock'] 	= false;
+			$json['product_input']  = $selected_variation->attribute_input_fields( true, $qty );
+			$json['in_stock']       = $selected_variation->in_stock( $qty );
+			$json['out_of_stock']   = false;
 
 			$json['image'] = $selected_variation->image_url( false, null, 'single' );
 			$json['image_full'] = $selected_variation->image_url( false, 'full', 'single' );
 
-			$json['description'] = $selected_variation->content( false ) ;
+			$json['description'] = $selected_variation->content( false );
 
 			$json['excerpt'] = mp_get_the_excerpt( $selected_variation->ID, 18 );
 
@@ -476,22 +336,22 @@ class MP_Product {
 	}
 
 	/**
-	 * Constructor function
+	 * MP_Product constructor
 	 *
 	 * @since 3.0
 	 * @access public
 	 * @uses $post
 	 *
-	 * @param int /object/WP_Post $product Optional if in the loop.
-	 * @param int $blog_id Optional to use when global cart
+	 * @param int|null|object|WP_Post $product Optional if in the loop.
+	 * @param int|null $blog_id Optional to use when global cart
 	 */
-	public function __construct( $product = null , $blog_id = null ) {
+	public function __construct( $product = null, $blog_id = null ) {
 		if ( is_null( $product ) && in_the_loop() ) {
 			global $post;
 			$product = $post;
 		}
 
-		if ( !is_null( $blog_id ) && is_multisite() ) {
+		if ( ! is_null( $blog_id ) && is_multisite() ) {
 			$current_blog_id = get_current_blog_id();
 			switch_to_blog( $blog_id );
 		}
@@ -499,7 +359,7 @@ class MP_Product {
 		$this->_get_post( $product );
 		$this->_set_content_tabs( $this );
 
-		if ( !is_null( $blog_id ) && is_multisite() ) {
+		if ( ! is_null( $blog_id ) && is_multisite() && isset( $current_blog_id ) ) {
 			switch_to_blog( $current_blog_id );
 		}
 	}
@@ -509,6 +369,14 @@ class MP_Product {
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
+	 * @param $term_id
+	 * @param $term_name
+	 * @param $tax_slug
+	 * @param bool $required
+	 * @param bool $selected
+	 *
+	 * @return mixed|string|void
 	 */
 	public static function attribute_option( $term_id, $term_name, $tax_slug, $required = false, $selected = false ) {
 		$html = '<option id="mp_product_options_att_' . $term_id . '" value="' . $term_id . '"' . ( ( $selected ) ? ' selected' : '' ) . '>' . $term_name . '</option>';
@@ -1460,15 +1328,18 @@ class MP_Product {
 	 * @access public
 	 *
 	 * @param double $price
+	 *
+	 * @return float|int
 	 */
 	public function manage_price_tax( $price ) {
 		$tax_rate = mp_tax_rate();
-		$tax_inclusive = mp_get_setting( 'tax->tax_inclusive', 0 );
-		$include_tax_to_price = mp_get_setting( 'tax->include_tax', 1 );
-		$special_tax = get_post_meta( $this->ID, 'charge_tax', true );
-		$special_fixed_tax = false;
 
 		if( ! empty( $tax_rate ) ) {
+			$tax_inclusive = mp_get_setting( 'tax->tax_inclusive', 0 );
+			$include_tax_to_price = mp_get_setting( 'tax->include_tax', 1 );
+			$special_tax = get_post_meta( $this->ID, 'charge_tax', true );
+			$special_fixed_tax = false;
+
 			//Set tax rate to special tax
 			if( $special_tax ) {
 				$tax_rate = get_post_meta( $this->ID, 'special_tax_rate', true );
@@ -1481,7 +1352,7 @@ class MP_Product {
 				$tax_rate = mp_get_setting( 'tax->rate', '' );
 			}
 
-			if ( mp_get_setting( 'tax->tax_digital' ) && ! $this->is_download() ) {
+			if ( ! $this->is_download() ) {
 				//Price with Tax added
 				if( $tax_inclusive != 1 && $include_tax_to_price == 1 ) {
 					if( $special_fixed_tax ) {
@@ -1495,11 +1366,9 @@ class MP_Product {
 					$taxDivisor = 1 + $tax_rate;
 					$price = $price / $taxDivisor;
 				}
-			}
-
-			//Calculate price when special price & download product
-			if ( ! empty( $special_tax ) && $this->is_download() ) {
-				if( $tax_inclusive != 1 && $include_tax_to_price == 1 ) {
+			} elseif ( mp_get_setting( 'tax->tax_digital' ) && $this->is_download() ) {
+				//Calculate price when special price & download product
+				if( $tax_inclusive != 1 ) {
 					if( $special_fixed_tax ) {
 						$price = $price + $tax_rate;
 					} else {
@@ -1507,7 +1376,7 @@ class MP_Product {
 					}
 				}
 			}
-		}
+		} // End if().
 
 		return $price;
 	}
@@ -1519,8 +1388,10 @@ class MP_Product {
 	 * @access public
 	 *
 	 * @param bool $echo
+	 *
+	 * @return string
 	 */
-	public function display_tax_string( $echo = 'false' ) {
+	public function display_tax_string( $echo = false ) {
 		$tax_inclusive = mp_get_setting( 'tax->tax_inclusive', 0 );
 		$include_tax_to_price = mp_get_setting( 'tax->include_tax', 1 );
 		$tax_label = mp_get_setting( 'tax->tax_label', 0 );
