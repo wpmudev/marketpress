@@ -150,6 +150,20 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 
 == Changelog ==
 
+= 3.2.6 =
+* Enhance: Allow users to deselect default template in store settings
+* Fixed: Products that were not sorted correctly before, will be automatically updated to work correctly
+* Fixed: Missing translation strings for field verification on checkout pages
+* Fixed: Taxes for digital and physical products
+* Fixed: Default template styles
+* Fixed: Compatibility with Toolset Types plugin
+* Fixed: Coupon code add-on affecting taxes in cart
+* Fixed: Warning on products page in admin
+* Fixed: Quick setup notice not dismissed first time
+* Fixed: Unable to checkout digital products
+* Fixed: Save changes button in admin appears multiple time when using different translations
+* Fixed: Layout on checkout when billing address does not match shipping address
+
 = 3.2.5 =
 * Enhance: Removed @import directives for better compatibility with Hummingbird
 * Enhance: Better support for older PHP versions (5.2 and 5.3)
