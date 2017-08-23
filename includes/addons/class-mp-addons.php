@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class MP_Addons
+ */
 class MP_Addons {
 	/**
 	 * Refers to the registered addons
@@ -27,7 +30,7 @@ class MP_Addons {
 	 * @var object
 	 */
 	private static $_instance = null;
-	
+
 	/**
 	 * Determine if an addon has settings
 	 *
@@ -53,7 +56,7 @@ class MP_Addons {
 			if ( false !== ($key = array_search( $addon, $this->_addons_enabled )) ) {
 				unset( $this->_addons_enabled[ $key ] );
 				$addon_obj = $this->get_addon( $addon );
-				
+
 				/**
 				 * Fires after an addon is disabled
 				 *
@@ -62,7 +65,7 @@ class MP_Addons {
 				do_action( 'mp_addons/disable' . $addon_obj->class );
 			}
 		}
-		
+
 		mp_update_setting( 'addons', $this->_addons_enabled );
 	}
 
@@ -77,24 +80,22 @@ class MP_Addons {
 		foreach ( (array) $addons as $addon ) {
 			$this->_addons_enabled[] = $addon;
 			$addon_obj = $this->get_addon( $addon );
-			
-			if( file_exists( $addon_obj->path ) )
-                        {
-                                require_once $addon_obj->path;
-                                
-                                /**
-                                  * Fires after an addon is enabled
-                                  *
-                                  * @since 3.0
-                                  */
-                                do_action( 'mp_addons/enable/' . $addon_obj->class );
 
-                                array_unique( $this->_addons_enabled );
+			if ( file_exists( $addon_obj->path ) ) {
+				require_once $addon_obj->path;
 
-                                mp_update_setting( 'addons', $this->_addons_enabled );
-                        }
+				/**
+				 * Fires after an addon is enabled
+				 *
+				 * @since 3.0
+				 */
+				do_action( 'mp_addons/enable/' . $addon_obj->class );
+
+				array_unique( $this->_addons_enabled );
+
+				mp_update_setting( 'addons', $this->_addons_enabled );
+			}
 		}
-		
 	}
 
 	/**
@@ -108,7 +109,7 @@ class MP_Addons {
 	public function get_addon( $class ) {
 		return mp_arr_get_value( $class, $this->_addons );
 	}
-		
+
 	/**
 	 * Get all registered add-ons
 	 *
@@ -128,7 +129,7 @@ class MP_Addons {
 	 * @return object
 	 */
 	public static function get_instance() {
-		if ( is_null(self::$_instance) ) {
+		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new MP_Addons();
 		}
 		return self::$_instance;
@@ -143,20 +144,20 @@ class MP_Addons {
 	public function is_addon_enabled( $class ) {
 		return ( in_array( $class, $this->_addons_enabled ) );
 	}
-	
+
 	/**
 	 * Register an add-on
 	 *
 	 * @since 3.0
 	 * @access public
 	 * @param array $args {
-	 *		An array of arguments.
+	 *      An array of arguments.
 	 *
-	 *		@type string $label The add-on label (displays in the add-ons admin list).
-	 *		@type string $desc The add-on description (displays in the add-ons admin list).
-	 *		@type string $class The add-on class.
-	 *		@type string $path The absolute path to the add-on file.
-	 *		@type bool $has_settings Whether the addon has settings or not.
+	 *      @type string $label The add-on label (displays in the add-ons admin list).
+	 *      @type string $desc The add-on description (displays in the add-ons admin list).
+	 *      @type string $class The add-on class.
+	 *      @type string $path The absolute path to the add-on file.
+	 *      @type bool $has_settings Whether the addon has settings or not.
 	 * }
 	 */
 	public function register( $args ) {
@@ -167,7 +168,7 @@ class MP_Addons {
 			'path' => '',
 			'has_settings' => false,
 		), $args );
-		
+
 		$this->_addons[ $args['class'] ] = (object) $args;
 	}
 
@@ -182,11 +183,13 @@ class MP_Addons {
 		$this->_addons_enabled = mp_get_setting( 'addons', array() );
 		foreach ( $this->_addons_enabled as $addon ) {
 			if ( $addon_obj = mp_arr_get_value( $addon, $this->_addons ) ) {
-				if( file_exists( $addon_obj->path ) ) require_once $addon_obj->path;
+				if ( file_exists( $addon_obj->path ) ) {
+					require_once $addon_obj->path;
+				}
 			}
 		}
 	}
-			
+
 	/**
 	 * Constructor function
 	 *

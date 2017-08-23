@@ -40,7 +40,23 @@ class MP_Import_Export_Addon {
 	 * @access private
 	 */
 	private function __construct() {
-		var_dump( 'asdsad' );
+		add_action( 'admin_menu', array( $this, 'add_menu_item' ), 9 );
+	}
+
+	/**
+	 * Add sumbmenu items to admin menu.
+	 *
+	 * @since  3.2.6
+	 * @action admin_menu
+	 */
+	public function add_menu_item() {
+		add_submenu_page(
+			'edit.php?post_type=' . MP_Product::get_post_type(),
+			__( 'Export Products', 'mp' ),
+			__( 'Export Products', 'mp' ),
+			apply_filters( 'mp_store_settings_cap', 'manage_store_settings' ),
+			'edit.php?action=mp_export'
+		);
 	}
 }
 

@@ -728,6 +728,15 @@ class Marketpress {
 			'has_settings' => false,
 		) );
 
+		// Import/Export Add-on.
+		mp_register_addon( array(
+			'label'        => __( 'Import/Export', 'mp' ),
+			'desc'         => __( 'Add import and export for products', 'mp' ),
+			'class'        => 'MP_Import_Export_Addon',
+			'path'         => mp_plugin_dir( 'includes/addons/mp-import-export/class-mp-import-export-addon.php' ),
+			'has_settings' => false,
+		));
+
 		/**
 		 * Fires after all internal addons have been registered
 		 *
