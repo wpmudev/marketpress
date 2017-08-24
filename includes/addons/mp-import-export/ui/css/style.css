@@ -1,0 +1,8 @@
+.mp-export-products-wrapper {
+    background-color: #FFFFFF;
+    padding: 2% 5%;
+}
+
+.mp-export-products-wrapper .select2-container {
+    width: 50%;
+}
