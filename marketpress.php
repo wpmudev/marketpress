@@ -1120,6 +1120,8 @@ function mp_plugin_activate() {
 	if ( get_option( 'mp_needs_quick_setup' ) == false ) {
 		add_option( 'mp_needs_quick_setup', 1 );
 	}
+
+	update_option( 'mp_flush_rewrites', 1 );
 }
 
 function mp_plugin_uninstall() {
