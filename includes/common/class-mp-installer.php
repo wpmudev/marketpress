@@ -33,7 +33,7 @@ class MP_Installer {
 	 * @access public
 	 */
 	private function __construct() {
-		add_action( 'init', array( &$this, 'run' ), 0 );
+		add_action( 'init', array( &$this, 'run' ) );
 		add_action( 'after_switch_theme', array( &$this, 'add_admin_store_caps' ) );
 		add_action( 'admin_notices', array( &$this, 'db_update_notice' ) );
 		add_action( 'admin_menu', array( &$this, 'add_menu_items' ), 99 );
@@ -393,7 +393,6 @@ class MP_Installer {
 			$post_id = get_the_ID();
 
 			$variations = get_post_meta( $post_id, 'mp_var_name', true );
-			//var_dump( $post_id );
 			if ( $variations && is_array( $variations ) && true == $update_fix_needed ) {//need update since it used mp_var_name post meta which is not used in the 3.0 version
 				if ( count( $variations ) > 1 ) {
 					//It's a variation product
@@ -699,7 +698,6 @@ class MP_Installer {
 
 		$old_settings = get_option( 'mp_settings', array() );
 
-
 		// Filter default settings
 		$default_settings = apply_filters( 'mp_default_settings', mp()->default_settings );
 		$settings         = array_replace_recursive( $default_settings, $old_settings );
@@ -721,6 +719,14 @@ class MP_Installer {
 				$settings = $this->update_3000( $settings );
 			}
 
+			//3.0.0.3 need data from 3.0
+			if ( ( version_compare( $old_version, '3.0.0.3', '<' ) || ( false !== $force_version && version_compare( $force_version, '3.0.0.3', '<' ) ) ) ) {
+				$settings = $this->update_3003( $settings );
+				update_option( 'mp_settings', $settings );
+				//we will remove the mp_db_update_required, so user can re run the wizard
+				update_option( 'mp_db_update_required', 1 );
+			}
+
 			//3.0 update
 			if ( version_compare( $old_version, '3.0.0.8', '<' ) || ( false !== $force_version && version_compare( $force_version, '3.0.0.8', '<' ) ) ) {
 				$settings = $this->update_3007( $settings );
@@ -735,20 +741,11 @@ class MP_Installer {
 			if ( version_compare( $old_version, '3.2.6', '<' ) || ( false !== $force_version && version_compare( $force_version, '3.2.6', '<' ) ) ) {
 				$this->update_326();
 			}
-		}
+		} // End if().
 
 		// Update settings
 		update_option( 'mp_settings', $settings );
-		if ( ! empty( $old_version ) ) {
-			$settings = get_option( 'mp_settings' );
-			//3.0.0.3 need data from 3.0
-			if ( ( version_compare( $old_version, '3.0.0.3', '<' ) || ( false !== $force_version && version_compare( $force_version, '3.0.0.3', '<' ) ) ) ) {
-				$settings = $this->update_3003( $settings );
-				update_option( 'mp_settings', $settings );
-				//we will remove the mp_db_update_required, so user can re run the wizard
-				update_option( 'mp_db_update_required', 1 );
-			}
-		}
+
 		// Give admin role all store capabilities
 		$this->add_admin_store_caps();
 		// Add "term_order" to $wpdb->terms table
@@ -915,8 +912,13 @@ class MP_Installer {
 		$store_caps = mp_get_store_caps();
 
 		// We've had few error reports that $role is not an object, lets check
-		if ( is_object( $role ) ) {
-			foreach ( $store_caps as $cap ) {
+		if ( ! is_object( $role ) ) {
+			return;
+		}
+
+		// Add store custom capability if it's not already there.
+		foreach ( $store_caps as $cap ) {
+			if ( ! $role->has_cap( $cap ) ) {
 				$role->add_cap( $cap );
 			}
 		}

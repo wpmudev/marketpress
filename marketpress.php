@@ -144,7 +144,6 @@ class Marketpress {
 	public function register_custom_types() {
 		global $wp_version;
 
-
 		// Register product_category taxonomy.
 		register_taxonomy( 'product_category', MP_Product::get_post_type(), apply_filters( 'mp_register_product_category', array(
 			'hierarchical'      => true,
@@ -906,11 +905,11 @@ class Marketpress {
 		require_once $this->plugin_dir( 'includes/wpmudev-metaboxes/wpmudev-metabox.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-mailer.php' );
 		require_once $this->plugin_dir( 'includes/common/helpers.php' );
-		require_once $this->plugin_dir( 'includes/common/class-mp-installer.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-product-attributes.php' );
 		require_once $this->plugin_dir( 'includes/addons/class-mp-addons.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-order.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-product.php' );
+		require_once $this->plugin_dir( 'includes/common/class-mp-installer.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-cart.php' );
 		require_once $this->plugin_dir( 'includes/common/template-functions.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-backward-compatibility.php' );

@@ -117,7 +117,6 @@ class MP_Store_Settings_Import {
 				foreach ( $taxonomies as $tax_type_key => $taxonomy ) {
 					// If term object is returned, break out of loop. (Returns false if there's no object)
 					if ( $term_object = get_term_by( 'name', $meta['value'] , $taxonomy ) ) {
-						//var_dump( 'for product ' . $post_id . ' link term id ' . $term_object->term_id . ' with ' . $term_object->taxonomy );
 						wp_set_object_terms( $post_id, $term_object->term_id, $term_object->taxonomy );
 						break;
 					}
