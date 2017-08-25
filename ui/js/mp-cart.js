@@ -25,7 +25,6 @@ var mp_cart = { };
         },
         "ignore": "",
         "submitHandler": function( form ) {
-            va
             var $form = $( form );
             var qty = $form.find( '[name="product_quantity"]' ).val();
             var product_id = $form.find( '[name="product_id"]' ).val();
