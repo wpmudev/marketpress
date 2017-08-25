@@ -22,7 +22,6 @@ class MP_Import_Export_Addon {
 	 * Get the single instance of the class.
 	 *
 	 * @since  3.2.6
-	 * @access public
 	 * @return MP_Import_Export_Addon|object
 	 */
 	public static function get_instance() {
@@ -66,6 +65,7 @@ class MP_Import_Export_Addon {
 	 * Render view.
 	 *
 	 * @since 3.2.6
+	 * @callback add_submenu_page
 	 */
 	public function display_page() {
 		// Check user capabilities.
@@ -79,8 +79,9 @@ class MP_Import_Export_Addon {
 	/**
 	 * Enqueue styles.
 	 *
-	 * @since 3.2.6
-	 * @param string $hook  Contains page slug.
+	 * @since  3.2.6
+	 * @action admin_enqueue_scripts
+	 * @param  string $hook  Contains page slug.
 	 */
 	public function enqueue_scripts( $hook ) {
 		// If not on export page, do not enqueue styles.
@@ -109,10 +110,14 @@ class MP_Import_Export_Addon {
 		);
 	}
 
+	/**
+	 * Export products.
+	 *
+	 * @since  3.2.6
+	 * @action wp_ajax_mp_export_products
+	 */
 	public function export_products() {
 		check_ajax_referer( 'mp_export_products' );
-
-		wp_mail( 'a.vanyukov@testor.ru', 'test', 'data' );
 
 		wp_die();
 	}
