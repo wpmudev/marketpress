@@ -30,9 +30,9 @@ class MP_Store_Settings_Import {
 	 * @access  private
 	 */
 	private function __construct() {
-        add_action( 'init', array( $this, 'process_form' ) );
+		add_action( 'init', array( $this, 'process_form' ) );
 
-        // Process variation terms
+		// Process variation terms
 		add_filter( 'wp_import_terms', array( $this, 'process_taxonomies' ) );
 
 		// Process posts that are marked as duplicates
@@ -40,13 +40,13 @@ class MP_Store_Settings_Import {
 
 		// Process attributes for variable products
 		add_filter( 'wp_import_post_meta', array( $this, 'process_products' ), 10, 2 );
-    }
+	}
 
 	/**
 	 * Hook into the import process to create missing taxonomies.
 	 *
 	 * Here we filter through all terms and see if WordPress has a registered taxonomy for the term. If there is
-	 * a taxonomy (usually there is one for tags and categories) - we pass it on to wordpress importer. If no
+	 * a taxonomy (usually there is one for tags and categories) - we pass it on to WordPress importer. If no
 	 * texonomy is found, that means it is an attribute for a variable product and we need to add it manually.
 	 *
 	 * @since  3.2.4
@@ -70,10 +70,9 @@ class MP_Store_Settings_Import {
 					wp_insert_term( $term['term_name'], $taxonomy );
 				}
 			} // End if().
-
 		} // End foreach().
 
-		// Everything else can be parsed by wordpress importer.
+		// Everything else can be parsed by WordPress importer.
 		return $terms;
 
 	}
@@ -110,9 +109,9 @@ class MP_Store_Settings_Import {
 	 * @return array
 	 */
 	public function process_products( $metakeys, $post_id ) {
-// TODO: value can consist of several keys
+		// TODO: value can consist of several keys
 		foreach ( $metakeys as $meta ) {
-			if ( $meta['key'] == 'name' ) {
+			if ( 'name' == $meta['key'] ) {
 
 				$taxonomies = get_taxonomies();
 				foreach ( $taxonomies as $tax_type_key => $taxonomy ) {
@@ -346,8 +345,12 @@ class MP_Store_Settings_Import {
 	private static function export_products() {
 		global $wpdb, $post;
 
-		$args = array( 'author' => false, 'category' => false, 'start_date' => false,
-			'end_date' => false, 'status' => false,
+		$args = array(
+			'author'     => false,
+			'category'   => false,
+			'start_date' => false,
+			'end_date'   => false,
+			'status'     => false,
 		);
 
 		/**
@@ -373,15 +376,20 @@ class MP_Store_Settings_Import {
 		 */
 		$terms = array();
 
-		$custom_taxonomies = get_taxonomies( array( '_builtin' => false ) );
-		$custom_terms = (array) get_terms( $custom_taxonomies, array( 'get' => 'all' ) );
+		$custom_taxonomies = get_taxonomies( array(
+			'_builtin' => false,
+		) );
+		$custom_terms = (array) get_terms( $custom_taxonomies, array(
+			'get' => 'all',
+		) );
 
 		// Put terms in order with no child going before its parent.
 		while ( $t = array_shift( $custom_terms ) ) {
-			if ( $t->parent == 0 || isset( $terms[$t->parent] ) )
-				$terms[$t->term_id] = $t;
-			else
+			if ( 0 == $t->parent || isset( $terms[ $t->parent ] ) ) {
+				$terms[ $t->term_id ] = $t;
+			} else {
 				$custom_terms[] = $t;
+			}
 		}
 
 		unset( $custom_taxonomies, $custom_terms );
