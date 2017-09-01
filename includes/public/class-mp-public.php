@@ -476,6 +476,7 @@ class MP_Public {
 					add_filter( 'the_content', array( &$this, 'single_product_content' ) );
 				}
 			} else {
+			    remove_filter( 'get_post_metadata', array( &$this, 'remove_product_post_thumbnail' ), 999 );
 				$template = $custom_template;
 			}
 		}
