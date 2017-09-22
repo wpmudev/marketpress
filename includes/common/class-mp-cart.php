@@ -387,7 +387,7 @@ class MP_Cart {
 
 		if ( $cart_cookie = mp_get_cookie_value( $this->_cookie_id ) ) {
 			// Clean cookie from none product items
-			$cart_cookie_items = unserialize( $cart_cookie );
+			$cart_cookie_items = json_decode( $cart_cookie, true );
 			foreach ( $cart_cookie_items as $blog_id => $blog_items ) {
 				foreach ( $blog_items as $item => $qty ) {
 					$product = new MP_Product( $item , $blog_id );
@@ -2476,7 +2476,7 @@ class MP_Cart {
 			$cookie_domain = get_blog_details( mp_main_site_id() )->domain;
 		}
 
-		setcookie( $this->_cookie_id, serialize( $this->_items ), $expire, '/', $cookie_domain );
+		setcookie( $this->_cookie_id, json_encode( $this->_items ), $expire, '/', $cookie_domain );
 	}
 
 	/**
