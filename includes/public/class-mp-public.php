@@ -476,6 +476,7 @@ class MP_Public {
 					add_filter( 'the_content', array( &$this, 'single_product_content' ) );
 				}
 			} else {
+			    remove_filter( 'get_post_metadata', array( &$this, 'remove_product_post_thumbnail' ), 999 );
 				$template = $custom_template;
 			}
 		}
@@ -629,9 +630,9 @@ class MP_Public {
 		$file_number = false;
 
 		//Check if its part of the downloads
-		$current_file = mp_get_get_value( 'numb' );
+		$current_file = (int) mp_get_get_value( 'numb' );
 
-		if ( $current_file && is_int( $current_file ) ) {
+		if ( $current_file ) {
 			$file_number = $current_file;
 
 			if ( is_array( $url ) ){
