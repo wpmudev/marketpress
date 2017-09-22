@@ -7,8 +7,11 @@ Change Log:
 3.2.7
 ----------------------------------------------------------------------
 
-- Fix: Potential php object injection vulnerability
-- Fix: On some occasions products not added to cart when Hummingbird is enabled
+- Enhance: Update translation strings
+- Fixed: Potential php object injection vulnerability
+- Fixed: On some occasions products not added to cart when Hummingbird is enabled
+- Fixed: Digital products not downloading after payment
+- Fixed: Variation images not showing in custom template files
 
 3.2.6
 ----------------------------------------------------------------------
