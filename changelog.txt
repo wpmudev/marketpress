@@ -4,6 +4,12 @@ Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonat
 Change Log:
 ----------------------------------------------------------------------
 
+3.2.7
+----------------------------------------------------------------------
+
+- Fix: Potential php object injection vulnerability
+- Fix: On some occasions products not added to cart when Hummingbird is enabled
+
 3.2.6
 ----------------------------------------------------------------------
 
