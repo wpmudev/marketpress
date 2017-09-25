@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the MarketPress package.
 msgid ""
 msgstr ""
-"Project-Id-Version: MarketPress 3.2.6\n"
+"Project-Id-Version: MarketPress 3.2.7-beta.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2017-08-30 09:20:49+00:00\n"
+"POT-Creation-Date: 2017-09-22 13:28:58+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -3706,9 +3706,11 @@ msgid ""
 "This option changes the built-in css styles for store pages. For a custom "
 "css style, save your css file with the <strong>/* MarketPress Style: Your "
 "CSS Theme Name Here */</strong> header line in the <strong>\"%s\"</strong> "
-"folder and it will appear in this list so you may select it. You can also "
-"select \"None\" and no one special CSS-file won't apply. More information "
-"on that <a target=\"_blank\" href=\"%s\">here &raquo;</a>."
+"folder and it will appear in this list so you may select it. You should "
+"select \"None\" if you don't wish to use custom CSS styles or if you are "
+"using default theme templates or custom theme templates and css to make "
+"your own completely unique store design. For more information on custom "
+"theme templates click <a target=\"_blank\" href=\"%s\">here &raquo;</a>."
 msgstr ""
 
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:805
@@ -8790,21 +8792,21 @@ msgstr ""
 msgid "Please enter a value greater than or equal to {0}."
 msgstr ""
 
-#: includes/public/class-mp-public.php:608
+#: includes/public/class-mp-public.php:609
 msgid "Sorry, the link is invalid for this download."
 msgstr ""
 
-#: includes/public/class-mp-public.php:613
+#: includes/public/class-mp-public.php:614
 msgid "Sorry, your order has been marked as unpaid."
 msgstr ""
 
-#: includes/public/class-mp-public.php:662
+#: includes/public/class-mp-public.php:663
 msgid ""
 "Sorry, our records show you've downloaded this file %d out of %d times "
 "allowed. Please contact us if you still need help."
 msgstr ""
 
-#: includes/public/class-mp-public.php:719
+#: includes/public/class-mp-public.php:720
 msgid ""
 "Whoops, there was a problem loading up this file for your download. Please "
 "contact us for help."
