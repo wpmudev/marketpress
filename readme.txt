@@ -3,7 +3,7 @@ Contributors: WPMUDEV
 Tags: E-commerce, ecommerce, storefront, sell, store, shopping, cart, payment gateways, digital downloads, online store
 Requires at least: 3.7
 Requires PHP: 5.2
-Tested up to: 4.8.1
+Tested up to: 4.8.2
 Stable tag: trunk
 
 Full-power ecommerce marketplace for WordPress and Multisite. 100% free and no extensions required.
@@ -150,6 +150,13 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 3. Descriptions and Reviews.
 
 == Changelog ==
+
+= 3.2.7 =
+* Enhance: Update translation strings
+* Fixed: Potential php object injection vulnerability
+* Fixed: On some occasions products not added to cart when Hummingbird is enabled
+* Fixed: Digital products not downloading after payment
+* Fixed: Variation images not showing in custom template files
 
 = 3.2.6 =
 * Enhance: Allow users to deselect default template in store settings
