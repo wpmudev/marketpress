@@ -636,6 +636,7 @@ $this->GB_provinces = array(
 	'Huntingdonshire'				 => 'Huntingdonshire',
 	'Inverness-shire'				 => 'Inverness-shire',
 	'Isle of Anglesey'				 => 'Isle of Anglesey',
+	'Isle of Wight'					 => 'Isle of Wight',
 	'Kent'							 => 'Kent',
 	'Kincardineshire'				 => 'Kincardineshire',
 	'Kinross-shire'					 => 'Kinross-shire',
