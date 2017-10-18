@@ -1348,7 +1348,7 @@ class MP_Product {
 				} else {
 					$special_fixed_tax = true;
 				}
-			} else {
+			} elseif ( 0 === $tax_rate ) {
 				$tax_rate = mp_get_setting( 'tax->rate', '' );
 			}
 
