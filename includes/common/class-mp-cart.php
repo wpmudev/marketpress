@@ -345,8 +345,11 @@ class MP_Cart {
 	 * @return array
 	 */
 	protected function _convert_to_objects( $items ) {
-		$cache_key = implode( ',', $items );
 		$products  = array();
+		if ( empty( $items ) ) {
+			return $products;
+		}
+		$cache_key = implode( ',', $items );
 
 		if ( $_posts = wp_cache_get( $cache_key, 'mp_cart' ) ) {
 			$posts = $_posts;
