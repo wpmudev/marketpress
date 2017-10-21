@@ -455,8 +455,8 @@ class MP_Coupon {
 		//Moved to variable as it will be used in many instances
 		$cart_products = $this->get_products( true ) ;
 
-		$coupon_start 			= get_post_meta( $this->ID, 'start_date', true );
-		$coupon_end 			= get_post_meta( $this->ID, 'end_date', true );
+		$coupon_start 			= $this->get_meta( 'start_date', 0, true );
+		$coupon_end 			= $this->get_meta( 'end_date', 0, true );
 
 		if ( ! $this->exists() ) {
 			$is_valid = false;
