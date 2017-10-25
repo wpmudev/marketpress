@@ -741,6 +741,11 @@ class MP_Installer {
 			if ( version_compare( $old_version, '3.2.6', '<' ) || ( false !== $force_version && version_compare( $force_version, '3.2.6', '<' ) ) ) {
 				$this->update_326();
 			}
+
+			// 3.2.8 update.
+			if ( version_compare( $old_version, '3.2.8', '<' ) || ( false !== $force_version && version_compare( $force_version, '3.2.8', '<' ) ) ) {
+				$this->upgrade_328();
+			}
 		} // End if().
 
 		// Update settings
@@ -1411,6 +1416,34 @@ class MP_Installer {
 
 			if ( isset( $price ) ) {
 				update_post_meta( $product_id, 'sort_price', $price );
+			}
+		}
+	}
+
+
+	/**
+	 * Update to version 3.2.8.
+	 *
+	 * Adds enabled options for sending all notification types.
+	 *
+	 * @since 3.2.8
+	 * @access private
+	 */
+	private function upgrade_328() {
+		$settings = get_option( 'mp_settings' );
+		//only if this setting is overwritten
+		if ( $settings ) {
+			$notification_kinds = array(
+				'new_order',
+				'new_order_mixed',
+				'new_order_downloads',
+				'order_shipped',
+				'order_shipped_mixed',
+				'order_shipped_downloads',
+				'admin_order',
+			);
+			foreach ( $notification_kinds as $kind ) {
+				mp_update_setting( 'email->' . $kind . '->send_email', 1 );
 			}
 		}
 	}
