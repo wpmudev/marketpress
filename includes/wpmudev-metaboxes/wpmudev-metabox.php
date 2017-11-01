@@ -633,6 +633,7 @@ class WPMUDEV_Metabox {
 			|| $page == 'store-settings-capabilities'
 			|| $page == 'store-settings-import'
 			|| $page == 'store-settings-addons'
+			|| $page == 'network-store-settings'
 			|| ( isset( $_GET['taxonomy'] ) && ($_GET['taxonomy'] == 'product_category' || $_GET['taxonomy'] == 'product_tag') )
 			|| ( isset( $_GET['post_type'] ) && ($_GET['post_type'] == 'mp_coupon' || $_GET['post_type'] == 'mp_order' || $_GET['post_type'] == 'product' ) ) 
 			|| ( isset( $screenpage->post_type ) && ( $screenpage->post_type == MP_Product::get_post_type() || $screenpage->post_type == "mp_order" || $screenpage->post_type == "mp_coupon") ) )  {
