@@ -282,69 +282,75 @@ class MP_Order {
 			$notification_kind = 'new_order_downloads';
 		}
 
-		$subject = mp_filter_email( $this, stripslashes( mp_get_setting( 'email->'.$notification_kind.'->subject' ) ) );
-		$msg     = mp_filter_email( $this, nl2br( stripslashes( mp_get_setting( 'email->'.$notification_kind.'->text' ) ) ) );
+		$send_email = mp_get_setting( 'email->'.$notification_kind.'->send_email', 1 );
+		if ( $send_email ) {
+			$subject = mp_filter_email( $this, stripslashes( mp_get_setting( 'email->'.$notification_kind.'->subject' ) ) );
+			$msg     = mp_filter_email( $this, nl2br( stripslashes( mp_get_setting( 'email->'.$notification_kind.'->text' ) ) ) );
 
-		if ( has_filter( 'mp_order_notification_subject' ) ) {
-			//trigger_error( 'The <strong>mp_order_notification_subject</strong> hook has been replaced with <strong>mp_order/notification_subject</strong> as of MP 3.0', E_USER_ERROR );
-			error_log( 'The <strong>mp_order_notification_subject</strong> hook has been replaced with <strong>mp_order/notification_subject</strong> as of MP 3.0' );
+			if ( has_filter( 'mp_order_notification_subject' ) ) {
+				//trigger_error( 'The <strong>mp_order_notification_subject</strong> hook has been replaced with <strong>mp_order/notification_subject</strong> as of MP 3.0', E_USER_ERROR );
+				error_log( 'The <strong>mp_order_notification_subject</strong> hook has been replaced with <strong>mp_order/notification_subject</strong> as of MP 3.0' );
 
-			return false;
+				return false;
+			}
+
+			if ( has_filter( 'mp_order_notification_body' ) ) {
+				//trigger_error( 'The <strong>mp_order_notification_body</strong> hook has been replaced with <strong>mp_order/notification_body</strong> as of MP 3.0', E_USER_ERROR );
+				error_log( 'The <strong>mp_order_notification_body</strong> hook has been replaced with <strong>mp_order/notification_body</strong> as of MP 3.0' );
+
+				return false;
+			}
+
+			if ( has_filter( 'mp_order_notification_' . mp_get_post_value( 'payment_method', '' ) ) ) {
+				//trigger_error( 'The <strong>mp_order_notification_' . mp_get_post_value( 'payment_method', '' ) . '</strong> hook has been replaced with <strong>mp_order/notification_body/' . mp_get_post_value( 'payment_method', '' ) . '</strong> as of MP 3.0', E_USER_ERROR );
+				error_log( 'The <strong>mp_order_notification_' . mp_get_post_value( 'payment_method', '' ) . '</strong> hook has been replaced with <strong>mp_order/notification_body/' . mp_get_post_value( 'payment_method', '' ) . '</strong> as of MP 3.0' );
+
+				return false;
+			}
+
+			/**
+			 * Filter the notification subject
+			 *
+			 * @since 3.0
+			 *
+			 * @param string $subject The current subject.
+			 * @param MP_Order $this The current order object.
+			 */
+			$subject = apply_filters( 'mp_order/notification_subject', $subject, $this );
+
+			/**
+			 * Filter the notification message
+			 *
+			 * @since 3.0
+			 *
+			 * @param string $msg The current message.
+			 * @param MP_Order $this The current order object.
+			 */
+			$msg         = apply_filters( 'mp_order/notification_body', $msg, $this );
+			$msg         = apply_filters( 'mp_order/notification_body/' . mp_get_post_value( 'payment_method', '' ), $msg, $this );
+			$attachments = apply_filters( 'mp_order/sendmail_attachments', array(), $this, 'new_order_client' );
+			$this->_send_email_to_buyers( $subject, $msg, $attachments );
 		}
 
-		if ( has_filter( 'mp_order_notification_body' ) ) {
-			//trigger_error( 'The <strong>mp_order_notification_body</strong> hook has been replaced with <strong>mp_order/notification_body</strong> as of MP 3.0', E_USER_ERROR );
-			error_log( 'The <strong>mp_order_notification_body</strong> hook has been replaced with <strong>mp_order/notification_body</strong> as of MP 3.0' );
+		$send_email = mp_get_setting( 'email->admin_order->send_email', 1 );
+		if ( $send_email ) {
+			$subject = mp_filter_email( $this, stripslashes( mp_get_setting( 'email->admin_order->subject', __( 'New Order Notification: ORDERID', 'mp' ) ) ) );
+			$msg     = mp_filter_email( $this, nl2br( stripslashes( mp_get_setting( 'email->admin_order->text', __( "A new order (ORDERID) was created in your store:\n\n ORDERINFOSKU\n\n SHIPPINGINFO\n\n PAYMENTINFO\n\n", 'mp' ) ) ) ) );
 
-			return false;
+			$subject = apply_filters( 'mp_order_notification_admin_subject', $subject, $this );
+
+			/**
+			 * Filter the admin order notification message
+			 *
+			 * @since 3.0
+			 *
+			 * @param string $msg
+			 * @param MP_Order $order
+			 */
+			$msg         = apply_filters( 'mp_order_notification_admin_msg', $msg, $this );
+			$attachments = apply_filters( 'mp_order/sendmail_attachments', array(), $this, 'new_order_admin' );
+			mp_send_email( mp_get_store_email(), $subject, $msg, $attachments );
 		}
-
-		if ( has_filter( 'mp_order_notification_' . mp_get_post_value( 'payment_method', '' ) ) ) {
-			//trigger_error( 'The <strong>mp_order_notification_' . mp_get_post_value( 'payment_method', '' ) . '</strong> hook has been replaced with <strong>mp_order/notification_body/' . mp_get_post_value( 'payment_method', '' ) . '</strong> as of MP 3.0', E_USER_ERROR );
-			error_log( 'The <strong>mp_order_notification_' . mp_get_post_value( 'payment_method', '' ) . '</strong> hook has been replaced with <strong>mp_order/notification_body/' . mp_get_post_value( 'payment_method', '' ) . '</strong> as of MP 3.0' );
-
-			return false;
-		}
-
-		/**
-		 * Filter the notification subject
-		 *
-		 * @since 3.0
-		 *
-		 * @param string $subject The current subject.
-		 * @param MP_Order $this The current order object.
-		 */
-		$subject = apply_filters( 'mp_order/notification_subject', $subject, $this );
-
-		/**
-		 * Filter the notification message
-		 *
-		 * @since 3.0
-		 *
-		 * @param string $msg The current message.
-		 * @param MP_Order $this The current order object.
-		 */
-		$msg         = apply_filters( 'mp_order/notification_body', $msg, $this );
-		$msg         = apply_filters( 'mp_order/notification_body/' . mp_get_post_value( 'payment_method', '' ), $msg, $this );
-		$attachments = apply_filters( 'mp_order/sendmail_attachments', array(), $this, 'new_order_client' );
-		$this->_send_email_to_buyers( $subject, $msg, $attachments );
-
-		$subject = mp_filter_email( $this, stripslashes( mp_get_setting( 'email->admin_order->subject', __( 'New Order Notification: ORDERID', 'mp' ) ) ) );
-		$msg     = mp_filter_email( $this, nl2br( stripslashes( mp_get_setting( 'email->admin_order->text', __( "A new order (ORDERID) was created in your store:\n\n ORDERINFOSKU\n\n SHIPPINGINFO\n\n PAYMENTINFO\n\n", 'mp' ) ) ) ) );
-
-		$subject = apply_filters( 'mp_order_notification_admin_subject', $subject, $this );
-
-		/**
-		 * Filter the admin order notification message
-		 *
-		 * @since 3.0
-		 *
-		 * @param string $msg
-		 * @param MP_Order $order
-		 */
-		$msg         = apply_filters( 'mp_order_notification_admin_msg', $msg, $this );
-		$attachments = apply_filters( 'mp_order/sendmail_attachments', array(), $this, 'new_order_admin' );
-		mp_send_email( mp_get_store_email(), $subject, $msg, $attachments );
 	}
 
 	/**
@@ -373,54 +379,57 @@ class MP_Order {
 			$notification_kind = 'order_shipped_downloads';
 		}
 
-		$subject = stripslashes( mp_get_setting( 'email->'.$notification_kind.'->subject' ) );
-		$msg     = nl2br( stripslashes( mp_get_setting( 'email->'.$notification_kind.'->text' ) ) );
+		$send_email = mp_get_setting( 'email->'.$notification_kind.'->send_email', 1 );
+		if ( $send_email ) {
+			$subject = stripslashes( mp_get_setting( 'email->'.$notification_kind.'->subject' ) );
+			$msg     = nl2br( stripslashes( mp_get_setting( 'email->'.$notification_kind.'->text' ) ) );
 
-		if ( has_filter( 'mp_shipped_order_notification_subject' ) ) {
-			trigger_error( 'The <strong>mp_shipped_order_notification_subject</strong> hook has been replaced with <strong>mp_order/shipment_notification_subject</strong> as of MP 3.0', E_USER_ERROR );
+			if ( has_filter( 'mp_shipped_order_notification_subject' ) ) {
+				trigger_error( 'The <strong>mp_shipped_order_notification_subject</strong> hook has been replaced with <strong>mp_order/shipment_notification_subject</strong> as of MP 3.0', E_USER_ERROR );
+			}
+
+			if ( has_filter( 'mp_shipped_order_notification_body' ) ) {
+				trigger_error( 'The <strong>mp_shipped_order_notification_body</strong> hook has been replaced with <strong>mp_order/shipment_notification_body</strong> as of MP 3.0', E_USER_ERROR );
+			}
+
+			if ( has_filter( 'mp_shipped_order_notification' ) ) {
+				trigger_error( 'The <strong>mp_shipped_order_notification</strong> hook has been replaced with <strong>mp_order/shipment_notification</strong> as of MP 3.0', E_USER_ERROR );
+			}
+
+			/**
+			 * Filter the shipment notification subject
+			 *
+			 * @since 3.0
+			 *
+			 * @param string $subject The email subject.
+			 * @param MP_Order $this The current order object.
+			 */
+			$subject = apply_filters( 'mp_order/shipment_notification_subject', $subject, $this );
+			$subject = mp_filter_email( $this, $subject );
+
+			/**
+			 * Filter the shipment notification body before string replacements happen
+			 *
+			 * @since 3.0
+			 *
+			 * @param string $msg The email message.
+			 * @param MP_Order $this The current order object.
+			 */
+			$msg = apply_filters( 'mp_order/shipment_notification_body', $msg, $this );
+			$msg = mp_filter_email( $this, $msg );
+
+			/**
+			 * Filter the shipment notification body after string replacements happen
+			 *
+			 * @since 3.0
+			 *
+			 * @param string $msg The email message.
+			 * @param MP_Order $this The current order object.
+			 */
+			$msg         = apply_filters( 'mp_order/shipment_notification', $msg, $this );
+			$attachments = apply_filters( 'mp_order/sendmail_attachments', array(), $this, 'order_shipped_client' );
+			$this->_send_email_to_buyers( $subject, $msg, $attachments );
 		}
-
-		if ( has_filter( 'mp_shipped_order_notification_body' ) ) {
-			trigger_error( 'The <strong>mp_shipped_order_notification_body</strong> hook has been replaced with <strong>mp_order/shipment_notification_body</strong> as of MP 3.0', E_USER_ERROR );
-		}
-
-		if ( has_filter( 'mp_shipped_order_notification' ) ) {
-			trigger_error( 'The <strong>mp_shipped_order_notification</strong> hook has been replaced with <strong>mp_order/shipment_notification</strong> as of MP 3.0', E_USER_ERROR );
-		}
-
-		/**
-		 * Filter the shipment notification subject
-		 *
-		 * @since 3.0
-		 *
-		 * @param string $subject The email subject.
-		 * @param MP_Order $this The current order object.
-		 */
-		$subject = apply_filters( 'mp_order/shipment_notification_subject', $subject, $this );
-		$subject = mp_filter_email( $this, $subject );
-
-		/**
-		 * Filter the shipment notification body before string replacements happen
-		 *
-		 * @since 3.0
-		 *
-		 * @param string $msg The email message.
-		 * @param MP_Order $this The current order object.
-		 */
-		$msg = apply_filters( 'mp_order/shipment_notification_body', $msg, $this );
-		$msg = mp_filter_email( $this, $msg );
-
-		/**
-		 * Filter the shipment notification body after string replacements happen
-		 *
-		 * @since 3.0
-		 *
-		 * @param string $msg The email message.
-		 * @param MP_Order $this The current order object.
-		 */
-		$msg         = apply_filters( 'mp_order/shipment_notification', $msg, $this );
-		$attachments = apply_filters( 'mp_order/sendmail_attachments', array(), $this, 'order_shipped_client' );
-		$this->_send_email_to_buyers( $subject, $msg, $attachments );
 	}
 
 	/**
