@@ -300,7 +300,8 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 		 * @access protected
 		 */
 		protected function _generate_ipn_url() {
-			$this->ipn_url = admin_url( 'admin-ajax.php?action=mp_process_ipn_return_' . $this->plugin_name );
+			$ipn_url = admin_url( 'admin-ajax.php?action=mp_process_ipn_return_' . $this->plugin_name );
+			$this->ipn_url = apply_filters( 'mp_gateway_api/ipn_url', $ipn_url, $this->plugin_name );
 		}
 
 		/**
