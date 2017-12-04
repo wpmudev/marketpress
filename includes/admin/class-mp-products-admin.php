@@ -1083,7 +1083,16 @@ class MP_Products_Screen {
 					}
 					break;
 				case 'default_variation':
-					update_post_meta( $post_id, $value_type, $value );
+					$current_default = get_post_meta( $post_id, $value_type );
+
+					if ( $current_default[0] == $value ) {
+						delete_post_meta( $post_id, $value_type );
+						wp_send_json_success( 'removed' );
+					} else {
+						update_post_meta( $post_id, $value_type, $value );
+						wp_send_json_success( 'added' );
+					}
+
 					break;
 				default:
 					if ( $value_type == '_thumbnail_id' && $value == '' ) {
