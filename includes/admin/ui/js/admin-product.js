@@ -215,15 +215,14 @@ jQuery( document ).ready( function( $ ) {
             if ( variation_errors == 0 ) {
 
 //alert($( '#original_publish' ).val());
-                if ( $( '#original_publish' ).val() == 'Publish' ) {
+                if ( mp_product_admin_i18n.status != 'publish' ) {
 //$( '.mp-admin-overlay' ).show();
                     $( '#save-post' ).removeAttr( 'disabled' );
                     //$( '#save-post' ).prop( 'disabled', false );
                     $( '#save-post' ).click();
                     //mp_variation_message();
                 }
-
-                if ( $( '#original_publish' ).val() == 'Update' ) {
+                else {
 
 //$( '.mp-admin-overlay' ).show();
                     if ( caller_id == 'mp_make_combinations' ) {
