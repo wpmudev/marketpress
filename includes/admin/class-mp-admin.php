@@ -265,7 +265,7 @@ class MP_Admin {
 	 * @access public
 	 */
 	public function enqueue_styles_scripts() {
-		global $pagenow, $post_type, $mp;
+		global $pagenow, $post_type, $mp, $post;
 
 		//wp_enqueue_script( 'mp-chosen', mp_plugin_url( 'includes/admin/ui/chosen/chosen.jquery.min.js' ), array( 'jquery' ), MP_VERSION );
 
@@ -294,7 +294,8 @@ class MP_Admin {
 					'message_valid_number_required'			 => __( 'Valid number is required', 'mp' ),
 					'message_input_required'				 => __( 'Input is required', 'mp' ),
 					'saving_message'						 => __( 'Please wait...saving in progress...', 'mp' ),
-					'placeholder_image'						 => $mp->plugin_url( '/includes/admin/ui/images/img-placeholder.jpg' )
+					'placeholder_image'						 => $mp->plugin_url( '/includes/admin/ui/images/img-placeholder.jpg' ),
+					'status' 								 => $post->post_status
 				) );
 
 				//jquery textext
