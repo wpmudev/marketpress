@@ -7,6 +7,11 @@ Change Log:
 3.2.7
 ----------------------------------------------------------------------
 
+- Enhance: Allow to deselect default variation in product edit screen
+
+3.2.7
+----------------------------------------------------------------------
+
 - Enhance: Update translation strings
 - Fixed: Potential php object injection vulnerability
 - Fixed: On some occasions products not added to cart when Hummingbird is enabled
