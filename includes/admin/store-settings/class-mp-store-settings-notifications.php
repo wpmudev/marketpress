@@ -62,6 +62,10 @@ class MP_Store_Settings_Notifications {
 		));
 		
 		if ( $new_order instanceof WPMUDEV_Field ) {
+			$new_order->add_field('checkbox', array(
+				'name' => 'send_email',
+				'message' => __('Enabled', 'mp'),
+			));
 			$new_order->add_field('text', array(
 				'name' => 'subject',
 				'label' => array('text' => __('Subject', 'mp')),
@@ -126,6 +130,10 @@ class MP_Store_Settings_Notifications {
 		));
 		
 		if ( $new_order instanceof WPMUDEV_Field ) {
+			$new_order->add_field('checkbox', array(
+				'name' => 'send_email',
+				'message' => __('Enabled', 'mp'),
+			));
 			$new_order->add_field('text', array(
 				'name' => 'subject',
 				'label' => array('text' => __('Subject', 'mp')),
@@ -155,6 +163,10 @@ class MP_Store_Settings_Notifications {
 		));
 		
 		if ( $new_order_downloads instanceof WPMUDEV_Field ) {
+			$new_order_downloads->add_field('checkbox', array(
+				'name' => 'send_email',
+				'message' => __('Enabled', 'mp'),
+			));
 			$new_order_downloads->add_field('text', array(
 				'name' => 'subject',
 				'label' => array('text' => __('Subject', 'mp')),
@@ -185,6 +197,10 @@ class MP_Store_Settings_Notifications {
 		));
 		
 		if ( $new_order_mixed instanceof WPMUDEV_Field ) {
+			$new_order_mixed->add_field('checkbox', array(
+				'name' => 'send_email',
+				'message' => __('Enabled', 'mp'),
+			));
 			$new_order_mixed->add_field('text', array(
 				'name' => 'subject',
 				'label' => array('text' => __('Subject', 'mp')),
@@ -242,6 +258,10 @@ class MP_Store_Settings_Notifications {
 		));
 		
 		if ( $order_shipped instanceof WPMUDEV_Field ) {
+			$order_shipped->add_field('checkbox', array(
+				'name' => 'send_email',
+				'message' => __('Enabled', 'mp'),
+			));
 			$order_shipped->add_field('text', array(
 				'name' => 'subject',
 				'label' => array('text' => __('Subject', 'mp')),
@@ -271,6 +291,10 @@ class MP_Store_Settings_Notifications {
 		) );
 		
 		if ( $order_shipped_downloads instanceof WPMUDEV_Field ) {
+			$order_shipped_downloads->add_field('checkbox', array(
+				'name' => 'send_email',
+				'message' => __('Enabled', 'mp'),
+			));
 			$order_shipped_downloads->add_field( 'text', array(
 				'name' => 'subject',
 				'label' => array( 'text' => __( 'Subject', 'mp' ) ),
@@ -301,6 +325,10 @@ class MP_Store_Settings_Notifications {
 		) );
 		
 		if ( $order_shipped_mixed instanceof WPMUDEV_Field ) {
+			$order_shipped_mixed->add_field('checkbox', array(
+				'name' => 'send_email',
+				'message' => __('Enabled', 'mp'),
+			));
 			$order_shipped_mixed->add_field( 'text', array(
 				'name' => 'subject',
 				'label' => array( 'text' => __( 'Subject', 'mp' ) ),

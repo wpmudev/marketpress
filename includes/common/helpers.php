@@ -601,11 +601,6 @@ if ( ! function_exists( 'mp_is_valid_zip' ) ) :
 		}
 
 		if ( empty( $zip ) ) {
-            
-            //Doesn't matter if empty for download only carts
-			if( mp_cart()->is_download_only() ){
-				return true;
-			}
 			//no post code provided
 			return false;
 		}

@@ -215,15 +215,14 @@ jQuery( document ).ready( function( $ ) {
             if ( variation_errors == 0 ) {
 
 //alert($( '#original_publish' ).val());
-                if ( $( '#original_publish' ).val() == 'Publish' ) {
+                if ( mp_product_admin_i18n.status != 'publish' ) {
 //$( '.mp-admin-overlay' ).show();
                     $( '#save-post' ).removeAttr( 'disabled' );
                     //$( '#save-post' ).prop( 'disabled', false );
                     $( '#save-post' ).click();
                     //mp_variation_message();
                 }
-
-                if ( $( '#original_publish' ).val() == 'Update' ) {
+                else {
 
 //$( '.mp-admin-overlay' ).show();
                     if ( caller_id == 'mp_make_combinations' ) {
@@ -982,7 +981,7 @@ jQuery( document ).ready( function( $ ) {
     $target.find("input[name='regular_price']").trigger('input');
 
     // Set default variant action
-    $('#mp-product-price-inventory-variants-metabox').on('click', 'tr:not(".default") a.set-default', function(event) {
+    $('#mp-product-price-inventory-variants-metabox').on('click', 'a.set-default', function(event) {
     	event.preventDefault();
     	$this = $( this );
     	post_id = $this.attr('data-post-id');
@@ -1002,9 +1001,11 @@ jQuery( document ).ready( function( $ ) {
 			data
 		).done( function( data, status ) {
 			$this.children('.fa').removeClass('fa-pulse');
-			if ( status == 'success' ) {
+			if ( status == 'success' && data['data'] === 'added' ) {
 				$this.parents('tr').addClass('default').siblings('tr').removeClass('default');
-			}
+			} else if ( status == 'success' && data['data'] === 'removed' ) {
+			    $this.parents('tr').addClass('alternate').removeClass('default');
+            }
 		});
     });
 

@@ -1263,7 +1263,24 @@ class MP_Product {
 				if ( $price['lowest_regular'] != $price['highest_regular'] ) {
 					$snippet .= '<span class="mp_product_price-normal mp_strikeout">' . mp_format_currency( '', $this->manage_price_tax( $price['lowest_regular'] ) ) . ' - ' . mp_format_currency( '', $this->manage_price_tax( $price['highest_regular'] ) ) . $this->display_tax_string( false ) . '</span>';
 				} else {
-					$snippet .= '<span class="mp_product_price-normal mp_strikeout">' . mp_format_currency( '', $this->manage_price_tax( ( $price['regular'] * $this->qty ) ) ) . $this->display_tax_string( false ) . '</span>';
+					/**
+					 * Fix for the following bug.
+					 *
+					 * Steps to reproduce:
+					 * - Create a variable product with at least 2 variations
+					 * - Set the regular price of the products for a spread wide enough to clearly see the effect (ie: 19.99 and 29.99)
+					 * - Set the sale price on the lower value variation (ie: 15.99)
+					 * - Set the lower value variation (sale product) as Default
+					 * - View the Products page (the strike out price should be wrong)
+					 * - Set the higher priced variation (non-sale product) as Default
+					 * - View the Products page (the strike out price should be correct)
+					 */
+					if ( $price['highest_regular'] > $price['regular'] ) {
+						$snippet .= '<span class="mp_product_price-normal mp_strikeout">' . mp_format_currency( '', $this->manage_price_tax( ( $price['regular'] * $this->qty ) ) ) . $this->display_tax_string( false ) . '</span>';
+					} else {
+						$snippet .= '<span class="mp_product_price-normal mp_strikeout">' . mp_format_currency( '', $this->manage_price_tax( ( $price['highest_regular'] * $this->qty ) ) ) . $this->display_tax_string( false ) . '</span>';
+					}
+
 				}
 
 			}
@@ -1348,7 +1365,7 @@ class MP_Product {
 				} else {
 					$special_fixed_tax = true;
 				}
-			} else {
+			} elseif ( 0 === $tax_rate ) {
 				$tax_rate = mp_get_setting( 'tax->rate', '' );
 			}
 

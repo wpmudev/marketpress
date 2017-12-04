@@ -455,19 +455,16 @@ class MP_Coupon {
 		//Moved to variable as it will be used in many instances
 		$cart_products = $this->get_products( true ) ;
 
-		$date_format			= get_option( 'date_format' );
-		$coupon_start 			= $this->get_meta( 'start_date', 0, false );
-		$coupon_start_object 	= DateTime::createFromFormat( $date_format, $coupon_start );
-		$coupon_end 			= $this->get_meta( 'end_date', 0, false );
-		$coupon_end_object		= DateTime::createFromFormat( $date_format, $coupon_end );
+		$coupon_start 			= $this->get_meta( 'start_date', 0, true );
+		$coupon_end 			= $this->get_meta( 'end_date', 0, true );
 
 		if ( ! $this->exists() ) {
 			$is_valid = false;
 		} elseif ( $this->remaining_uses( false, true ) == 0 ) {
 			$is_valid = false;
-		} elseif ( $now < strtotime( $coupon_start_object->format( 'd-m-Y' ) ) ) {
+		} elseif ( $now < strtotime( $coupon_start ) ) {
 			$is_valid = false;
-		} elseif ( $this->get_meta( 'has_end_date' ) && ( $now > strtotime( $coupon_end_object->format( 'd-m-Y' ) ) ) ) {
+		} elseif ( $this->get_meta( 'has_end_date' ) && ( $now > strtotime( $coupon_end ) ) ) {
 			$is_valid = false;
 		} elseif ( array() == $cart_products) {
 			$is_valid = false;
