@@ -4,10 +4,24 @@ Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonat
 Change Log:
 ----------------------------------------------------------------------
 
-3.2.7
+3.2.8
 ----------------------------------------------------------------------
 
+- New: Options for sending all notification types
+- Enhance: Isle of Wight added to the country list
 - Enhance: Allow to deselect default variation in product edit screen
+- Enhance: Remove extra fields from checkout
+- Enhance: Users will not be able to order without filling out all required fields on checkout
+- Enhance: Add prefixes to css styles so they do not affect non MarketPress pages
+- Fix: Shipping tax calculated incorrectly
+- Fix: PHP notices when creating variations
+- Fix: Wrong symbol for Turkish Lira
+- Fix: Tax settings for Canada not being applied correctly
+- Fix: Error when adding coupon code on checkout page
+- Fix: Error when creating global MarketPress pages on multisite
+- Fix: Product page with variations will not auto select the first variation by default
+- Fix: Inability to deselect default variation for a product
+- Fix: Wrong sale price on products page for variable products
 
 3.2.7
 ----------------------------------------------------------------------
