@@ -2583,8 +2583,9 @@ if ( ! function_exists( 'mp_product' ) ) {
 			// Button
 			$selected_atts = array();
 
-			if ( $variation ) {
+			if ( $variation && isset( $variation_id ) && false !== get_post_meta( $variation_id, 'default_variation' ) ) {
 				$atts = $variation->get_attributes();
+
 				foreach ( $atts as $slug => $att ) {
 					$selected_atts[ $slug ] = key( $att['terms'] );
 				}
