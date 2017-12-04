@@ -339,51 +339,59 @@ class MP_Coupons_Addon {
 	 * @return float
 	 */
 	public function cart_total( $total, $_total, $cart ) {
-		
-		if( isset( $_total[ 'product_original' ] ) ){
-			$total = $_total[ 'product_original' ];
+		$coupon_discount = $this->get_total_discount_amt();
+		if ( $coupon_discount ) {
+
+			if( isset( $_total[ 'product_original' ] ) ){
+				$total = $_total[ 'product_original' ];
+			}
+			elseif( $cart instanceof MP_Cart ){
+				$total = $cart->product_original_total();
+			}
+
+			if ( abs( $coupon_discount ) >= $total ) {
+				$total = $total + ( - 1 * $total );
+			} else {
+				$total = $total + $coupon_discount;
+			}
+
+			if ( ! mp_get_setting( 'tax->tax_inclusive' ) ) {
+				$total = ( $total + (float) $cart->tax_total()  );
+			}
+			$total = ( $total + (float) $cart->shipping_total());
+
+			$total = floatval( $total );
 		}
-		elseif( $cart instanceof MP_Cart ){
-			$total = $cart->product_original_total();
-		}
-
-		$coupon_discount = $this->get_total_discount_amt();		
-
-		if ( abs( $this->get_total_discount_amt() ) >= $total ) {
-			$total = $total + ( - 1 * $total );
-		} else {
-			$total = $total + $this->get_total_discount_amt();
-		}
-
-		if ( ! mp_get_setting( 'tax->tax_inclusive' ) ) {		
-			$total = ( $total + (float) $cart->tax_total()  );
-		}														
-		$total = ( $total + (float) $cart->shipping_total());
-
-		return floatval( $total );
+		return $total;
 	}
 
 	public function tax_total( $tax_amount, $total, $cart ) {
+		$coupon_discount = $this->get_total_discount_amt();
+		if ( $coupon_discount ) {
+			$total = (int) $cart->product_original_total();
+			if ( mp_get_setting( 'tax->tax_shipping' ) ) {
+				$total += (int) $cart->shipping_total();
+			}
 
-		$total = (int) $cart->product_original_total() + (int) $cart->shipping_total();
+			if ( abs( $coupon_discount ) >= $total ) {
+				$total_pre = $total + ( - 1 * $total );
+			} else {
+				$total_pre = $total + $coupon_discount;
+			}
 
-		if ( abs( $this->get_total_discount_amt() ) >= $total ) {
-			$total_pre = $total + ( - 1 * $total );
-		} else {
-			$total_pre = $total + $this->get_total_discount_amt();
+			$tax_rate   = mp_tax_rate();
+			if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
+				$cart_price = $total_pre;
+				$total_pre = $total_pre / (1 + $tax_rate);
+			} else {
+				$cart_price = $total_pre * ( 1 + $tax_rate );
+			}
+
+			$tax_amount = (float) $cart_price - (float) $total_pre;
+
+			$tax_amount = number_format( $tax_amount, 2 );
 		}
-
-		$tax_rate   = mp_tax_rate();
-		if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
-			$cart_price = $total_pre;					
-			$total_pre = $total_pre / (1 + $tax_rate);		
-		} else {											
-			$cart_price = $total_pre * ( 1 + $tax_rate );
-		}
-
-		$tax_amount = (float) $cart_price - (float) $total_pre;
-
-		return number_format( $tax_amount, 2 );
+		return $tax_amount;
 	}
 
 	/**
@@ -463,7 +471,10 @@ class MP_Coupons_Addon {
 
 		$cart = new MP_Cart();
 
-		$total = ( (float) $cart->product_total() + (float) $cart->tax_total() + (float) $cart->shipping_total() );
+		$total = ( (float) $cart->product_total() + (float) $cart->tax_total() );
+		if ( mp_get_setting( 'tax->tax_shipping' ) ) {
+			$total += (float) $cart->shipping_total();
+		}
 
 		if ( abs( $discount_value ) >= $total ) {
 			$discount_value = - 1 * $total;
