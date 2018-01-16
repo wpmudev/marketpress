@@ -185,7 +185,7 @@ module.exports = function(grunt) {
 			},
 			wporg: {
 				src:  excludeCopyFilesWPorg,
-				dest: 'build/<%= pkg.name %>-wporg/'
+				dest: 'build/wordpress-ecommerce/'
 			}
 		},
 
@@ -204,12 +204,12 @@ module.exports = function(grunt) {
 			wporg: {
 				options: {
 					mode: 'zip',
-					archive: './build/<%= pkg.name %>-wporg-<%= pkg.version %>.zip'
+					archive: './build/wordpress-ecommerce-<%= pkg.version %>.zip'
 				},
 				expand: true,
-				cwd: 'build/<%= pkg.name %>-wporg/',
+				cwd: 'build/wordpress-ecommerce/',
 				src: ['**/*'],
-				dest: '<%= pkg.name %>-wporg/'
+				dest: 'wordpress-ecommerce/'
 			}
 		},
 
