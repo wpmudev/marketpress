@@ -33,7 +33,8 @@ class MP_Installer {
 	 * @access public
 	 */
 	private function __construct() {
-		add_action( 'init', array( &$this, 'run' ), 0 );
+		$this->run();
+
 		add_action( 'after_switch_theme', array( &$this, 'add_admin_store_caps' ) );
 		add_action( 'admin_notices', array( &$this, 'db_update_notice' ) );
 		add_action( 'admin_menu', array( &$this, 'add_menu_items' ), 99 );

@@ -849,7 +849,7 @@ class Marketpress {
 	public function maybe_flush_rewrites() {
 		$flush_rewrites = get_option( 'mp_flush_rewrites_30', 1 );
 
-		if ( 1 === $flush_rewrites ) {
+		if ( 1 === $flush_rewrites || '1' === $flush_rewrites ) {
 			flush_rewrite_rules();
 			update_option( 'mp_flush_rewrites_30', 0 );
 		}
