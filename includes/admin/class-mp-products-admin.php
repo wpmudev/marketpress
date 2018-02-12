@@ -222,7 +222,7 @@ class MP_Products_Screen {
 			return $post_id;
 		}
 
-		update_option( 'mp_flush_rewrites_30', 1 );
+		update_option( 'mp_flush_rewrites', 1 );
 	}
 
 	/**

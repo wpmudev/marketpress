@@ -369,7 +369,7 @@ class Marketpress {
 		require_once $this->plugin_dir( 'includes/common/constants.php' );
 
 		// Includes.
-		add_action( 'init', array( &$this, 'includes' ), -1 );
+		add_action( 'init', array( &$this, 'includes' ), 0 );
 
 		// Load gateway/shipping plugins.
 		add_action( 'init', array( &$this, 'load_plugins' ), 2 );
@@ -847,11 +847,11 @@ class Marketpress {
 	 * @action init
 	 */
 	public function maybe_flush_rewrites() {
-		$flush_rewrites = get_option( 'mp_flush_rewrites_30', 1 );
+		$flush_rewrites = get_option( 'mp_flush_rewrites', 1 );
 
 		if ( 1 === $flush_rewrites || '1' === $flush_rewrites ) {
 			flush_rewrite_rules();
-			update_option( 'mp_flush_rewrites_30', 0 );
+			update_option( 'mp_flush_rewrites', 0 );
 		}
 	}
 
@@ -905,11 +905,13 @@ class Marketpress {
 		require_once $this->plugin_dir( 'includes/wpmudev-metaboxes/wpmudev-metabox.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-mailer.php' );
 		require_once $this->plugin_dir( 'includes/common/helpers.php' );
-		require_once $this->plugin_dir( 'includes/common/class-mp-installer.php' );
+
 		require_once $this->plugin_dir( 'includes/common/class-mp-product-attributes.php' );
 		require_once $this->plugin_dir( 'includes/addons/class-mp-addons.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-order.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-product.php' );
+		require_once $this->plugin_dir( 'includes/common/class-mp-installer.php' );
+
 
 		require_once $this->plugin_dir( 'includes/common/class-mp-cart.php' );
 		require_once $this->plugin_dir( 'includes/common/template-functions.php' );

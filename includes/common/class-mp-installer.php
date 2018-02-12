@@ -43,6 +43,8 @@ class MP_Installer {
 			&$this,
 			'enqueue_db_update_scripts',
 		) );
+		// Give admin role all store capabilities
+		add_action( 'init', array( $this, 'add_admin_store_caps' ) );
 	}
 
 	/**
@@ -692,6 +694,9 @@ class MP_Installer {
 		// Create/update product attributes table
 		$this->create_product_attributes_table();
 
+		// Add "term_order" to $wpdb->terms table
+		$this->add_term_order_column();
+
 		//If current MP version equals to old version skip importer
 		if ( MP_VERSION == $old_version && 0 == $force_upgrade ) {
 			return;
@@ -751,11 +756,6 @@ class MP_Installer {
 
 		// Update settings
 		update_option( 'mp_settings', $settings );
-
-		// Give admin role all store capabilities
-		$this->add_admin_store_caps();
-		// Add "term_order" to $wpdb->terms table
-		$this->add_term_order_column();
 
 		// Only run these on first install
 		if ( empty( $old_settings ) ) {
