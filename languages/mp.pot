@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MarketPress 3.2.8-beta.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2018-02-12 13:01:48+00:00\n"
+"POT-Creation-Date: 2018-02-12 13:28:47+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -4084,37 +4084,37 @@ msgid ""
 "in your cart. We have adjusted the quantity in your cart automatically."
 msgstr ""
 
-#: includes/common/class-mp-installer.php:62
+#: includes/common/class-mp-installer.php:64
 msgid "An error occurred while updating. Please refresh this page and try again."
 msgstr ""
 
-#: includes/common/class-mp-installer.php:64
+#: includes/common/class-mp-installer.php:66
 msgid "Upgrading Database...Please Wait..."
 msgstr ""
 
-#: includes/common/class-mp-installer.php:65
+#: includes/common/class-mp-installer.php:67
 msgid "Complete!"
 msgstr ""
 
-#: includes/common/class-mp-installer.php:528
+#: includes/common/class-mp-installer.php:530
 msgid "Update Data"
 msgstr ""
 
-#: includes/common/class-mp-installer.php:598
+#: includes/common/class-mp-installer.php:600
 msgid "Update MarketPress Data"
 msgstr ""
 
-#: includes/common/class-mp-installer.php:599
+#: includes/common/class-mp-installer.php:601
 msgid ""
 "MarketPress requires a database update to continue working correctly.<br "
 "/>Below you will find a list of items that require your attention."
 msgstr ""
 
-#: includes/common/class-mp-installer.php:630
+#: includes/common/class-mp-installer.php:632
 msgid "Product Metadata"
 msgstr ""
 
-#: includes/common/class-mp-installer.php:639
+#: includes/common/class-mp-installer.php:641
 msgid ""
 "Depending on the amount of products you have, this update could take quite "
 "some time. Please keep this window open while the update completes. If you "
@@ -4122,21 +4122,21 @@ msgid ""
 "please don't exit the window."
 msgstr ""
 
-#: includes/common/class-mp-installer.php:645
+#: includes/common/class-mp-installer.php:647
 msgid ""
 "Please update each subsite in your WordPress network where you have older "
 "version of the MarketPress plugin."
 msgstr ""
 
-#: includes/common/class-mp-installer.php:651
+#: includes/common/class-mp-installer.php:653
 msgid "Perform Update"
 msgstr ""
 
-#: includes/common/class-mp-installer.php:655
+#: includes/common/class-mp-installer.php:657
 msgid "MarketPress performed a quick automatic update successfully!"
 msgstr ""
 
-#: includes/common/class-mp-installer.php:675
+#: includes/common/class-mp-installer.php:677
 msgid ""
 "MarketPress requires a database update to continue working correctly. <a "
 "class=\"button-primary\" href=\"%s\">Go to update page</a>"
