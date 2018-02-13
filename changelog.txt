@@ -22,6 +22,7 @@ Change Log:
 - Fix: Product page with variations will not auto select the first variation by default
 - Fix: Inability to deselect default variation for a product
 - Fix: Wrong sale price on products page for variable products
+- Fix: Conflict with Domain Mapping plugin
 
 3.2.7
 ----------------------------------------------------------------------
