@@ -73,13 +73,12 @@
             expiration_month: expObj.month,
             expiration_year: expObj.year,
             address: {
-                address1: $( '[name="billing[address1]"]' ).val().substr( 0, 60 ),
-                address2: ( $( '[name="billing[address2]"]' ).length ) ? $( '[name="billing[address1]"]' ).val().substr( 0, 60 ) : '',
-                city: $( '[name="billing[city]"]' ).val().substr( 0, 30 ),
-                state: $( '[name="billing[state]"]' ).val().substr( 0, 2 ),
-                zip: $( '[name="billing[zip]"]' ).val().substr( 0, 10 ),
-                postcode: $( '[name="billing[zip]"]' ).val().substr( 0, 10 ),
-                country: $( '[name="billing[country]"]' ).val().substr( 0, 2 )
+				address1: $( '[name="billing[address1]"]' ).val().substr( 0, 60 ),
+				address2: ( $( '[name="billing[address2]"]' ).length ) ? $( '[name="billing[address1]"]' ).val().substr( 0, 60 ) : '',
+				city: $( '[name="billing[city]"]' ).val().substr( 0, 30 ),
+				region: $( 'billing[state]' ).val().substr( 0, 2 ),
+				postal_code: $( '[name="billing[zip]"]' ).val().substr( 0, 10 ),
+				country: $( '[name="billing[country]"]' ).val().substr( 0, 2 )
             }
         }, function( data ) {
             if ( data.error ) {

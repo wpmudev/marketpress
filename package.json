@@ -1,14 +1,27 @@
 {
-  "name": "marketpress-grunt",
-  "version": "1.0.0",
+  "name": "marketpress",
+  "private": true,
+  "version": "3.2.8",
+  "main": "marketpress.php",
+  "author": "WPMU DEV",
+  "license": "GPL-2.0",
   "devDependencies": {
-    "autoprefixer": "^6.3.6",
+    "autoprefixer": "^7.1.2",
     "grunt": "^1.0.1",
+    "grunt-checktextdomain": "^1.0.1",
     "grunt-cli": "^1.2.0",
+    "grunt-contrib-clean": "^1.1.0",
+    "grunt-contrib-compress": "^1.4.3",
+    "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-postcss": "^0.8.0",
-    "grunt-sass": "^1.2.0",
-    "grunt-wp-i18n": "^0.5.4",
+    "grunt-sass": "^2.0.0",
+    "grunt-wp-i18n": "^1.0.0",
     "load-grunt-tasks": "^3.5.0"
+  },
+  "scripts": {
+    "watch": "clear && grunt watch",
+    "release": "clear && grunt release",
+    "build": "clear && grunt build:main"
   }
 }

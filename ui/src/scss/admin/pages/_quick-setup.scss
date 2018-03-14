@@ -262,7 +262,8 @@
 		@include bp(large) {
 			// Callout
 			.mp_callout {
-				padding: 0 15%;
+				padding: 5% 15% 100px;
+				height: 200px;
 			}
 		}
 		

@@ -620,6 +620,10 @@ class MP_Multisite {
 	 * @return string
 	 */
 	function mp_list_global_products_sc( $atts ) {
+		if ( ! is_array( $atts ) ) {
+			$atts = array();
+		}
+
 		$atts['echo'] = false;
 		if ( $var = get_query_var( 'mp_global_category' ) ) {
 			$atts['category'] = $var;

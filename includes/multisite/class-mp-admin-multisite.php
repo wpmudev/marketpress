@@ -581,9 +581,9 @@ class MP_Admin_Multisite {
 				return '<a target="_blank" class="button mp-edit-page-button" href="' . add_query_arg( array(
 					'post'   => $post_id,
 					'action' => 'edit',
-				), get_admin_url( null, 'post.php' ) ) . '">' . __( 'Edit Page' ) . '</a>';
+				), get_admin_url( null, 'post.php' ) ) . '">' . __( 'Edit Page', 'mp' ) . '</a>';
 			} else {
-				return '<a class="button mp-create-page-button" href="' . wp_nonce_url( get_admin_url( null, 'admin-ajax.php?action=mp_create_store_page&type=' . $type ), 'mp_create_store_page' ) . '">' . __( 'Create Page' ) . '</a>';
+				return '<a class="button mp-create-page-button" href="' . wp_nonce_url( get_admin_url( null, 'admin-ajax.php?action=mp_create_store_page&type=' . $type ), 'mp_create_store_page' ) . '">' . __( 'Create Page', 'mp' ) . '</a>';
 			}
 		}
 

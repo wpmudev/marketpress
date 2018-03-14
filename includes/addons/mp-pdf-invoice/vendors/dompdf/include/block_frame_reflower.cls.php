@@ -723,7 +723,7 @@ class Block_Frame_Reflower extends Frame_Reflower {
                                          $style->margin_bottom,
                                          $style->padding_bottom), $cb["h"]);
 
-    $cb_x = $x + $left_margin + $style->length_in_pt(array($style->border_left_width, 
+    $cb_x = (float) $x + (float) $left_margin + (float) $style->length_in_pt(array($style->border_left_width,
                                                            $style->padding_left), $cb["w"]);
 
     $cb_y = $y + $top;

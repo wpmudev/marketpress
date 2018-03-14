@@ -53,7 +53,7 @@ class MP_Store_Settings_Capabilities {
 			));
 			$metabox->add_field('checkbox_group', array(
 				'name' => "caps[$role_name]",
-				'label' => array('text' => __('Capabilities')),
+				'label' => array( 'text' => __( 'Capabilities', 'mp' ) ),
 				'options' => $caps,
 				'width' => '33.3%',
 			));

@@ -10,7 +10,7 @@ if ( is_multisite() ) {
 
 		function __construct() {
 			$widget_ops = array( 'classname'   => 'mp_global_category_list_widget',
-			                     'description' => __( "Displays a network-wide HTML list of product categories from network MarketPress stores." )
+			                     'description' => __( "Displays a network-wide HTML list of product categories from network MarketPress stores.", 'mp' )
 			);
 			parent::__construct( 'mp_global_category_list_widget', __( 'Global Product Category List', 'mp' ), $widget_ops );
 		}
@@ -56,7 +56,7 @@ if ( is_multisite() ) {
 			) );
 			extract( $instance );
 			?>
-			<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ) ?></label>
+			<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:', 'mp' ) ?></label>
 				<input type="text" class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>"
 				       name="<?php echo $this->get_field_name( 'title' ); ?>" value="<?php if ( isset ( $title ) ) {
 					echo esc_attr( $title );
@@ -89,7 +89,7 @@ if ( is_multisite() ) {
 				<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'show_count' ); ?>"
 				       name="<?php echo $this->get_field_name( 'show_count' ); ?>"<?php checked( $show_count ); ?> />
 				<label
-					for="<?php echo $this->get_field_id( 'show_count' ); ?>"><?php _e( 'Show product counts' ); ?></label>
+					for="<?php echo $this->get_field_id( 'show_count' ); ?>"><?php _e( 'Show product counts', 'mp' ); ?></label>
 			</p>
 			<?php
 		}

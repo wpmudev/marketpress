@@ -4,13 +4,82 @@ Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonat
 Change Log:
 ----------------------------------------------------------------------
 
+3.2.8
+----------------------------------------------------------------------
+
+- New: Options for sending all notification types
+- Enhance: Isle of Wight added to the country list
+- Enhance: Allow to deselect default variation in product edit screen
+- Enhance: Remove extra fields from checkout
+- Enhance: Users will not be able to order without filling out all required fields on checkout
+- Enhance: Add prefixes to css styles so they do not affect non MarketPress pages
+- Fix: Shipping tax calculated incorrectly
+- Fix: PHP notices when creating variations
+- Fix: Wrong symbol for Turkish Lira
+- Fix: Tax settings for Canada not being applied correctly
+- Fix: Error when adding coupon code on checkout page
+- Fix: Error when creating global MarketPress pages on multisite
+- Fix: Product page with variations will not auto select the first variation by default
+- Fix: Inability to deselect default variation for a product
+- Fix: Wrong sale price on products page for variable products
+- Fix: Conflict with Domain Mapping plugin
+
+3.2.7
+----------------------------------------------------------------------
+
+- Enhance: Update translation strings
+- Fixed: Potential php object injection vulnerability
+- Fixed: On some occasions products not added to cart when Hummingbird is enabled
+- Fixed: Digital products not downloading after payment
+- Fixed: Variation images not showing in custom template files
+
+3.2.6
+----------------------------------------------------------------------
+
+- Enhance: Allow users to deselect default template in store settings
+- Fixed: Products that were not sorted correctly before, will be automatically updated to work correctly
+- Fixed: Missing translation strings for field verification on checkout pages
+- Fixed: Taxes for digital and physical products
+- Fixed: Default template styles
+- Fixed: Compatibility with Toolset Types plugin
+- Fixed: Coupon code add-on affecting taxes in cart
+- Fixed: Warning on products page in admin
+- Fixed: Quick setup notice not dismissed first time
+- Fixed: Unable to checkout digital products
+- Fixed: Save changes button in admin appears multiple time when using different translations
+- Fixed: Layout on checkout when billing address does not match shipping address
+
+
+3.2.5
+----------------------------------------------------------------------
+
+- Enhance: Removed @import directives for better compatibility with Hummingbird
+- Enhance: Better support for older PHP versions (5.2 and 5.3)
+- Fixed: Issue with Upfront navigation on single product pages
+- Fixed: Tax rate resetting to 0%
+- Fixed: PHP notices on product pages
+- Fixed: PHP warning during quick setup
+- Fixed: Styles in admin interface
+- Fixed: MarketPress disabling front-end page comments
+- Fixed: Some orders were not changing status to Paid with Stripe payment gateway
+
 3.2.4
 ----------------------------------------------------------------------
 
-- Added: Multi-file uploa field type
-- Added: Addon to enable product multiple files
-- Added: File list incase the product files are more than one
-- Refactored: Download code to cater for multiple files via a prameter
+- Added: Password check for password-protected products
+- Added: Settings link on the Plugins page
+- Added: Multi-file upload field type
+- Added: Add-on to enable product multiple files
+- Added: File list in case the product files are more than one
+- Fixed: When editing variable products, do not update price if it is not set
+- Fixed: Checkout page (sections not opening, inability to continue checkout without inputing zip code, notices on checkout page)
+- Fixed: Coupons could not be applied to cart when date format was set to d/m/Y
+- Fixed: Issue with conversions not being tracked in Google Analytics
+- Fixed: Removed warnings and notices on product page
+- Fixed: Various small bug fixes and improvements
+- Changed: Simplify will now show message if the payment is declined
+- Updated: WePay Payment gateway to use the latest v3 API with the 'address.postal_code' attribute
+- Refactored: Download code to cater for multiple files via a parameter
 
 3.2.3
 ----------------------------------------------------------------------

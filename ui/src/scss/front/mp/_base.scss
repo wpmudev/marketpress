@@ -2,9 +2,10 @@
 //
 
 // Generic
-*,
-*:before,
-*:after {
+[class^="mp-"], [class^="mp-"]:before, [class^="mp-"]:after,
+[class^="mp_"], [class^="mp_"]:before, [class^="mp_"]:after,
+[id^="mp-"], [id^="mp-"]:before, [id^="mp-"]:after,
+[id^="mp_"], [id^="mp_"]:before, [id^="mp_"]:after {
 	box-sizing: border-box;
 }
 

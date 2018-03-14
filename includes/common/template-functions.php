@@ -1707,7 +1707,7 @@ if ( ! function_exists( 'mp_tax_rate' ) ) :
 	 * @param bool $echo Optional, whether to echo or return. Defaults to return.
 	 */
 	function mp_tax_rate( $echo = false ) {
-//get address
+		//get address
 		$state    = mp_get_user_address_part( 'state', 'shipping' );
 		$country  = mp_get_user_address_part( 'country', 'shipping' );
 		$tax_rate = 0;
@@ -1722,14 +1722,14 @@ if ( ! function_exists( 'mp_tax_rate' ) ) :
 
 		switch ( $country ) {//mp_get_setting( 'base_country' )
 			case 'US':
-// USA taxes are only for orders delivered inside the state
+				// USA taxes are only for orders delivered inside the state
 				if ( $country == 'US' && $state == mp_get_setting( 'base_province' ) ) {
 					$tax_rate = (float) mp_get_setting( 'tax->rate' );
 				}
 				break;
 
 			case 'CA':
-//Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
+				//Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
 				if ( $country == 'CA' && array_key_exists( $state, mp()->CA_provinces ) ) {
 					if ( $_tax_rate = mp_get_setting( "tax->canada_rate->$state" ) ) {
 						$tax_rate = (float) $_tax_rate;
@@ -1738,26 +1738,28 @@ if ( ! function_exists( 'mp_tax_rate' ) ) :
 				break;
 
 			case 'AU':
-//Australia taxes orders in country
+				//Australia taxes orders in country
 				if ( $country == 'AU' ) {
 					$tax_rate = (float) mp_get_setting( 'tax->rate' );
 				}
 				break;
 
 			default:
-//EU countries charge VAT within the EU
+				//EU countries charge VAT within the EU
 				if ( in_array( mp_get_setting( 'base_country' ), mp()->eu_countries ) ) {
 					if ( in_array( $country, mp()->eu_countries ) ) {
 						$tax_rate = (float) mp_get_setting( 'tax->rate' );
 					}
 				} else {
-//all other countries use the tax outside preference
-//if ( mp_get_setting( 'tax->tax_outside' ) || (!mp_get_setting( 'tax->tax_outside' ) && $country == mp_get_setting( 'base_country' )) ) {
+					//all other countries use the tax outside preference
+					//if ( mp_get_setting( 'tax->tax_outside' ) || (!mp_get_setting( 'tax->tax_outside' ) && $country == mp_get_setting( 'base_country' )) ) {
 					$tax_rate = (float) mp_get_setting( 'tax->rate' );
-//}
+					//}
 				}
 				break;
 		}
+        
+        //$tax_rate = (float) mp_get_setting( 'tax->rate' );
 
 		if ( empty( $tax_rate ) ) {
 			$tax_rate = 0;
@@ -2016,37 +2018,35 @@ if ( ! function_exists( 'mp_list_products' ) ) :
 			);
 		}
 
-                if( mp_get_setting( 'inventory_remove' ) )
-                {
-                        $query['meta_query'][] = array(
-                                array(
-                                        'relation' => 'OR',
-                                        array(
-                                                'key'     => 'inventory_tracking',
-                                                'value'   => '0',
-                                                'compare' => '=',
-                                        ),
-                                        array(
-                                                'relation' => 'OR',
-                                                array(
-                                                        'key'     => 'inv_out_of_stock_purchase',
-                                                        'value'   => '1',
-                                                        'compare' => '=',
-                                                ),
-                                                array(
-                                                        'key'     => 'inventory',
-                                                        'value'   => '0',
-                                                        'compare' => '>',
-                                                )
-                                        )
-                                )
-                        );
-                }
+        if( mp_get_setting( 'inventory_remove' ) )
+        {
+            $query['meta_query'][] = array(
+                array(
+                    'relation' => 'OR',
+                    array(
+                        'key'     => 'inventory_tracking',
+                        'value'   => '0',
+                        'compare' => '=',
+                    ),
+                    array(
+                        'relation' => 'OR',
+                        array(
+                            'key'     => 'inv_out_of_stock_purchase',
+                            'value'   => '1',
+                            'compare' => '=',
+                        ),
+                        array(
+                            'key'     => 'inventory',
+                            'value'   => '0',
+                            'compare' => '>',
+                        )
+                    )
+                )
+            );
+        }
 
 // The Query
-		//var_dump($query);
 		$custom_query = new WP_Query( $query );
-
 // Get layout type
 		$layout_type = mp_get_setting( 'list_view' );
 		if ( ! is_null( $args['list_view'] ) ) {
@@ -2471,7 +2471,9 @@ if ( ! function_exists( 'mp_product' ) ) {
         
         $lightbox_code = apply_filters( 'mp_single_product_image_lightbox', $lightbox_code );
 
-		if ( $image && $has_image ) {
+		$post = get_post();
+
+		if ( $image && $has_image && ! post_password_required( $post ) ) {
 			if ( ! $product->has_variations() ) {
 
 				if ( $values ) {
@@ -2535,19 +2537,23 @@ if ( ! function_exists( 'mp_product' ) ) {
 			}
 		}
 
-		if ( $image ) {
+		if ( $image && ! post_password_required( $post ) ) {
 			$return .= '<div class="mp_single_product_details">';
 
 			$return .= '<span style="display:none" class="date updated">' . get_the_time( $product->ID ) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
 		}
 
 
-                if ( $title ) {
-                        $return .= ' <h1 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
-                }
+        if ( $title ) {
+                $return .= ' <h1 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
 
-                if ( $meta ) {
-                        $return .= '<div class="mp_product_meta">';
+		        // If post password required and it doesn't match the cookie.
+		        if ( post_password_required( $post ) )
+			        $return .= get_the_password_form( $post );
+        }
+
+        if ( $meta && ! post_password_required( $post ) ) {
+                $return .= '<div class="mp_product_meta">';
 
 			// Price
 			$return .= ( $variation ) ? $variation->display_price( false ) : $product->display_price( false );
@@ -2577,8 +2583,9 @@ if ( ! function_exists( 'mp_product' ) ) {
 			// Button
 			$selected_atts = array();
 
-			if ( $variation ) {
+			if ( $variation && isset( $variation_id ) && false !== get_post_meta( $variation_id, 'default_variation' ) ) {
 				$atts = $variation->get_attributes();
+
 				foreach ( $atts as $slug => $att ) {
 					$selected_atts[ $slug ] = key( $att['terms'] );
 				}
@@ -2599,83 +2606,85 @@ if ( ! function_exists( 'mp_product' ) ) {
 			$return .= '</div><!-- end mp_social_shares -->';
 		}
 
-		if ( $image ) {
+		if ( $image && ! post_password_required( $post ) ) {
 			$return .= '</div><!-- end mp_single_product_details-->';
 		}
 
-		$return .= '<div class="mp_single_product_extra">';
+		if ( ! post_password_required( $post ) ) {
+			$return .= '<div class="mp_single_product_extra">';
 
-		if( ! $display_description && isset( $product->content_tabs[ 'mp-product-overview' ] ) ){
-			unset( $product->content_tabs[ 'mp-product-overview' ] );
-		}
-
-		$return .= $product->content_tab_labels( false );
-
-		$index = 0;
-
-		if( $display_description ){
-			$return .= '
-<div id="mp-product-overview' . '-' . $product->ID . '" class="mp_product_tab_content mp_product_tab_content-overview mp_product_tab_content-current">';
-
-			$return .= '
-<div itemprop="description" class="mp_product_tab_content_text">';
-
-			if ( $content == 'excerpt' ) {
-				$return .= ( $variation ) ? mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true ) : $product->excerpt();
-			} else {
-				$product_description = ( !$product->post_content && $variation ) ? $product->get_variation()->post_content : $product->post_content;
-				$return .= apply_filters('the_content', $product_description);
+			if ( ! $display_description && isset( $product->content_tabs['mp-product-overview'] ) ) {
+				unset( $product->content_tabs['mp-product-overview'] );
 			}
 
-			$return .= '
-</div><!-- end mp_product_tab_content_text -->
-</div><!-- end mp-product-overview -->';
-			$index++;
-		}
+			$return .= $product->content_tab_labels( false );
+
+			$index = 0;
+
+			if ( $display_description ) {
+				$return .= '
+	<div id="mp-product-overview' . '-' . $product->ID . '" class="mp_product_tab_content mp_product_tab_content-overview mp_product_tab_content-current">';
+
+				$return .= '
+	<div itemprop="description" class="mp_product_tab_content_text">';
+
+				if ( $content == 'excerpt' ) {
+					$return .= ( $variation ) ? mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true ) : $product->excerpt();
+				} else {
+					$product_description = ( ! $product->post_content && $variation ) ? $product->get_variation()->post_content : $product->post_content;
+					$return              .= apply_filters( 'the_content', $product_description );
+				}
+
+				$return .= '
+	</div><!-- end mp_product_tab_content_text -->
+	</div><!-- end mp-product-overview -->';
+				$index ++;
+			}
 
 
-		// Remove overview tab as it's already been manually output above
-		unset( $product->content_tabs[ 'mp-product-overview' ] );
+			// Remove overview tab as it's already been manually output above
+			unset( $product->content_tabs['mp-product-overview'] );
 
-		$func_args = func_get_args();
-		$args      = mp_parse_args( $func_args, mp()->defaults['list_products'] );
+			$func_args = func_get_args();
+			$args      = mp_parse_args( $func_args, mp()->defaults['list_products'] );
 
-		foreach ( $product->content_tabs as $slug => $label ) {
-			switch ( $slug ) {
-				case 'mp-related-products' :
-					$view = mp_get_setting( 'related_products->view' );
-					if ( mp_get_setting( 'related_products->show' ) ) {
-						$layout_type = mp_get_setting( 'list_view' );
-						if ( ! is_null( $args['list_view'] ) ) {
-							$layout_type = $args['list_view'] ? 'list' : 'grid';
+			foreach ( $product->content_tabs as $slug => $label ) {
+				switch ( $slug ) {
+					case 'mp-related-products' :
+						$view = mp_get_setting( 'related_products->view' );
+						if ( mp_get_setting( 'related_products->show' ) ) {
+							$layout_type = mp_get_setting( 'list_view' );
+							if ( ! is_null( $args['list_view'] ) ) {
+								$layout_type = $args['list_view'] ? 'list' : 'grid';
+							}
+							$return .= '
+							<div id="mp-related-products-' . $product->ID . '" class="' . ( ( $index == 0 ) ? 'mp_product_tab_content-current' : '' ) . ' mp-multiple-products mp_product_tab_content mp_product_tab_content-related-products">
+								<div class="mp_product_tab_content_products mp_products mp_products-related ' . ( isset( $view ) ? 'mp_products-' . $view : 'mp_products-list' ) . '">' . $product->related_products() . ' </div>
+							</div><!-- end mp-related-products -->';
 						}
+						break;
+
+					default :
+						/**
+						 * Filter the content tab html
+						 *
+						 * @since 3.0
+						 *
+						 * @param string
+						 * @param string $slug The tab slug.
+						 */
+						$tab = apply_filters( 'mp_content_tab_html', '', $slug );
+
 						$return .= '
-						<div id="mp-related-products-' . $product->ID . '" class="' . ( ( $index == 0 ) ? 'mp_product_tab_content-current' : '' ) . ' mp-multiple-products mp_product_tab_content mp_product_tab_content-related-products">
-							<div class="mp_product_tab_content_products mp_products mp_products-related ' . ( isset( $view ) ? 'mp_products-' . $view : 'mp_products-list' ) . '">' . $product->related_products() . ' </div>
-						</div><!-- end mp-related-products -->';
-					}
-					break;
-
-				default :
-					/**
-					 * Filter the content tab html
-					 *
-					 * @since 3.0
-					 *
-					 * @param string
-					 * @param string $slug The tab slug.
-					 */
-					$tab = apply_filters( 'mp_content_tab_html', '', $slug );
-
-					$return .= '
-					<div id="' . esc_attr( $slug ) . '-' . $product->ID . '" class="' . ( ( $index == 0 ) ? 'mp_product_tab_content-current' : '' ) . ' mp_product_tab_content mp_product_tab_content-html" style="display:none">
-						<div class="mp_product_tab_content_html">' . $tab . '</div><!-- end mp_product_tab_content_html -->
-					</div><!-- end ' . esc_attr( $slug ) . ' -->';
-					break;
+						<div id="' . esc_attr( $slug ) . '-' . $product->ID . '" class="' . ( ( $index == 0 ) ? 'mp_product_tab_content-current' : '' ) . ' mp_product_tab_content mp_product_tab_content-html" style="display:none">
+							<div class="mp_product_tab_content_html">' . $tab . '</div><!-- end mp_product_tab_content_html -->
+						</div><!-- end ' . esc_attr( $slug ) . ' -->';
+						break;
+				}
+				$index ++;
 			}
-			$index++;
+			$return .= '</div><!-- end mp_single_product_extra -->';
 		}
-		$return .= '</div><!-- end mp_single_product_extra -->';
 
 		$return .= '
 			
@@ -2701,6 +2710,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 		} else {
 			return $return;
 		}
+
 	}
 
 }
@@ -3316,6 +3326,24 @@ if ( ! function_exists( 'mp_get_ajax_url' ) ) {
 			//this case the frontend is non ssl, meanwhile backend is ssl, and that will make the cookies
 			//wrong, need to fix it
 			$ajax_url = admin_url( $path, 'http' );
+		}
+
+		if( defined( 'DOMAINMAP_BASEFILE' ) ) {
+			global $wpdb;
+			$blog_id = get_current_blog_id();
+
+			switch_to_blog(1);
+			$domain = $wpdb->get_var( $wpdb->prepare(
+				"SELECT domain from {$wpdb->prefix}domain_mapping WHERE blog_id = %d",
+				absint( $blog_id )
+			));
+			restore_current_blog();
+
+			$schema = is_ssl() ? 'https://' : 'http://';
+			if( is_ssl() && force_ssl_admin() ) {
+				$schema = 'http://';
+			}
+			$ajax_url = $schema . $domain . '/wp-admin/' . $path;
 		}
 
 		return $ajax_url;

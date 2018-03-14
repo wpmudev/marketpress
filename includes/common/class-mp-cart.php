@@ -345,8 +345,11 @@ class MP_Cart {
 	 * @return array
 	 */
 	protected function _convert_to_objects( $items ) {
-		$cache_key = implode( ',', $items );
 		$products  = array();
+		if ( empty( $items ) ) {
+			return $products;
+		}
+		$cache_key = implode( ',', $items );
 
 		if ( $_posts = wp_cache_get( $cache_key, 'mp_cart' ) ) {
 			$posts = $_posts;
@@ -387,7 +390,7 @@ class MP_Cart {
 
 		if ( $cart_cookie = mp_get_cookie_value( $this->_cookie_id ) ) {
 			// Clean cookie from none product items
-			$cart_cookie_items = unserialize( $cart_cookie );
+			$cart_cookie_items = json_decode( $cart_cookie, true );
 			foreach ( $cart_cookie_items as $blog_id => $blog_items ) {
 				foreach ( $blog_items as $item => $qty ) {
 					$product = new MP_Product( $item , $blog_id );
@@ -709,7 +712,7 @@ class MP_Cart {
 
 			$shipping_line .= '
 				<div class="mp_cart_resume_item mp_cart_resume_item-shipping-total">
-					<span class="mp_cart_resume_item_label">' . ( ( $this->is_editable ) ? __( 'Estimated Shipping', 'mp' ) : __( 'Shipping' ) ) . '</span>
+					<span class="mp_cart_resume_item_label">' . ( ( $this->is_editable ) ? __( 'Estimated Shipping', 'mp' ) : __( 'Shipping', 'mp' ) ) . '</span>
 					<span class="mp_cart_resume_item_amount">' . $this->shipping_total( true ) . '</span>
 				</div><!-- end mp_cart_resume_item-shipping-total -->';
 		}
@@ -2476,7 +2479,7 @@ class MP_Cart {
 			$cookie_domain = get_blog_details( mp_main_site_id() )->domain;
 		}
 
-		setcookie( $this->_cookie_id, serialize( $this->_items ), $expire, '/', $cookie_domain );
+		setcookie( $this->_cookie_id, json_encode( $this->_items ), $expire, '/', $cookie_domain );
 	}
 
 	/**

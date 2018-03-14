@@ -116,7 +116,7 @@ class MP_Store_Settings_General {
 	 * @return string
 	 */
 	public function format_tax_rate_value( $value, $field ) {
-		return ( intval( $value ) * 100);
+		return ( (float)$value * 100 );
 	}
 
 	/**
@@ -587,7 +587,7 @@ class MP_Store_Settings_General {
 			'placeholder'	 => __( 'Select a Country', 'mp' ),
 			'multiple'		 => false,
 			'label'			 => array( 'text' => __( 'Base Country', 'mp' ) ),
-			'options'		 => array( '' => __( 'Select A Country' ) ) + mp_countries(),
+			'options'		 => array( '' => __( 'Select A Country', 'mp' ) ) + mp_countries(),
 			'width'			 => 'element',
 			'validation'	 => array(
 				'required' => true,

@@ -615,15 +615,16 @@ class WPMUDEV_Metabox {
 	 */
 	public function admin_enqueue_scripts() {
 		if ( isset( $_GET['page'] ) ) {
-			$page = isset( $_GET['page'] );
+			$page = $_GET['page'];
 		} else {
 			$page = '';
 		}
-		
+
 		//Load MP validation only on MP pages
 		$screenpage = get_current_screen();
 
-		if ( $page == 'store-settings' 
+		if ( $page == 'store-settings'
+			|| $page == 'store-setup-wizard'
 			|| $page == 'store-settings-presentation' 
 			|| $page == 'store-settings-notifications' 
 			|| $page == 'store-settings-shipping' 
@@ -632,10 +633,10 @@ class WPMUDEV_Metabox {
 			|| $page == 'store-settings-capabilities'
 			|| $page == 'store-settings-import'
 			|| $page == 'store-settings-addons'
+			|| $page == 'network-store-settings'
 			|| ( isset( $_GET['taxonomy'] ) && ($_GET['taxonomy'] == 'product_category' || $_GET['taxonomy'] == 'product_tag') )
 			|| ( isset( $_GET['post_type'] ) && ($_GET['post_type'] == 'mp_coupon' || $_GET['post_type'] == 'mp_order' || $_GET['post_type'] == 'product' ) ) 
 			|| ( isset( $screenpage->post_type ) && ( $screenpage->post_type == MP_Product::get_post_type() || $screenpage->post_type == "mp_order" || $screenpage->post_type == "mp_coupon") ) )  {
-			
 				wp_register_script( 'jquery-validate', $this->class_url( 'ui/js/jquery.validate.min.js' ), array( 'jquery' ), '1.12' );
 				wp_register_script( 'jquery-validate-methods', $this->class_url( 'ui/js/jquery.validate.methods.min.js' ), array( 'jquery-validate' ), '1.12' );
 				wp_enqueue_script( 'wpmudev-metaboxes-admin', $this->class_url( 'ui/js/admin.js' ), array(
@@ -781,9 +782,13 @@ class WPMUDEV_Metabox {
 			}
 
 		if ( self::$did_metabox_count == 0 ) :
+        
+            $current_screen = get_current_screen();
+			$current_screen_id_part = explode( '_page_', $current_screen->id );
+			$current_screen_id = $current_screen->parent_base . '_page_' . end( $current_screen_id_part );
 			?>
 			<div id="poststuff">
-			<div class="meta-box-sortables <?php echo esc_attr( get_current_screen()->id ); ?>">
+			<div class="meta-box-sortables <?php echo esc_attr( $current_screen_id ); ?>">
 		<?php endif;
 			?>
 			<?php $this->before_settings_metabox(); ?>

@@ -1,7 +1,7 @@
 var mp_checkout;
 
 ( function( $ ) {
-	
+
 	/**
 	 * Fix jqueryui * bootstrap tooltip conflict
 	 * @since 3.0
@@ -218,7 +218,8 @@ var mp_checkout;
             $checkout.find( '.mp_checkout_section_heading-link' ).on( 'click', function( e ) {
                 var $this = $( this );
                 var $section = $this.closest( '.mp_checkout_section' );
-                var $current = $section.nextAll( '.current' );
+                //var $current = $('.mp_form-checkout').find('.current');
+				var $current = $section.nextAll( '.current' );
 
                 if ( $current.length > 0 ) {
                     // section is before the current step - ok to proceed
@@ -258,12 +259,12 @@ var mp_checkout;
                     var $email = $form.find( '[name="mp_login_email"]' );
                     var $pass = $form.find( '[name="mp_login_password"]' );
 
-
                     if ( $form.valid() ) {
                         var checkout_as_guest = false;
                         if ($form.find('#is_checkout_as_guest').size() > 0) {
                             checkout_as_guest = true;
                         }
+
                         if ( $checkout.hasClass( 'last-step' ) ) {
                             var gateway = $( '[name="payment_method"]' ).filter( ':checked' ).val();
 
@@ -318,6 +319,14 @@ var mp_checkout;
                                 }
                             } );
                         } else {
+							// continue as guest to billing/shipping address
+							if ( $form.find('.mp_checkout_section-login-register').hasClass('current') ) {
+                                marketpress.loadingOverlay( 'hide' );
+                                mp_checkout.nextStep();
+                                return;
+							}
+
+                            // continue to review/order payment
                             var url = mp_i18n.ajaxurl + '?action=mp_update_checkout_data';
                             marketpress.loadingOverlay( 'show' );
 
@@ -481,13 +490,13 @@ var mp_checkout;
             var $billingInfo = $( '#mp-checkout-column-billing-info' );
 
             if ( $cb.prop( 'checked' ) ) {
-                $billingInfo.removeClass( 'fullwidth' );
+                //$billingInfo.removeClass( 'fullwidth' );
                 setTimeout( function() {
                     $shippingInfo.fadeIn( 500 );
                 }, 550 );
             } else {
                 $shippingInfo.fadeOut( 500, function() {
-                    $billingInfo.addClass( 'fullwidth' );
+                    //$billingInfo.addClass( 'fullwidth' );
                 } );
             }
         },
