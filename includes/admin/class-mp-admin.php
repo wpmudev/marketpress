@@ -34,9 +34,7 @@ class MP_Admin {
 	private function __construct() {
 		$this->_init_dash_notices();
 		add_action( 'init',array( &$this, '_includes' ), 1 );
-
-		//save orders screen options
-		add_filter( 'set-screen-option', array( &$this, 'save_orders_screen_options' ), 10, 3 );
+		
 		//set custom post-updated messages
 		add_filter( 'post_updated_messages', array( &$this, 'post_updated_messages' ) );
 		//enqueue styles and scripts
