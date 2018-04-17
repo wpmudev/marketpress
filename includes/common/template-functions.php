@@ -3341,7 +3341,7 @@ if ( ! function_exists( 'mp_get_ajax_url' ) ) {
 
 			$schema = is_ssl() ? 'https://' : 'http://';
 			if( is_ssl() && force_ssl_admin() ) {
-				$schema = 'http://';
+				$schema = 'https://';
 			}
 			$ajax_url = $schema . $domain . '/wp-admin/' . $path;
 		}
