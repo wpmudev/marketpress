@@ -778,7 +778,7 @@ class MP_Public {
 				readfile( $tmp );
 			}
 
-			if ( ! $not_delete ) {
+			if ( empty( $not_delete ) ) {
 				@unlink( $tmp );
 			}
 		}
