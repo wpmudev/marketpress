@@ -381,7 +381,7 @@ class Marketpress {
 		add_action( 'init', array( &$this, 'register_custom_types' ), 1 );
 
 		// Maybe flush rewrites.
-		add_action( 'init', array( &$this, 'maybe_flush_rewrites' ), 99 );
+		add_action( 'admin_init', array( &$this, 'maybe_flush_rewrites' ), 99 );
 
 		// Fix insecure images.
 		add_filter( 'wp_get_attachment_url', array( &$this, 'fix_insecure_images' ), 10, 2 );
