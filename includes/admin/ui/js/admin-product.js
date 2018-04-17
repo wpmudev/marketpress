@@ -1,5 +1,9 @@
 jQuery( document ).ready( function( $ ) {
 
+    $( '.text-wrap' ).live('click', function(e) {
+        $(this).find('.variation_values').focus();
+    } );
+
     $( '.mp-variation-row .mp-variation-attribute-name' ).live( 'keyup', function( e ) {
         if ( $( this ).val() == '' ) {
             $( this ).addClass( 'mp_variation_invalid' );
@@ -17,7 +21,7 @@ jQuery( document ).ready( function( $ ) {
         //}
     } );
 
-    $( 'textarea.variation_values' ).live( 'keyup', function( e ) {
+    $( 'input.variation_values' ).live( 'keyup', function( e ) {
 
         var keyCode = e.keyCode || e.which;
 
@@ -27,9 +31,9 @@ jQuery( document ).ready( function( $ ) {
             //var press = jQuery.Event( "keyup" );
             //press.which = '13';
             //press.originalEvent = KeyboardEvent;
-            // $( 'textarea.variation_values' ).val( $( 'textarea.variation_values' ).val() );
-            //$( 'textarea.variation_values' ).trigger( press );
-            //alert($( 'textarea.variation_values' ).val());
+            // $( 'input.variation_values' ).val( $( 'input.variation_values' ).val() );
+            //$( 'input.variation_values' ).trigger( press );
+            //alert($( 'input.variation_values' ).val());
             e.preventDefault();
         }
     } );
@@ -106,7 +110,7 @@ jQuery( document ).ready( function( $ ) {
 
 	$( '.mp-variation-add-all' ).live( 'click', function( e ) {
 		e.preventDefault();
-		var $variation_tags_textarea = $( this ).parents( '.variation-row' ).find( 'textarea.variation_values' ),
+		var $variation_tags_textarea = $( this ).parents( '.variation-row' ).find( 'input.variation_values' ),
 		variation_tags = $( this ).parents( '.variation-row' ).find( '.mp_product_attributes_select option:selected' ).attr( 'data-tags' ),
 		variation_tags_array = variation_tags.split( ',' ),
 		existing_tags = $variation_tags_textarea.textext()[0].tags()._formData,
@@ -118,7 +122,7 @@ jQuery( document ).ready( function( $ ) {
 	} );
 
 	$( '.mp_product_attributes_select' ).live( 'change', function( ) {
-		var $variation_tags_textarea = $( this ).parents( '.variation-row' ).find( 'textarea.variation_values' );
+		var $variation_tags_textarea = $( this ).parents( '.variation-row' ).find( 'input.variation_values' );
 		$variation_tags_textarea.textext()[0].input().unbind('getSuggestions');
 		if ( $( this ).val( ) == '-1' ) {
 			$( this ).parent( ).find( '.mp-variation-attribute-name' ).show( );

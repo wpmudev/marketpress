@@ -192,7 +192,7 @@
 		if(self.opts(OPT_ENABLED))
 		{
 			container = $(self.opts(OPT_HTML_TAGS));
-			input.after(container);
+			input.before(container);
 
 			$(self).data('container', container);
 
