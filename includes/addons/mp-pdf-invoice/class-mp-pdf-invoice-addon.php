@@ -231,6 +231,7 @@ class MP_PDF_Invoice_Addon {
 		$metabox->add_field( 'select', array(
 			'name'    => 'pdf_invoice[template]',
 			'label'   => array( 'text' => __( "Choose a template", 'mp' ) ),
+			'desc'    => __( "If having problems during invoice generation, add <code>define( 'DOMPDF_ENABLE_HTML5PARSER', true );</code> to the wp-config.php file.", 'mp' ),
 			'options' => $templates
 		) );
 		$metabox->add_field( 'file', array(
