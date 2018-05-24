@@ -97,7 +97,7 @@ class MP_GDPR {
 	 */
 	public function register_exporter( $exporters ) {
 		$exporters['mp'] = array(
-			'exporter_friendly_name' => __( 'MarketPress User Data' ),
+			'exporter_friendly_name' => __( 'MarketPress User Data', 'mp' ),
 			'callback'               => array( $this, 'export_data' ),
 		);
 
@@ -113,7 +113,7 @@ class MP_GDPR {
 	 */
 	public function register_eraser( $erasers ) {
 		$erasers['mp'] = array(
-			'eraser_friendly_name' => __( 'MarketPress User Data' ),
+			'eraser_friendly_name' => __( 'MarketPress User Data', 'mp' ),
 			'callback'             => array( $this, 'erase_data' ),
 		);
 
