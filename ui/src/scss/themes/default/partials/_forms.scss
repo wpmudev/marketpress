@@ -75,6 +75,18 @@ textarea.mp_form_input {
 	}
 }
 
+// Privacy policy errors
+.mp_privacy_policy {
+	.mp_tooltip { // Overwrite for padding issue
+		display: none;
+	}
+	.error {
+		display: none;
+		color: $color--error;
+		font-size: $font__size--m;
+	}
+}
+
 // Select2 3.5.x
 div.mp_select2,
 div.mp_select2_search {
