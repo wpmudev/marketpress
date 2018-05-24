@@ -67,7 +67,7 @@ class MP_GDPR {
 		}
 
 		$content = sprintf( '<h3>%s</h3><p>%s</p><h3>%s</h3><p>%s</p><h3>%s</h3><p>%s</p>',
-			__( 'Third parties', 'wdcp' ),
+			__( 'Third parties', 'mp' ),
 			__( 'This site might be using third party services and tools to process payments or/and
 		           process shipping data when creating orders on the MarketPress store. These services include payment
 		           gateways: 2Checkout, Authorize.net AIM, eWay shared payments, eWay Rapid 3.1 Payments, Mijireh,
