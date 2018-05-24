@@ -7,6 +7,10 @@ Change Log:
 3.2.9
 ----------------------------------------------------------------------
 
+- GDPR: Ability to erase user personal data
+- GDPR: Ability to export user personal data
+- GDPR: Plugin information to default "Private Policy" page during auto-creation of the page
+- GDPR: Checkbox with Privacy Policy during checkout
 - Enhance: Define DONOTCACHEPAGE constant on plugin pages
 - Fix: Paypal Error: 10413 - The totals of the cart item amounts do not match order amounts
 - Fix: Highlighting and selecting variation values
