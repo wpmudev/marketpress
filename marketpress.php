@@ -342,11 +342,14 @@ class Marketpress {
 	 * @access public
 	 */
 	public function load_plugins() {
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/shipping-modules/class-mp-shipping-api.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/shipping-modules/class-mp-shipping-api-calculated.php' );
 		mp_include_dir( $this->plugin_dir( 'includes/common/shipping-modules' ) );
 		MP_Shipping_API::load_active_plugins();
 
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/payment-gateways/class-mp-gateway-api.php' );
 		mp_include_dir( $this->plugin_dir( 'includes/common/payment-gateways' ) );
 
@@ -366,6 +369,7 @@ class Marketpress {
 		$this->_init_vars();
 
 		// Include constants.
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/constants.php' );
 
 		// Includes.
@@ -599,6 +603,9 @@ class Marketpress {
 	 * Install actions.
 	 */
 	function install_actions() {
+		// Add GDPR compliance.
+		MP_GDPR::get_instance();
+
 		// Install - Add pages button.
 		if ( ! empty( $_GET['install_mp_pages'] ) ) {
 			$this->create_pages();
@@ -902,19 +909,31 @@ class Marketpress {
 	 * @access public
 	 */
 	public function includes() {
+		/* @noinspection PhpIncludeInspection */
+		require_once $this->plugin_dir( 'includes/common/class-mp-gdpr.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/wpmudev-metaboxes/wpmudev-metabox.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/class-mp-mailer.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/helpers.php' );
 
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/class-mp-product-attributes.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/addons/class-mp-addons.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/class-mp-order.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/class-mp-product.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/class-mp-installer.php' );
 
-
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/class-mp-cart.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/template-functions.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/class-mp-backward-compatibility.php' );
 		//require_once $this->plugin_dir( 'includes/common/class-mp-taxes.php' );
 
@@ -923,23 +942,32 @@ class Marketpress {
 		}
 
 		if ( is_multisite() && is_plugin_active_for_network( mp_get_plugin_slug() ) ) {
+			/* @noinspection PhpIncludeInspection */
 			require_once $this->plugin_dir( 'includes/multisite/class-mp-multisite.php' );
+			/* @noinspection PhpIncludeInspection */
 			require_once $this->plugin_dir( 'includes/multisite/template-functions.php' );
 			if ( is_admin() ) {
+				/* @noinspection PhpIncludeInspection */
 				require_once $this->plugin_dir( 'includes/multisite/class-mp-admin-multisite.php' );
 			}
 		}
 
 		if ( is_admin() ) {
+			/* @noinspection PhpIncludeInspection */
 			require_once $this->plugin_dir( 'includes/admin/class-mp-admin.php' );
+			/* @noinspection PhpIncludeInspection */
 			require_once $this->plugin_dir( 'includes/admin/class-mp-pages-admin.php' );
 
 			if ( mp_doing_ajax() ) {
+				/* @noinspection PhpIncludeInspection */
 				require_once $this->plugin_dir( 'includes/admin/class-mp-ajax.php' );
+				/* @noinspection PhpIncludeInspection */
 				require_once $this->plugin_dir( 'includes/public/class-mp-public.php' );
 			}
+			/* @noinspection PhpIncludeInspection */
 			require_once $this->plugin_dir( 'includes/admin/class-mp-dashboard-widgets.php' );
 		} else {
+			/* @noinspection PhpIncludeInspection */
 			require_once $this->plugin_dir( 'includes/public/class-mp-public.php' );
 		}
 	}
