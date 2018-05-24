@@ -7,6 +7,9 @@ Change Log:
 3.2.9
 ----------------------------------------------------------------------
 
+- GDPR: Added ability to erase user personal data
+- GDPR: Added ability to export user personal data
+- GDPR: Added plugin information to default "Private Policy" page during auto-creation of the page
 - Fix: Typo in helpers file
 
 
