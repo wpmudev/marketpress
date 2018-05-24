@@ -7,6 +7,14 @@ Change Log:
 3.2.9
 ----------------------------------------------------------------------
 
+- Enhance: Define DONOTCACHEPAGE constant on plugin pages
+- Fix: Paypal Error: 10413 - The totals of the cart item amounts do not match order amounts
+- Fix: Highlighting and selecting variation values
+- Fix: Add to cart showing Mixed Content error on mapped site in Domain Mapping plugin
+- Fix: "OOPS! THAT PAGE CAN’T BE FOUND." message after plugin installation
+- Fix: Validation not working for some fields in the Setup Wizard
+- Fix: Export to PDF fatal error
+- Fix: Remove plugin shortcodes from Customizer text fields
 - Fix: Typo in helpers file
 
 
