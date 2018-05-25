@@ -3339,11 +3339,13 @@ if ( ! function_exists( 'mp_get_ajax_url' ) ) {
 			));
 			restore_current_blog();
 
-			$schema = is_ssl() ? 'https://' : 'http://';
-			if( is_ssl() && force_ssl_admin() ) {
-				$schema = 'https://';
+			if ( ! empty( $domain ) ) {
+				$schema = is_ssl() ? 'https://' : 'http://';
+				if( is_ssl() && force_ssl_admin() ) {
+					$schema = 'https://';
+				}
+				$ajax_url = $schema . $domain . '/wp-admin/' . $path;
 			}
-			$ajax_url = $schema . $domain . '/wp-admin/' . $path;
 		}
 
 		return $ajax_url;
