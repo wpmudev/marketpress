@@ -1,5 +1,4 @@
 jQuery(document).ready(function ($) {
-
 	var $form = $( "form#mp-main-form" );
 
 	// Tabs

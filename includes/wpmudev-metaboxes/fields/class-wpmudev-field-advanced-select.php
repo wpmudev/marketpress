@@ -116,7 +116,7 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 								},
 								"data": options,
 								"width": "100%"
-							}
+							};
 							if ($this.attr('data-format-dropdown-header') !== undefined) {
 								args.formatDropdownHeader = function () {
 									return $this.attr('data-format-dropdown-header');
@@ -140,7 +140,7 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 							$this.mp_select2(args);
 						}
 					});
-				}
+				};
 
 				$(document).on('wpmudev_repeater_field/before_add_field_group', function () {
 					$('.wpmudev-advanced-select').mp_select2('destroy');
