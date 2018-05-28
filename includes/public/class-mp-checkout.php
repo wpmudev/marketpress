@@ -1281,6 +1281,7 @@ class MP_Checkout {
 			<div class="mp_checkout_field mp_checkout_checkbox mp_privacy_policy">
 				<label class="mp_form_label">
 					<input type="checkbox" class="mp_form_checkbox" data-rule-required="true" name="billing[policy]" value="1" autocomplete="off">
+					<span class="mp_field_required">*</span>
 					<span>' . __( "By clicking this checkbox you allow the website to process your personal data.", "mp" ) . '&nbsp;'. get_the_privacy_policy_link() . '</span>
 				</label>
 				<label for="billing[policy]" class="error">' . __( "This field is required.", "mp" ) . '</label>
