@@ -49,7 +49,7 @@ class MP_GDPR {
 	 */
 	private function register_hooks() {
 		// Register private policy text.
-		add_action( 'admin_init', array( $this, 'privacy_policy_content' ), 20 );
+		add_action( 'admin_init', array( $this, 'privacy_policy_content' ) );
 
 		// Register data exporter provider.
 		add_filter( 'wp_privacy_personal_data_exporters', array( $this, 'register_exporter' ), 10 );

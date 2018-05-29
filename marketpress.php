@@ -372,6 +372,9 @@ class Marketpress {
 		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/constants.php' );
 
+		// Add GDPR compliance.
+		add_action( 'admin_init', array( $this, 'add_gdpr_compliance' ), 0 );
+
 		// Includes.
 		add_action( 'init', array( &$this, 'includes' ), 0 );
 
@@ -416,6 +419,16 @@ class Marketpress {
 		$this->load_widgets();
 
 		$this->localization();
+	}
+
+	/**
+	 * Add GDPR compliance.
+	 */
+	public function add_gdpr_compliance() {
+		/* @noinspection PhpIncludeInspection */
+		require_once $this->plugin_dir( 'includes/common/class-mp-gdpr.php' );
+
+		MP_GDPR::get_instance();
 	}
 
 	/**
@@ -603,9 +616,6 @@ class Marketpress {
 	 * Install actions.
 	 */
 	function install_actions() {
-		// Add GDPR compliance.
-		MP_GDPR::get_instance();
-
 		// Install - Add pages button.
 		if ( ! empty( $_GET['install_mp_pages'] ) ) {
 			$this->create_pages();
