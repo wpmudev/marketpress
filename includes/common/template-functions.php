@@ -3332,7 +3332,7 @@ if ( ! function_exists( 'mp_get_ajax_url' ) ) {
 			global $wpdb;
 			$blog_id = get_current_blog_id();
 
-			switch_to_blog(1);
+			switch_to_blog( $blog_id );
 			$domain = $wpdb->get_var( $wpdb->prepare(
 				"SELECT domain from {$wpdb->prefix}domain_mapping WHERE blog_id = %d",
 				absint( $blog_id )
