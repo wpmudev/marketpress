@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the MarketPress package.
 msgid ""
 msgstr ""
-"Project-Id-Version: MarketPress 3.2.9-beta.1\n"
+"Project-Id-Version: MarketPress 3.2.9-beta.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2018-05-24 16:05:25+00:00\n"
+"POT-Creation-Date: 2018-06-04 10:11:38+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -82,7 +82,7 @@ msgid_plural "%s add-ons disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/addons/class-mp-addons-list-table.php:128 marketpress.php:596
+#: includes/addons/class-mp-addons-list-table.php:128 marketpress.php:609
 msgid "Settings"
 msgstr ""
 
@@ -199,7 +199,7 @@ msgstr ""
 
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:674
 #: includes/admin/class-mp-products-admin.php:510
-#: includes/admin/class-mp-setup-wizard.php:566
+#: includes/admin/class-mp-setup-wizard.php:565
 #: includes/common/payment-gateways/authorizenet-aim.php:291
 #: includes/common/payment-gateways/authorizenet-aim.php:326
 #: includes/common/payment-gateways/payfast.php:347
@@ -209,11 +209,11 @@ msgstr ""
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:675
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:759
 #: includes/admin/class-mp-products-admin.php:510
-#: includes/admin/class-mp-setup-wizard.php:513
-#: includes/admin/class-mp-setup-wizard.php:519
-#: includes/admin/class-mp-setup-wizard.php:525
-#: includes/admin/class-mp-setup-wizard.php:531
-#: includes/admin/class-mp-setup-wizard.php:565
+#: includes/admin/class-mp-setup-wizard.php:512
+#: includes/admin/class-mp-setup-wizard.php:518
+#: includes/admin/class-mp-setup-wizard.php:524
+#: includes/admin/class-mp-setup-wizard.php:530
+#: includes/admin/class-mp-setup-wizard.php:564
 #: includes/admin/store-settings/class-mp-store-settings-general.php:232
 #: includes/admin/store-settings/class-mp-store-settings-general.php:299
 #: includes/admin/store-settings/class-mp-store-settings-general.php:305
@@ -333,7 +333,7 @@ msgstr ""
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:916
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:1015
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:1018
-#: includes/admin/class-mp-dashboard-widgets.php:305 marketpress.php:694
+#: includes/admin/class-mp-dashboard-widgets.php:305 marketpress.php:704
 msgid "Coupons"
 msgstr ""
 
@@ -547,7 +547,7 @@ msgstr ""
 #: includes/common/class-mp-cart.php:717 includes/common/helpers.php:168
 #: includes/common/payment-gateways/_ideal.php:137
 #: includes/common/payment-gateways/_payway.php:116
-#: includes/public/class-mp-checkout.php:1303
+#: includes/public/class-mp-checkout.php:1304
 msgid "Shipping"
 msgstr ""
 
@@ -583,15 +583,15 @@ msgstr ""
 
 #: includes/addons/mp-pdf-invoice/templates/default/invoice.php:66
 #: includes/addons/mp-pdf-invoice/templates/default/packing.php:66
-#: includes/common/class-mp-order.php:863 includes/common/helpers.php:163
-#: includes/public/class-mp-checkout.php:1426
+#: includes/common/class-mp-gdpr.php:382 includes/common/class-mp-order.php:863
+#: includes/common/helpers.php:163 includes/public/class-mp-checkout.php:1427
 msgid "Billing Address"
 msgstr ""
 
 #: includes/addons/mp-pdf-invoice/templates/default/invoice.php:71
 #: includes/addons/mp-pdf-invoice/templates/default/packing.php:71
-#: includes/common/class-mp-order.php:871 includes/common/helpers.php:164
-#: includes/public/class-mp-checkout.php:1433
+#: includes/common/class-mp-gdpr.php:386 includes/common/class-mp-order.php:871
+#: includes/common/helpers.php:164 includes/public/class-mp-checkout.php:1434
 msgid "Shipping Address"
 msgstr ""
 
@@ -688,7 +688,7 @@ msgstr ""
 #: includes/admin/class-mp-orders-admin.php:378
 #: includes/admin/class-mp-orders-admin.php:1041
 #: includes/admin/class-mp-orders-admin.php:1062
-#: includes/common/class-mp-gdpr.php:302 includes/common/class-mp-order.php:994
+#: includes/common/class-mp-gdpr.php:327 includes/common/class-mp-order.php:994
 #: includes/common/payment-gateways/payfast.php:244 marketpress.php:306
 msgid "Received"
 msgstr ""
@@ -698,7 +698,7 @@ msgstr ""
 #: includes/admin/class-mp-orders-admin.php:949
 #: includes/admin/class-mp-orders-admin.php:1045
 #: includes/admin/class-mp-orders-admin.php:1063
-#: includes/common/class-mp-gdpr.php:303
+#: includes/common/class-mp-gdpr.php:328
 #: includes/common/payment-gateways/2checkout.php:294
 #: includes/common/payment-gateways/_cubepoints.php:130
 #: includes/common/payment-gateways/authorizenet-aim.php:193
@@ -719,7 +719,7 @@ msgstr ""
 #: includes/admin/class-mp-orders-admin.php:950
 #: includes/admin/class-mp-orders-admin.php:1049
 #: includes/admin/class-mp-orders-admin.php:1064
-#: includes/common/class-mp-gdpr.php:304
+#: includes/common/class-mp-gdpr.php:329
 #: includes/common/class-mp-order.php:1001 marketpress.php:320
 msgid "Shipped"
 msgstr ""
@@ -729,7 +729,7 @@ msgstr ""
 #: includes/admin/class-mp-orders-admin.php:951
 #: includes/admin/class-mp-orders-admin.php:1053
 #: includes/admin/class-mp-orders-admin.php:1065
-#: includes/common/class-mp-gdpr.php:305
+#: includes/common/class-mp-gdpr.php:330
 #: includes/common/class-mp-order.php:1018 marketpress.php:327
 msgid "Closed"
 msgstr ""
@@ -1153,7 +1153,7 @@ msgid "Shipping Rates"
 msgstr ""
 
 #: includes/admin/class-mp-dashboard-widgets.php:316
-#: includes/admin/class-mp-setup-wizard.php:632
+#: includes/admin/class-mp-setup-wizard.php:631
 #: includes/admin/store-settings/class-mp-store-settings-payments.php:50
 msgid "Payment Gateways"
 msgstr ""
@@ -1178,7 +1178,7 @@ msgstr ""
 
 #: includes/admin/class-mp-exporter-orders.php:154
 #: includes/admin/class-mp-orders-admin.php:1009
-#: includes/common/class-mp-gdpr.php:332
+#: includes/common/class-mp-gdpr.php:366
 msgid "Order Date"
 msgstr ""
 
@@ -1190,7 +1190,7 @@ msgstr ""
 #: includes/admin/class-mp-orders-admin.php:432
 #: includes/admin/class-mp-pages-admin.php:62
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:227
-#: includes/common/class-mp-gdpr.php:336
+#: includes/common/class-mp-gdpr.php:370
 #: includes/common/template-functions.php:175
 #: includes/common/template-functions.php:926
 msgid "Order Status"
@@ -1359,7 +1359,7 @@ msgid "Move To Trash"
 msgstr ""
 
 #: includes/admin/class-mp-orders-admin.php:1008
-#: includes/common/class-mp-gdpr.php:328
+#: includes/common/class-mp-gdpr.php:362
 #: includes/common/template-functions.php:2134
 msgid "Order ID"
 msgstr ""
@@ -1397,7 +1397,6 @@ msgid "Store Page Settings"
 msgstr ""
 
 #: includes/admin/class-mp-pages-admin.php:57
-#: includes/admin/class-mp-setup-wizard.php:417
 #: includes/admin/class-mp-shortcode-builder.php:716
 #: includes/admin/class-mp-shortcode-builder.php:727
 #: includes/admin/class-mp-shortcode-builder.php:883
@@ -1688,7 +1687,7 @@ msgid "Weight"
 msgstr ""
 
 #: includes/admin/class-mp-products-admin.php:1676
-#: includes/admin/class-mp-setup-wizard.php:548
+#: includes/admin/class-mp-setup-wizard.php:547
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:166
 #: includes/common/shipping-modules/class-mp-shipping-api-calculated.php:146
 msgid "Kilograms"
@@ -1697,7 +1696,7 @@ msgstr ""
 #: includes/admin/class-mp-products-admin.php:1684
 #: includes/admin/class-mp-products-admin.php:2123
 #: includes/admin/class-mp-products-admin.php:2369
-#: includes/admin/class-mp-setup-wizard.php:547
+#: includes/admin/class-mp-setup-wizard.php:546
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:165
 #: includes/common/shipping-modules/class-mp-shipping-api-calculated.php:146
 #: includes/common/shipping-modules/class-mp-shipping-api.php:227
@@ -1919,7 +1918,6 @@ msgid "These are the countries that you will ship to."
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:411
-#: includes/admin/class-mp-setup-wizard.php:413
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:103
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:104
 msgid "All Countries"
@@ -1930,24 +1928,13 @@ msgstr ""
 msgid "Choose Countries"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:418
-#: includes/admin/store-settings/class-mp-store-settings-shipping.php:109
-#: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-variations.php:93
-msgid "All"
-msgstr ""
-
-#: includes/admin/class-mp-setup-wizard.php:419
-#: includes/admin/store-settings/class-mp-store-settings-shipping.php:110
-msgid "EU"
-msgstr ""
-
-#: includes/admin/class-mp-setup-wizard.php:431
+#: includes/admin/class-mp-setup-wizard.php:429
 #: includes/admin/store-settings/class-mp-store-settings-general.php:381
 msgid "Currency Settings"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:436
-#: includes/admin/class-mp-setup-wizard.php:444
+#: includes/admin/class-mp-setup-wizard.php:434
+#: includes/admin/class-mp-setup-wizard.php:442
 #: includes/admin/store-settings/class-mp-store-settings-general.php:386
 #: includes/admin/store-settings/class-mp-store-settings-general.php:394
 #: includes/multisite/class-mp-admin-multisite.php:204
@@ -1955,114 +1942,114 @@ msgstr ""
 msgid "Select a Currency"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:446
+#: includes/admin/class-mp-setup-wizard.php:444
 #: includes/admin/store-settings/class-mp-store-settings-general.php:396
 msgid "Store Currency"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:452
+#: includes/admin/class-mp-setup-wizard.php:451
 #: includes/admin/store-settings/class-mp-store-settings-general.php:403
 #: includes/multisite/class-mp-admin-multisite.php:221
 msgid "Currency Symbol Position"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:468
+#: includes/admin/class-mp-setup-wizard.php:467
 #: includes/admin/store-settings/class-mp-store-settings-general.php:449
 msgid "Tax Settings"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:474
+#: includes/admin/class-mp-setup-wizard.php:473
 msgid "Default Tax Rate"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:492
+#: includes/admin/class-mp-setup-wizard.php:491
 #: includes/admin/store-settings/class-mp-store-settings-general.php:471
 msgid "Current Rates"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:493
+#: includes/admin/class-mp-setup-wizard.php:492
 #: includes/admin/store-settings/class-mp-store-settings-general.php:472
 msgid "%s Tax Rate"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:506
+#: includes/admin/class-mp-setup-wizard.php:505
 #: includes/admin/store-settings/class-mp-store-settings-general.php:485
 msgid "Tax Label"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:508
+#: includes/admin/class-mp-setup-wizard.php:507
 msgid "I.e. Taxes, VAT, GST, etc"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:512
+#: includes/admin/class-mp-setup-wizard.php:511
 #: includes/admin/store-settings/class-mp-store-settings-general.php:491
 msgid "Apply Tax To Shipping Fees?"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:518
+#: includes/admin/class-mp-setup-wizard.php:517
 #: includes/admin/store-settings/class-mp-store-settings-general.php:497
 msgid "Enter Prices Inclusive of Tax?"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:524
+#: includes/admin/class-mp-setup-wizard.php:523
 #: includes/admin/store-settings/class-mp-store-settings-general.php:503
 msgid "Show Price + Tax?"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:530
+#: includes/admin/class-mp-setup-wizard.php:529
 msgid "Apply Tax to Downloadable Products?"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:540
-#: includes/admin/class-mp-setup-wizard.php:576
+#: includes/admin/class-mp-setup-wizard.php:539
+#: includes/admin/class-mp-setup-wizard.php:575
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:163
 msgid "Measurement System"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:569
+#: includes/admin/class-mp-setup-wizard.php:568
 msgid "I want to charge shipping"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:583
+#: includes/admin/class-mp-setup-wizard.php:582
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:115
 msgid "No Shipping"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:597
+#: includes/admin/class-mp-setup-wizard.php:596
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:129
 msgid "Calculated Options"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:602
+#: includes/admin/class-mp-setup-wizard.php:601
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:134
 #: includes/public/class-mp-checkout.php:82
 msgid "Shipping Method"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:617
+#: includes/admin/class-mp-setup-wizard.php:616
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:149
 msgid "Select Shipping Options"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:618
+#: includes/admin/class-mp-setup-wizard.php:617
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:150
 msgid ""
 "Select which calculated shipping methods the customer will be able to "
 "choose from."
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:644
-#: includes/admin/class-mp-setup-wizard.php:650
+#: includes/admin/class-mp-setup-wizard.php:643
+#: includes/admin/class-mp-setup-wizard.php:649
 msgid "Other Gateways"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:649
+#: includes/admin/class-mp-setup-wizard.php:648
 #: includes/common/payment-gateways/manual-payments.php:35
 #: includes/common/payment-gateways/manual-payments.php:36
 msgid "Manual Payment"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:656
+#: includes/admin/class-mp-setup-wizard.php:655
 msgid "Setup your payment gateway"
 msgstr ""
 
@@ -3747,6 +3734,15 @@ msgstr ""
 msgid "General Shipping Settings"
 msgstr ""
 
+#: includes/admin/store-settings/class-mp-store-settings-shipping.php:109
+#: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-variations.php:93
+msgid "All"
+msgstr ""
+
+#: includes/admin/store-settings/class-mp-store-settings-shipping.php:110
+msgid "EU"
+msgstr ""
+
 #: includes/admin/widgets/cart.php:7
 msgid ""
 "Shows dynamic shopping cart contents along with a checkout button for your "
@@ -4003,7 +3999,7 @@ msgstr ""
 msgid "Estimated %s"
 msgstr ""
 
-#: includes/common/class-mp-cart.php:752 includes/common/class-mp-gdpr.php:340
+#: includes/common/class-mp-cart.php:752 includes/common/class-mp-gdpr.php:374
 msgid "Order Total"
 msgstr ""
 
@@ -4150,95 +4146,95 @@ msgstr ""
 msgid "Orders Data"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:233
+#: includes/common/class-mp-gdpr.php:244
 msgid "Billing First Name"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:234
+#: includes/common/class-mp-gdpr.php:245
 msgid "Billing Last Name"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:235
+#: includes/common/class-mp-gdpr.php:246
 msgid "Billing Email"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:236
+#: includes/common/class-mp-gdpr.php:247
 msgid "Billing Company Name"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:237
+#: includes/common/class-mp-gdpr.php:248
 msgid "Billing Address 1"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:238
+#: includes/common/class-mp-gdpr.php:249
 msgid "Billing Address 2"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:239
+#: includes/common/class-mp-gdpr.php:250
 msgid "Billing City"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:240
+#: includes/common/class-mp-gdpr.php:251
 msgid "Billing State"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:241
+#: includes/common/class-mp-gdpr.php:252
 msgid "Billing ZIP"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:242
+#: includes/common/class-mp-gdpr.php:253
 msgid "Billing Country"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:243
+#: includes/common/class-mp-gdpr.php:254
 msgid "Billing Phone"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:247
+#: includes/common/class-mp-gdpr.php:258
 msgid "Shipping First Name"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:248
+#: includes/common/class-mp-gdpr.php:259
 msgid "Shipping Last Name"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:249
+#: includes/common/class-mp-gdpr.php:260
 msgid "Shipping Email"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:250
+#: includes/common/class-mp-gdpr.php:261
 msgid "Shipping Company Name"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:251
+#: includes/common/class-mp-gdpr.php:262
 msgid "Shipping Address 1"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:252
+#: includes/common/class-mp-gdpr.php:263
 msgid "Shipping Address 2"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:253
+#: includes/common/class-mp-gdpr.php:264
 msgid "Shipping City"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:254
+#: includes/common/class-mp-gdpr.php:265
 msgid "Shipping State"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:255
+#: includes/common/class-mp-gdpr.php:266
 msgid "Shipping ZIP"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:256
+#: includes/common/class-mp-gdpr.php:267
 msgid "Shipping Country"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:257
+#: includes/common/class-mp-gdpr.php:268
 msgid "Shipping Phone"
 msgstr ""
 
-#: includes/common/class-mp-gdpr.php:344
+#: includes/common/class-mp-gdpr.php:378
 msgid "Order Info"
 msgstr ""
 
@@ -4365,7 +4361,7 @@ msgid "Email"
 msgstr ""
 
 #: includes/common/class-mp-order.php:821
-#: includes/public/class-mp-checkout.php:1313
+#: includes/public/class-mp-checkout.php:1314
 msgid "Special Instructions"
 msgstr ""
 
@@ -5255,7 +5251,7 @@ msgstr ""
 #: includes/common/payment-gateways/paypal-payflow.php:423
 #: includes/common/shipping-modules/mp-ups.php:158
 #: includes/public/class-mp-checkout.php:1254
-#: includes/public/class-mp-checkout.php:1382
+#: includes/public/class-mp-checkout.php:1383
 msgid "Password"
 msgstr ""
 
@@ -8471,7 +8467,7 @@ msgid "[mp_global_tag_cloud]"
 msgstr ""
 
 #: includes/common/template-functions.php:910
-#: includes/public/class-mp-checkout.php:1439
+#: includes/public/class-mp-checkout.php:1440
 msgid "Cart"
 msgstr ""
 
@@ -8831,58 +8827,58 @@ msgstr ""
 msgid "An account with this username already exists"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1284
+#: includes/public/class-mp-checkout.php:1285
 msgid ""
 "By clicking this checkbox you allow the website to process your personal "
 "data."
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1286
+#: includes/public/class-mp-checkout.php:1287
 #: includes/public/class-mp-public.php:405
 #: includes/public/class-mp-short-codes.php:126
 msgid "This field is required."
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1296
+#: includes/public/class-mp-checkout.php:1297
 msgid "Shipping address different than billing?"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1375
+#: includes/public/class-mp-checkout.php:1376
 msgid "Have an account?"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1376
+#: includes/public/class-mp-checkout.php:1377
 msgid "Sign in to speed up the checkout process."
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1378
+#: includes/public/class-mp-checkout.php:1379
 msgid "E-Mail Address/Username"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1385
+#: includes/public/class-mp-checkout.php:1386
 msgid "Login"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1391
-#: includes/public/class-mp-checkout.php:1397
+#: includes/public/class-mp-checkout.php:1392
+#: includes/public/class-mp-checkout.php:1398
 msgid "First-time customer?"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1392
+#: includes/public/class-mp-checkout.php:1393
 msgid ""
 "Proceed to checkout and you'll have an opportunity to create an account at "
 "the end."
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1393
+#: includes/public/class-mp-checkout.php:1394
 msgid "Continue as Guest"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1398
+#: includes/public/class-mp-checkout.php:1399
 msgid "Proceed to checkout and create an account at the end."
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1399
+#: includes/public/class-mp-checkout.php:1400
 #: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-quick-setup.php:58
 msgid "Continue"
 msgstr ""
@@ -9540,47 +9536,47 @@ msgid_plural "Closed <span class=\"count\">(%s)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: marketpress.php:425
+#: marketpress.php:438
 msgid "Add a Product"
 msgstr ""
 
-#: marketpress.php:660
+#: marketpress.php:670
 msgid "Your pages were created successfully."
 msgstr ""
 
-#: marketpress.php:674
+#: marketpress.php:684
 #. translators: %s: plugin title
 msgid ""
 "<strong>Welcome to %s</strong> &#8211; Install pages required by the plugin "
 "automatically."
 msgstr ""
 
-#: marketpress.php:679
+#: marketpress.php:689
 #. translators: %s: plugin title
 msgid "Install %s Pages"
 msgstr ""
 
-#: marketpress.php:695
+#: marketpress.php:705
 msgid "Offer and accept coupon codes"
 msgstr ""
 
-#: marketpress.php:703
+#: marketpress.php:713
 msgid "Pro Sites"
 msgstr ""
 
-#: marketpress.php:704
+#: marketpress.php:714
 msgid "Grant access to themes and gateways depending on the user's Pro Site level"
 msgstr ""
 
-#: marketpress.php:721
+#: marketpress.php:731
 msgid "Invoice PDF"
 msgstr ""
 
-#: marketpress.php:730
+#: marketpress.php:740
 msgid "Multiple Downloads"
 msgstr ""
 
-#: marketpress.php:731
+#: marketpress.php:741
 msgid "Enable multiple downloads per product"
 msgstr ""
 
