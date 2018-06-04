@@ -170,6 +170,7 @@ class MP_GDPR {
 	 * @return array
 	 */
 	public function erase_data( $email_address, $page = 1 ) {
+		$guest = false;
 		$result = array(
 			'items_removed'  => false,
 			'items_retained' => false,
@@ -180,17 +181,27 @@ class MP_GDPR {
 		$customer = get_user_by( 'email', $email_address );
 
 		if ( ! $customer instanceof WP_User ) {
-			return $result;
+			global $wpdb;
+
+			$orders = $wpdb->get_results( $wpdb->prepare(
+				"SELECT DISTINCT post_id AS id FROM {$wpdb->prefix}postmeta WHERE meta_value LIKE '%%%s%%'",
+				$email_address
+			), ARRAY_A ); // db-call ok; no-cache ok.
+
+			$guest = true;
 		}
 
-		// Delete shipping and billing meta data for the user.
-		delete_user_meta( $customer->ID, 'mp_shipping_info' );
-		delete_user_meta( $customer->ID, 'mp_billing_info' );
+		if ( ! $guest ) {
+			// Delete shipping and billing meta data for the user.
+			delete_user_meta( $customer->ID, 'mp_shipping_info' );
+			delete_user_meta( $customer->ID, 'mp_billing_info' );
 
-		// Remove personal data from order.
-		$orders = get_user_meta( $customer->ID, 'mp_order_history', true );
+			// Remove personal data from order.
+			$orders = get_user_meta( $customer->ID, 'mp_order_history', true );
 
-		if ( ! $orders ) {
+		}
+
+		if ( ! isset( $orders ) || ! $orders ) {
 			return $result;
 		}
 
@@ -290,10 +301,24 @@ class MP_GDPR {
 	 * @return array|bool
 	 */
 	private function get_order_data( $email_address ) {
+		$guest = false;
 		$customer = get_user_by( 'email', $email_address );
 
+		// If guest user - we need to find orders IDs where the email was used.
 		if ( ! $customer instanceof WP_User ) {
-			return false;
+			global $wpdb;
+
+			$orders = $wpdb->get_results( $wpdb->prepare(
+				"SELECT DISTINCT post_id AS id FROM {$wpdb->prefix}postmeta WHERE meta_value LIKE '%%%s%%'",
+				$email_address
+			), ARRAY_A ); // db-call ok; no-cache ok.
+
+			// No orders - return.
+			if ( ! $orders ) {
+				return false;
+			}
+
+			$guest = true;
 		}
 
 		$data = array();
@@ -305,7 +330,14 @@ class MP_GDPR {
 			'order_closed'   => __( 'Closed', 'mp' ),
 		);
 
-		$orders = get_user_meta( $customer->ID, 'mp_order_history', true );
+		if ( ! $guest ) {
+			$orders = get_user_meta( $customer->ID, 'mp_order_history', true );
+		}
+
+		// If no orders - return.
+		if ( ! isset( $orders ) ) {
+			return false;
+		}
 
 		foreach ( $orders as $order ) {
 			$order_data = get_post( $order['id'] );
@@ -322,6 +354,8 @@ class MP_GDPR {
 					$order_info .= $product[0]['name'] . ' x ' . $product[0]['quantity'] . '<br>';
 				}
 			}
+
+			$mp_order = new MP_Order( $order['id'] );
 
 			$data[] = array(
 				array(
@@ -343,6 +377,14 @@ class MP_GDPR {
 				array(
 					'name'  => __( 'Order Info', 'mp' ),
 					'value' => $order_info,
+				),
+				array(
+					'name'  => __( 'Billing Address', 'mp' ),
+					'value' => $mp_order->get_address( 'billing' ),
+				),
+				array(
+					'name'  => __( 'Shipping Address', 'mp' ),
+					'value' => $mp_order->get_address( 'shipping' ),
 				),
 			);
 		} // End foreach().
