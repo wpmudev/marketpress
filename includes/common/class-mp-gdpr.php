@@ -382,15 +382,24 @@ class MP_GDPR {
 					'name'  => __( 'Order Info', 'mp' ),
 					'value' => $order_info,
 				),
-				array(
-					'name'  => __( 'Billing Address', 'mp' ),
-					'value' => $mp_order->get_address( 'billing' ),
-				),
-				array(
-					'name'  => __( 'Shipping Address', 'mp' ),
-					'value' => $mp_order->get_address( 'shipping' ),
-				),
 			);
+
+			$billing_address = $mp_order->get_address( 'billing' );
+			$shipping_address = $mp_order->get_address( 'shipping' );
+
+			if ( ' <br /><br />, ' !== $billing_address ) {
+				$data[] = array(
+					'name'  => __( 'Billing Address', 'mp' ),
+					'value' => $billing_address,
+				);
+			}
+
+			if ( ' <br /><br />, ' !== $shipping_address ) {
+				$data[] = array(
+					'name'  => __( 'Shipping Address', 'mp' ),
+					'value' => $shipping_address,
+				);
+			}
 		} // End foreach().
 
 		return $data;
