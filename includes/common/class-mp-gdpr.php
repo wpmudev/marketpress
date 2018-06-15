@@ -351,6 +351,10 @@ class MP_GDPR {
 
 				$order_info = '';
 				foreach ( $cart as $product ) {
+					if ( ! isset( $product[0] ) || ! isset( $product[0]['name'] ) ) {
+						continue;
+					}
+
 					$order_info .= $product[0]['name'] . ' x ' . $product[0]['quantity'] . '<br>';
 				}
 			}
