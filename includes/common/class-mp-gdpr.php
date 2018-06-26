@@ -376,7 +376,7 @@ class MP_GDPR {
 				),
 				array(
 					'name'  => __( 'Order Total', 'mp' ),
-					'value' => $order['total'],
+					'value' => $order_meta['mp_order_total'][0],
 				),
 				array(
 					'name'  => __( 'Order Info', 'mp' ),
