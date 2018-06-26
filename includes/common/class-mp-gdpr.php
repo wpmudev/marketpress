@@ -388,14 +388,14 @@ class MP_GDPR {
 			$shipping_address = $mp_order->get_address( 'shipping' );
 
 			if ( ' <br /><br />, ' !== $billing_address ) {
-				$data[] = array(
+				$data[][] = array(
 					'name'  => __( 'Billing Address', 'mp' ),
 					'value' => $billing_address,
 				);
 			}
 
 			if ( ' <br /><br />, ' !== $shipping_address ) {
-				$data[] = array(
+				$data[][] = array(
 					'name'  => __( 'Shipping Address', 'mp' ),
 					'value' => $shipping_address,
 				);
