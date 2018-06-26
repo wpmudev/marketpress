@@ -240,7 +240,7 @@ class MP_GDPR {
 		$data = array();
 
 		$metas = array(
-			'mp_shipping_info' => array(
+			'mp_billing_info' => array(
 				'first_name'   => __( 'Billing First Name', 'mp' ),
 				'last_name'    => __( 'Billing Last Name', 'mp' ),
 				'email'        => __( 'Billing Email', 'mp' ),
@@ -254,7 +254,7 @@ class MP_GDPR {
 				'phone'        => __( 'Billing Phone', 'mp' ),
 
 			),
-			'mp_billing_info'  => array(
+			'mp_shipping_info'  => array(
 				'first_name'   => __( 'Shipping First Name', 'mp' ),
 				'last_name'    => __( 'Shipping Last Name', 'mp' ),
 				'email'        => __( 'Shipping Email', 'mp' ),
