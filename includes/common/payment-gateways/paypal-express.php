@@ -454,7 +454,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				$vcart->update_total( array() );// Reset in order to prevent issue caused by cart subtotals being pre-set to 0.
 			}
 
-			$request["PAYMENTREQUEST_{$index}_ITEMAMT"] = (float) $vcart->total( false ); //items subtotal
+			$request["PAYMENTREQUEST_{$index}_ITEMAMT"] = (float) $vcart->product_total( false ); //items subtotal
 
 			//shipping total
 			if ( ( $shipping_price = $vcart->shipping_total( false ) ) !== false ) {
