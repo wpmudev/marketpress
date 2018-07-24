@@ -471,7 +471,7 @@ class MP_Coupons_Addon {
 
 		$cart = new MP_Cart();
 
-		$total = ( (float) $cart->product_total() + (float) $cart->tax_total() );
+		$total = ( (float) $cart->product_original_total() + (float) $cart->tax_total() );
 		if ( mp_get_setting( 'tax->tax_shipping' ) ) {
 			$total += (float) $cart->shipping_total();
 		}
