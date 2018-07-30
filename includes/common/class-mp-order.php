@@ -328,6 +328,7 @@ class MP_Order {
 			 */
 			$msg         = apply_filters( 'mp_order/notification_body', $msg, $this );
 			$msg         = apply_filters( 'mp_order/notification_body/' . mp_get_post_value( 'payment_method', '' ), $msg, $this );
+			$msg         = nl2br( $msg );
 			$attachments = apply_filters( 'mp_order/sendmail_attachments', array(), $this, 'new_order_client' );
 			$this->_send_email_to_buyers( $subject, $msg, $attachments );
 		}
@@ -592,7 +593,7 @@ class MP_Order {
 
 								//Handle multiple files
 								$download_url = $product->download_url( get_query_var( 'mp_order_id' ), false );
-								
+
 								if ( is_array( $download_url ) ){
 									//If we have more than one product file, we loop and add each to a new line
 									foreach ( $download_url as $key => $value ){
