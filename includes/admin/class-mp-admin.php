@@ -387,9 +387,21 @@ class MP_Admin {
 		if ( in_array( 'mp-activation-pointer', $dismissed ) ) {
 			return;
 		}
-		$activation_content = sprintf( '<h3> %s </h3> <p> %s </p>',
+		$wizard_button = sprintf(
+			'<a class="button button-primary" href="%s">%s</a>',
+			admin_url( 'admin.php?page=store-setup-wizard' ),
+			esc_html__( 'Run Setup Wizard', 'mp' )
+		);
+		$dismiss_button = sprintf(
+			'<a class="close" href="#">%s</a>',
+			esc_html__( 'Dismiss', 'mp' )
+		);
+		$activation_content = sprintf(
+			'<h3>%s</h3><p>%s</p><div class="wp-pointer-buttons">%s %s</div>',
 			esc_html__( 'Create Online Shop', 'mp' ),
-			esc_html__( 'Start creating store pages and products for your online shop here.', 'mp' )
+			esc_html__( 'Start creating store pages and products for your online shop here.', 'mp' ),
+			$wizard_button,
+			$dismiss_button
 		);
 
 		?>
@@ -400,8 +412,15 @@ class MP_Admin {
 						position: {edge: 'left', align: 'right'},
 						pointerClass: 'wp-pointer mp-admin-pointer',
 						content: content,
+						buttons: function () {
+							return $();
+						},
 						show: function (event, pointer_target) {
 							pointer_target.pointer.css({'position': 'fixed'});
+							pointer_target.pointer.find('.close').bind('click.pointer', function (e) {
+								e.preventDefault();
+								pointer_target.element.pointer('close');
+							});
 						},
 						close: function () {
 							$.post(ajaxurl, {
@@ -426,6 +445,10 @@ class MP_Admin {
 				.mp-admin-pointer {
 					display: none !important;
 				}
+			}
+
+			.mp-admin-pointer .wp-pointer-buttons a.button.button-primary {
+				float: left;
 			}
 		</style>
 		<?php
