@@ -1151,13 +1151,8 @@ $GLOBALS['mp'] = Marketpress::get_instance();
 
 register_activation_hook( __FILE__, 'mp_plugin_activate' );
 register_uninstall_hook( __FILE__, 'mp_plugin_uninstall' );
-add_action( 'admin_init', 'mp_plugin_redirect', 1 );
 
 function mp_plugin_activate() {
-	if ( get_option( 'mp_plugin_do_activation_redirect', '1' ) == '1' ) {
-		update_option( 'mp_plugin_do_activation_redirect', '1' );
-	}
-
 	if ( get_option( 'mp_needs_quick_setup' ) == false ) {
 		add_option( 'mp_needs_quick_setup', 1 );
 	}
@@ -1181,20 +1176,6 @@ function mp_plugin_uninstall() {
 	delete_site_option( 'mp_flush_rewrites_30' );
 	delete_site_option( 'mp_needs_pages' );
 	delete_site_option( 'mp_needs_quick_setup' );
-	delete_site_option( 'mp_plugin_do_activation_redirect' );
 	delete_site_option( 'mp_settings' );
 	delete_site_option( 'mp_version' );
-}
-
-function mp_plugin_redirect() {
-	$need_redirection = get_option( 'mp_plugin_do_activation_redirect', '0' );
-
-	if ( $need_redirection == '1' ) {
-		update_option( 'mp_plugin_do_activation_redirect', '0' );
-
-		if ( get_option( 'mp_needs_quick_setup', 1 ) == 1 && current_user_can( 'manage_options' ) ) {
-			wp_redirect( admin_url( add_query_arg( array( 'page' => 'store-setup-wizard' ), 'admin.php' ) ) );
-			exit;
-		}
-	}
 }
