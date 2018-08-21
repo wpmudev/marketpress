@@ -47,6 +47,8 @@ class MP_Admin {
 			add_action( 'admin_footer', array( &$this, 'print_deprecated_notice_scripts' ) );
 			add_action( 'wp_ajax_mp_dismissed_deprecated_message', array( &$this, 'dismissed_deprecated_messag' ) );
 		}
+		// Display a native WP pointer after plugin activation
+		add_action( 'admin_footer', array( &$this, 'display_activation_pointer' ) );
 
 		// Show notice to run setup wizard.
 		if ( '1' === get_option( 'mp_needs_quick_setup', 1 ) && ( ( isset( $_GET['quick_setup_step'] ) && '3' !== $_GET['quick_setup_step'] ) || ! isset( $_GET['quick_setup_step'] ) ) ) {
@@ -324,6 +326,11 @@ class MP_Admin {
 			}
 		}
 
+		if ( ! empty( $pagenow ) && ( 'plugins.php' === $pagenow ) ) {
+			wp_enqueue_script( 'wp-pointer' );
+			wp_enqueue_style( 'wp-pointer' );
+		}
+
 		$quick_setup = mp_get_get_value( 'quick_setup_step' );
 		if ( isset( $quick_setup ) ) {
 			//wp_enqueue_style( 'mp-quick-setup', mp_plugin_url( 'includes/admin/ui/css/quick-setup.css' ), array(), MP_VERSION );
@@ -373,7 +380,50 @@ class MP_Admin {
 		return $messages;
 	}
 
+	public function display_activation_pointer() {
+		$activation_content = sprintf( '<h3> %s </h3> <p> %s </p>',
+			esc_html__( 'Create Online Shop', 'mp' ),
+			esc_html__( 'Start creating store pages and products for your online shop here.', 'mp' )
+		);
 
+		?>
+		<script type="text/javascript">
+			;jQuery(document).ready(function ($) {
+				function mp_open_pointer(id, target, content) {
+					var options = {
+						position: {edge: 'left', align: 'right'},
+						pointerClass: 'wp-pointer mp-admin-pointer',
+						content: content,
+						show: function (event, pointer_target) {
+							pointer_target.pointer.css({'position': 'fixed'});
+						},
+						close: function () {
+							$.post(ajaxurl, {
+								pointer: id,
+								action: 'dismiss-wp-pointer'
+							});
+						}
+					};
+
+					var $target = $(target);
+					$target.pointer(options);
+					if ($target.is(':visible')) {
+						$target.pointer('open');
+					}
+				}
+
+				mp_open_pointer('mp-activation-pointer', '#toplevel_page_store-settings', '<?php echo $activation_content; ?>');
+			});
+		</script>
+		<style>
+			@media screen and (max-width: 782px) {
+				.mp-admin-pointer {
+					display: none !important;
+				}
+			}
+		</style>
+		<?php
+	}
 
 }
 
