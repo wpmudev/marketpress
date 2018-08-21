@@ -387,6 +387,7 @@ class MP_Admin {
 		if ( in_array( 'mp-activation-pointer', $dismissed ) ) {
 			return;
 		}
+		$quick_setup_needed = (int) get_option( 'mp_needs_quick_setup', 1 );
 		$wizard_button = sprintf(
 			'<a class="button button-primary" href="%s">%s</a>',
 			admin_url( 'admin.php?page=store-setup-wizard' ),
@@ -400,7 +401,7 @@ class MP_Admin {
 			'<h3>%s</h3><p>%s</p><div class="wp-pointer-buttons">%s %s</div>',
 			esc_html__( 'Create Online Shop', 'mp' ),
 			esc_html__( 'Start creating store pages and products for your online shop here.', 'mp' ),
-			$wizard_button,
+			$quick_setup_needed ? $wizard_button : '<span></span>',
 			$dismiss_button
 		);
 
@@ -447,8 +448,10 @@ class MP_Admin {
 				}
 			}
 
-			.mp-admin-pointer .wp-pointer-buttons a.button.button-primary {
-				float: left;
+			.mp-admin-pointer .wp-pointer-buttons {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
 			}
 		</style>
 		<?php
