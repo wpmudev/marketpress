@@ -381,6 +381,12 @@ class MP_Admin {
 	}
 
 	public function display_activation_pointer() {
+		$dismissed = explode(
+			',',
+			(string) get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ) );
+		if ( in_array( 'mp-activation-pointer', $dismissed ) ) {
+			return;
+		}
 		$activation_content = sprintf( '<h3> %s </h3> <p> %s </p>',
 			esc_html__( 'Create Online Shop', 'mp' ),
 			esc_html__( 'Start creating store pages and products for your online shop here.', 'mp' )
