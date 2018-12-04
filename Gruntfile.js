@@ -185,7 +185,12 @@ module.exports = function(grunt) {
 			},
 			wporg: {
 				src:  excludeCopyFilesWPorg,
-				dest: 'build/wordpress-ecommerce/'
+				dest: 'build/wordpress-ecommerce/',
+				options: {
+					process: function (content, srcpath) {
+						return content.replace( /WDP ID:      144\n/, '' );
+					}
+				}
 			}
 		},
 
