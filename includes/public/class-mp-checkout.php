@@ -144,7 +144,6 @@ class MP_Checkout {
 	 * @access protected
 	 */
 	protected function _update_shipping_section() {
-
 		$data = (array) mp_get_post_value( 'billing', array() );
 
 		// Force state to empty if not set by user to ensure that old state value will be deleted
@@ -165,20 +164,20 @@ class MP_Checkout {
 			mp_update_session_value( 'mp_shipping_info', mp_get_session_value( 'mp_billing_info' ) );
 		}
 
-                //Save shipping info needs even if shipping info disabled for saving other fields (ex. 'special_instructions')
-                $data = (array) mp_get_post_value( 'shipping', array() );
+	    //Save shipping info needs even if shipping info disabled for saving other fields (ex. 'special_instructions')
+	    $data = (array) mp_get_post_value( 'shipping', array() );
 
-                if ( $data ) {
-                    // Force state to empty if not set by user to ensure that old state value will be deleted
-                    if( $enable_shipping_address && !isset( $data['state'] ) ) {
-                            $data['state'] = '';
-                    }
+	    if ( $data ) {
+	        // Force state to empty if not set by user to ensure that old state value will be deleted
+	        if( $enable_shipping_address && !isset( $data['state'] ) ) {
+                $data['state'] = '';
+	        }
 
-                    foreach ( $data as $key => $value ) {
-                            $value = trim( $value );
-                            mp_update_session_value( "mp_shipping_info->{$key}", $value );
-                    }
-                }
+	        foreach ( $data as $key => $value ) {
+                $value = trim( $value );
+                mp_update_session_value( "mp_shipping_info->{$key}", $value );
+	        }
+	    }
 	}
 
 	/**
@@ -695,7 +694,7 @@ class MP_Checkout {
 		}
 		foreach ( $types as $type ) {
 			$address_name_fields = $this->get_address_name_fields( $type );
-			$required_fields = array( 'first_name', 'last_name', 'email', 'address1', 'city', 'country', 'zip' );
+			$required_fields = array( 'first_name', 'last_name', 'email', 'address1', 'city', 'country', 'zip', 'policy' );
 
 			/**
 			* Filter the required fields
@@ -1278,6 +1277,17 @@ class MP_Checkout {
 					<h3 class="mp_sub_title">' . __( 'Billing', 'mp' ) . '</h3>' .
 		$this->address_fields( 'billing' ) . '';
 
+		$html .= '
+			<div class="mp_checkout_field mp_checkout_checkbox mp_privacy_policy">
+				<label class="mp_form_label">
+					<input type="checkbox" class="mp_form_checkbox" data-rule-required="true" name="billing[policy]" value="1" autocomplete="off">
+					<span class="mp_field_required">*</span>
+					<span>' . __( "By clicking this checkbox you allow the website to process your personal data.", "mp" ) . '&nbsp;'. get_the_privacy_policy_link() . '</span>
+				</label>
+				<label for="billing[policy]" class="error">' . __( "This field is required.", "mp" ) . '</label>
+			</div>
+		';
+
 		$cart				 = mp_cart();
 		$is_download_only	 = $cart->is_download_only();
 
@@ -1293,9 +1303,6 @@ class MP_Checkout {
 					<div id="mp-checkout-column-shipping-info" class="mp_checkout_column fullwidth"' . (( $enable_shipping_address ) ? '' : ' style="display:none"') . '>
 						<h3 class="mp_sub_title">' . __( 'Shipping', 'mp' ) . '</h3>' .
 			$this->address_fields( 'shipping' ) . '';
-
-
-
 		}
 
 		$html .= '

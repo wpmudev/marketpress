@@ -95,6 +95,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		'IL' => 'Israel',
 		'IT' => 'Italy',
 		'JP' => 'Japan',
+		'MT' => 'Malta',
 		'MX' => 'Mexico',
 		'NL' => 'Netherlands',
 		'NO' => 'Norway',
@@ -383,14 +384,14 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			}
 
 			if ( $cart->is_global ) {
-				
+
 				//check if the current merchant don't have email setting, we bypass
 				$gateways = mp_get_network_setting( 'gateways' );
 				$merchant_email_network = trim( $gateways['paypal_express']['merchant_email'] );
-				
+
 				$gateways = mp_get_setting( 'gateways' );
                 $merchant_email = trim( $gateways['paypal_express']['merchant_email'] );
-				
+
 				// Subsite merchant_email empty use network setting
 				if( empty( $merchant_email ) ) {
 					$merchant_email = $merchant_email_network;
@@ -442,7 +443,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 					$request["L_PAYMENTREQUEST_{$index}_NUMBER{$i}-{$q}"]       = $item->get_meta( 'sku', '' );
 					$request["L_PAYMENTREQUEST_{$index}_QTY{$i}-{$q}"]          = $quantity;
 					$request["L_PAYMENTREQUEST_{$index}_ITEMURL{$i}-{$q}"]      = $item->url( false );
-					$request["L_PAYMENTREQUEST_{$index}_ITEMCATEGORY{$i}-{$q}"] = 'Physical';	
+					$request["L_PAYMENTREQUEST_{$index}_ITEMCATEGORY{$i}-{$q}"] = 'Physical';
 
 					$vcart->add_item( $product_id, 1 );
 				}
@@ -533,13 +534,13 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			$this->API_Endpoint = "https://api-3t.paypal.com/nvp";
 			$this->paypalURL    = "https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=";
 		}
-		
+
 		add_filter( 'wpmudev_field/get_value/gateways[paypal_express][mode]', array(
 			&$this,
 			'force_check_mode'
 		), 10, 4 );
 	}
-	
+
 	/**
 	 * Force check the force_check_mode
 	 *
@@ -553,7 +554,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		} else {
 			$mode = $this->get_setting( 'mode' );
 		}
-		
+
 		return $mode;
 	}
 
@@ -571,7 +572,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		if ( ( $api_user = $this->get_setting( 'api_user' ) ) && ( $api_pass = $this->get_setting( 'api_pass' ) ) && ( $api_sig = $this->get_setting( 'api_sig' ) ) ) {
 			// Update api mode
 			mp_push_to_array( $settings, 'gateways->paypal_express->mode', $api_mode );
-			
+
 			// Update api user
 			mp_push_to_array( $settings, 'gateways->paypal_express->api_credentials->username', $api_user );
 
@@ -615,7 +616,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				),
 			),
 		) );
-		
+
 		if ( is_plugin_active_for_network( mp_get_plugin_slug() ) && mp_get_network_setting( 'global_cart' ) ) {
 			$metabox->add_field( 'text', array(
 				'name'       => $this->get_field_name( 'merchant_email' ),
@@ -626,7 +627,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				),
 			) );
 		}
-		
+
 		$this->common_metabox_fields( $metabox );
 	}
 

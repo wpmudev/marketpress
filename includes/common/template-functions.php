@@ -3332,18 +3332,20 @@ if ( ! function_exists( 'mp_get_ajax_url' ) ) {
 			global $wpdb;
 			$blog_id = get_current_blog_id();
 
-			switch_to_blog(1);
+			switch_to_blog( $blog_id );
 			$domain = $wpdb->get_var( $wpdb->prepare(
 				"SELECT domain from {$wpdb->prefix}domain_mapping WHERE blog_id = %d",
 				absint( $blog_id )
 			));
 			restore_current_blog();
 
-			$schema = is_ssl() ? 'https://' : 'http://';
-			if( is_ssl() && force_ssl_admin() ) {
-				$schema = 'http://';
+			if ( ! empty( $domain ) ) {
+				$schema = is_ssl() ? 'https://' : 'http://';
+				if( is_ssl() && force_ssl_admin() ) {
+					$schema = 'https://';
+				}
+				$ajax_url = $schema . $domain . '/wp-admin/' . $path;
 			}
-			$ajax_url = $schema . $domain . '/wp-admin/' . $path;
 		}
 
 		return $ajax_url;

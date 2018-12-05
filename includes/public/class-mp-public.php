@@ -45,6 +45,8 @@ class MP_Public {
 	 */
 	private function __construct() {
 		//$this->includes();
+		add_action( 'wp', array( $this, 'disable_caching' ) );
+
 		add_action( 'init', array( &$this, 'includes' ), 1 );
 
 		add_filter( 'get_post_metadata', array( &$this, 'remove_product_post_thumbnail' ), 999, 4 );
@@ -66,6 +68,24 @@ class MP_Public {
 		add_action( 'template_redirect', array( &$this, 'maybe_serve_download' ) );
 
 		add_filter( 'body_class', array( &$this, 'add_mp_body_class' ) );
+	}
+
+	/**
+	 * Add DONOTCACHEPAGE constant on all MP pages.
+	 *
+	 * @since 3.2.9
+	 */
+	public function disable_caching() {
+		$post_type = MP_Product::get_post_type();
+
+		if (
+			get_post_type() == $post_type ||
+			get_query_var( $post_type ) ||
+			$this->is_store_page() ||
+			( is_singular( $post_type ) || is_tax( array( 'product_category', 'product_tag' ) ) )
+		) {
+			define( 'DONOTCACHEPAGE', true );
+		}
 	}
 
 	public function add_mp_body_class( $classes ) {
@@ -778,7 +798,7 @@ class MP_Public {
 				readfile( $tmp );
 			}
 
-			if ( ! $not_delete ) {
+			if ( empty( $not_delete ) ) {
 				@unlink( $tmp );
 			}
 		}

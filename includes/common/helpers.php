@@ -773,7 +773,7 @@ if ( ! function_exists( 'mp_public' ) ) :
 	 * @return object
 	 */
 	function mp_public() {
-		if ( ! class_exists( 'MP_Pubic' ) ) {
+		if ( ! class_exists( 'MP_Public' ) ) {
 			require_once mp_plugin_dir( 'includes/public/class-mp-public.php' );
 		}
 

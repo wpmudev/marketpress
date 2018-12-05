@@ -51,7 +51,7 @@ class MP_Shipping_UPS extends MP_Shipping_API_Calculated {
 			'Next Day Air Saver'     => new UPS_Service('13', __('Next Day Air Saver', 'mp'),     __('(1 Day)', 'mp')),
 			'Next Day Air Early AM'  => new UPS_Service('14', __('Next Day Air Early AM', 'mp'),  __('(1 Days)', 'mp')),
 			'2nd Day Air AM'         => new UPS_Service('59', __('2nd Day Air AM', 'mp'),         __('(2 Days)', 'mp')),
-			'Worldwide Express' 		 => new UPS_Service('07', __('Worldwide Express', 'mp'),      __('(1-3 Days)', 'mp')),
+			'Worldwide Express'      => new UPS_Service('07', __('Worldwide Express', 'mp'),      __('(1-3 Days)', 'mp')),
 			'Worldwide Expedited'    => new UPS_Service('08', __('Worldwide Expedited', 'mp'),    __('(2-5 Days)', 'mp') ),
 			'Standard'               => new UPS_Service('11', __('Standard', 'mp'),               __('(Scheduled)', 'mp') ),
 			'Worldwide Express Plus' => new UPS_Service('54', __('Worldwide Express Plus', 'mp'), __('(1-3 Days)', 'mp') ),

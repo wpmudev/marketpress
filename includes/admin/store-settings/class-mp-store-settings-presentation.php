@@ -52,6 +52,8 @@ class MP_Store_Settings_Presentation {
 			foreach ( $pages as $type => $page ) {
 				MP_Pages_Admin::get_instance()->save_store_page_value( $type, $page, false );
 			}
+			// Refresh rewrite rules.
+			update_option( 'mp_flush_rewrites', 1 );
 		}
 	}
 

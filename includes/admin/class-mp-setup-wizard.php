@@ -410,19 +410,17 @@ class MP_Setup_Wizard {
 				'desc'                   => __( 'These are the countries that you will ship to.', 'mp' ),
 				'options'                => mp_popular_country_list() + array( 'all_countries' => __( 'All Countries', 'mp' ) ) + mp_country_list(),
 				//all_countries|disabled
-				'default_value'          => array( 'all_countries' => __( 'All Countries', 'mp' ) ),
+				//'default_value'          => array( 'all_countries' => __( 'All Countries', 'mp' ) ),
 				'placeholder'            => __( 'Choose Countries', 'mp' ),
+				/*
 				'format_dropdown_header' => '
 				<ul class="select2-all-none">
 					<li class="select2-none">' . __( 'None', 'mp' ) . '</li>
 					<li class="select2-all">' . __( 'All', 'mp' ) . '</li>
 					<li class="select2-eu" data-countries="' . implode( ',', mp()->eu_countries ) . '">' . __( 'EU', 'mp' ) . '</li>
 				</ul>',
-				'validation'             => array(
-					'required' => true,
-				),
+				*/
 			) );
-
 
 			/* Currency options */
 			$metabox = new WPMUDEV_Metabox( array(
@@ -447,6 +445,7 @@ class MP_Setup_Wizard {
 				'options'     => $options,
 				'width'       => 'element',
 			) );
+
 			$metabox->add_field( 'radio_group', array(
 				'name'          => 'curr_symbol_position',
 				'label'         => array( 'text' => __( 'Currency Symbol Position', 'mp' ) ),

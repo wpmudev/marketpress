@@ -3,7 +3,7 @@
 Plugin Name: MarketPress
 Plugin URI:  https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
-Version:     3.2.9
+Version:     3.2.9-beta.5
 Author:      WPMU DEV
 Author URI:  http://premium.wpmudev.org
 Text Domain: mp
@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 Plugin Authors: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonathan Cowher (Incsub), Ricardo Freitas (Incsub), Cvetan Cvetanov (Incsub), Julien Zerbib (Incsub), Sabri Bouchaala (Incsub), Emmanuel Laborin (Incsub)
 */
 
-define( 'MP_VERSION', '3.2.8' );
+define( 'MP_VERSION', '3.2.9-beta.5' );
 
 /**
  * Main class Marketpress.
@@ -342,11 +342,14 @@ class Marketpress {
 	 * @access public
 	 */
 	public function load_plugins() {
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/shipping-modules/class-mp-shipping-api.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/shipping-modules/class-mp-shipping-api-calculated.php' );
 		mp_include_dir( $this->plugin_dir( 'includes/common/shipping-modules' ) );
 		MP_Shipping_API::load_active_plugins();
 
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/payment-gateways/class-mp-gateway-api.php' );
 		mp_include_dir( $this->plugin_dir( 'includes/common/payment-gateways' ) );
 
@@ -366,7 +369,11 @@ class Marketpress {
 		$this->_init_vars();
 
 		// Include constants.
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/constants.php' );
+
+		// Add GDPR compliance.
+		add_action( 'admin_init', array( $this, 'add_gdpr_compliance' ), 0 );
 
 		// Includes.
 		add_action( 'init', array( &$this, 'includes' ), 0 );
@@ -381,7 +388,7 @@ class Marketpress {
 		add_action( 'init', array( &$this, 'register_custom_types' ), 1 );
 
 		// Maybe flush rewrites.
-		add_action( 'init', array( &$this, 'maybe_flush_rewrites' ), 99 );
+		add_action( 'admin_init', array( &$this, 'maybe_flush_rewrites' ), 99 );
 
 		// Fix insecure images.
 		add_filter( 'wp_get_attachment_url', array( &$this, 'fix_insecure_images' ), 10, 2 );
@@ -412,6 +419,16 @@ class Marketpress {
 		$this->load_widgets();
 
 		$this->localization();
+	}
+
+	/**
+	 * Add GDPR compliance.
+	 */
+	public function add_gdpr_compliance() {
+		/* @noinspection PhpIncludeInspection */
+		require_once $this->plugin_dir( 'includes/common/class-mp-gdpr.php' );
+
+		MP_GDPR::get_instance();
 	}
 
 	/**
@@ -902,19 +919,31 @@ class Marketpress {
 	 * @access public
 	 */
 	public function includes() {
+		/* @noinspection PhpIncludeInspection */
+		require_once $this->plugin_dir( 'includes/common/class-mp-gdpr.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/wpmudev-metaboxes/wpmudev-metabox.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/class-mp-mailer.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/helpers.php' );
 
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/class-mp-product-attributes.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/addons/class-mp-addons.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/class-mp-order.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/class-mp-product.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/class-mp-installer.php' );
 
-
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/class-mp-cart.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/template-functions.php' );
+		/* @noinspection PhpIncludeInspection */
 		require_once $this->plugin_dir( 'includes/common/class-mp-backward-compatibility.php' );
 		//require_once $this->plugin_dir( 'includes/common/class-mp-taxes.php' );
 
@@ -923,23 +952,32 @@ class Marketpress {
 		}
 
 		if ( is_multisite() && is_plugin_active_for_network( mp_get_plugin_slug() ) ) {
+			/* @noinspection PhpIncludeInspection */
 			require_once $this->plugin_dir( 'includes/multisite/class-mp-multisite.php' );
+			/* @noinspection PhpIncludeInspection */
 			require_once $this->plugin_dir( 'includes/multisite/template-functions.php' );
 			if ( is_admin() ) {
+				/* @noinspection PhpIncludeInspection */
 				require_once $this->plugin_dir( 'includes/multisite/class-mp-admin-multisite.php' );
 			}
 		}
 
 		if ( is_admin() ) {
+			/* @noinspection PhpIncludeInspection */
 			require_once $this->plugin_dir( 'includes/admin/class-mp-admin.php' );
+			/* @noinspection PhpIncludeInspection */
 			require_once $this->plugin_dir( 'includes/admin/class-mp-pages-admin.php' );
 
 			if ( mp_doing_ajax() ) {
+				/* @noinspection PhpIncludeInspection */
 				require_once $this->plugin_dir( 'includes/admin/class-mp-ajax.php' );
+				/* @noinspection PhpIncludeInspection */
 				require_once $this->plugin_dir( 'includes/public/class-mp-public.php' );
 			}
+			/* @noinspection PhpIncludeInspection */
 			require_once $this->plugin_dir( 'includes/admin/class-mp-dashboard-widgets.php' );
 		} else {
+			/* @noinspection PhpIncludeInspection */
 			require_once $this->plugin_dir( 'includes/public/class-mp-public.php' );
 		}
 	}
@@ -1113,13 +1151,8 @@ $GLOBALS['mp'] = Marketpress::get_instance();
 
 register_activation_hook( __FILE__, 'mp_plugin_activate' );
 register_uninstall_hook( __FILE__, 'mp_plugin_uninstall' );
-add_action( 'admin_init', 'mp_plugin_redirect', 1 );
 
 function mp_plugin_activate() {
-	if ( get_option( 'mp_plugin_do_activation_redirect', '1' ) == '1' ) {
-		update_option( 'mp_plugin_do_activation_redirect', '1' );
-	}
-
 	if ( get_option( 'mp_needs_quick_setup' ) == false ) {
 		add_option( 'mp_needs_quick_setup', 1 );
 	}
@@ -1143,20 +1176,6 @@ function mp_plugin_uninstall() {
 	delete_site_option( 'mp_flush_rewrites_30' );
 	delete_site_option( 'mp_needs_pages' );
 	delete_site_option( 'mp_needs_quick_setup' );
-	delete_site_option( 'mp_plugin_do_activation_redirect' );
 	delete_site_option( 'mp_settings' );
 	delete_site_option( 'mp_version' );
-}
-
-function mp_plugin_redirect() {
-	$need_redirection = get_option( 'mp_plugin_do_activation_redirect', '0' );
-
-	if ( $need_redirection == '1' ) {
-		update_option( 'mp_plugin_do_activation_redirect', '0' );
-
-		if ( get_option( 'mp_needs_quick_setup', 1 ) == 1 && current_user_can( 'manage_options' ) ) {
-			wp_redirect( admin_url( add_query_arg( array( 'page' => 'store-setup-wizard' ), 'admin.php' ) ) );
-			exit;
-		}
-	}
 }

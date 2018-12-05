@@ -100,8 +100,8 @@ class MP_Cart {
 	 */
 	public $is_editable = true;
 
-	/*	 * Refers to the number of times products have been downloaded
-	 *
+	/**
+	 * Refers to the number of times products have been downloaded
 	 *
 	 * @since 3.0
 	 * @access public
@@ -132,6 +132,8 @@ class MP_Cart {
 	 *
 	 * @param int $item_id The id of the item to add
 	 * @param int $qty The quantity of the item
+	 *
+	 * @return bool
 	 */
 	public function add_item( $item_id, $qty = 1 ) {
 		$cart_updated = true;
@@ -169,6 +171,7 @@ class MP_Cart {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @param string $hook  Hook name
 	 * @action admin_enqueue_scripts
 	 */
 	public function admin_enqueue_styles_scripts( $hook ) {
@@ -297,7 +300,6 @@ class MP_Cart {
 				break;
 
 			case 'remove_item' :
-
 				$this->remove_item( $item_id );
 				$product      = new MP_Product( $item_id, $this->get_blog_id() );
 				wp_send_json_success( array(
@@ -1447,7 +1449,7 @@ class MP_Cart {
 	 * @since 3.0
 	 * @access public
 	 *
-	 * @param $item_id The item ID
+	 * @param int $item_id The item ID.
 	 *
 	 * @return int How many of the item are in the cart
 	 */

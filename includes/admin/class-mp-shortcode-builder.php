@@ -127,7 +127,10 @@ class MP_Shortcode_Builder {
 		$this->_product_cats = get_terms( 'product_category', 'hide_empty=0' );
 		$this->_product_tags = get_terms( 'product_tag', 'hide_empty=0' );
 
-		add_action( 'media_buttons', array( &$this, 'media_buttons' ) );
+		if ( is_admin() && ! is_customize_preview() ) {
+			add_action( 'media_buttons', array( &$this, 'media_buttons' ) );
+		}
+
 		add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_styles_scripts' ) );
 		add_action( 'in_admin_footer', array( &$this, 'display_short_code_form' ) );
 		add_filter( 'wp_dropdown_cats', array( &$this, 'wp_dropdown_cats' ), 10, 2 );
@@ -1458,7 +1461,7 @@ class MP_Shortcode_Builder {
 		} else {
 			$page = '';
 		}
-		
+
 		$screenpage = get_current_screen();
 		
 		// We have to refactor this to accept all post types
@@ -1472,7 +1475,7 @@ class MP_Shortcode_Builder {
 			|| $page == 'store-settings-capabilities'
 			|| $page == 'store-settings-addons'
 			|| ( isset( $_GET['taxonomy'] ) && ($_GET['taxonomy'] == 'product_category' || $_GET['taxonomy'] == 'product_tag') )
-			|| ( isset( $_GET['post_type'] ) && ($_GET['post_type'] == 'mp_coupon' || $_GET['post_type'] == 'mp_order' || $_GET['post_type'] == 'product' || $_GET['post_type'] == 'page') ) 
+			|| ( isset( $_GET['post_type'] ) && ($_GET['post_type'] == 'mp_coupon' || $_GET['post_type'] == 'mp_order' || $_GET['post_type'] == 'product' || $_GET['post_type'] == 'page') )
 			|| ( isset( $screenpage->post_type ) && ( $screenpage->post_type == "product" || $screenpage->post_type == "incsub_event" || $screenpage->post_type == "post" || $screenpage->post_type == "mp_order" || $screenpage->post_type == "mp_coupon" || $screenpage->post_type == "page") ) )  {
 
 			wp_enqueue_style( 'colorbox', mp_plugin_url( 'includes/admin/ui/colorbox/colorbox.css' ), false, MP_VERSION );
@@ -1497,7 +1500,7 @@ class MP_Shortcode_Builder {
 	 */
 	public function media_buttons( $editor_id ) {
 		// I was trying to get the editor_id here, but it seems the editor is unique, uniqid() is used.
-		
+
 		$SC_Builder = true;
 		if( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'store-settings-addons' ) {
 			$SC_Builder = false;
