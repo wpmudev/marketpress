@@ -168,8 +168,13 @@ module.exports = function(grunt) {
 				dest: 'build/<%= pkg.name %>/'
 			},
 			wporg: {
-				src:  includeCopyFilesWPorg,
-				dest: 'build/wordpress-ecommerce/'
+				src:  excludeCopyFilesWPorg,
+				dest: 'build/wordpress-ecommerce/',
+				options: {
+					process: function (content, srcpath) {
+						return content.replace( /WDP ID:      144\n/, '' );
+					}
+				}
 			}
 		},
 
