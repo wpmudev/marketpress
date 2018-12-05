@@ -4,15 +4,28 @@ module.exports = function(grunt) {
 	require('load-grunt-tasks')(grunt);
 
 	// Files to exclude during build process
-	var includeCopyFiles = [
-		'includes/**',
-		'languages/**',
-		'ui/**',
-		'marketpress.php'
+	var excludeCopyFiles = [
+		'**',
+		'!npm-debug.log',
+		'!node_modules/**',
+		'!build/**',
+		'!.git/**',
+		'!Gruntfile.js',
+		'!package.json',
+		'!.gitignore',
+		'!.gitmodules',
+		'!deploy.sh',
+		'!tests/**',
+		'!tmp/**',
+		'!**/Gruntfile.js',
+		'!**/package.json',
+		'!**/package-lock.json',
+		'!**/README.md',
+		'!**/*~'
 	];
 
-	var includeCopyFilesDEV = includeCopyFiles.slice(0).concat( [ 'changelog.txt' ] );
-	var includeCopyFilesWPorg = includeCopyFiles.slice(0).concat( [ '!includes/admin/dash-notice/**', 'readme.txt' ] );
+	var excludeCopyFilesDEV = excludeCopyFiles.slice(0).concat( [ '!readme.txt' ] );
+	var excludeCopyFilesWPorg = excludeCopyFiles.slice(0).concat( [ '!includes/admin/dash-notice/**', '!changelog.txt' ] );
 
 	grunt.initConfig({
 
@@ -59,9 +72,12 @@ module.exports = function(grunt) {
 			},
 			files: {
 				src:  [
-					'include/**/*.php',
-					'ui/**/*.php',
-					'marketpress.php'
+					'**/*.php', // Include all files
+					'!node_modules/**', // Exclude node_modules/
+					'!tests/**', // Exclude tests/
+					'!includes/admin/dash-notice/**', // Exclude WPMU DEV Shared UI
+					'!includes/wpmudev-metaboxes/**', // Exclude WPMU DEV MetaBoxes
+					'!build/**' // Exclude WPMU DEV Shared UI
 				],
 				expand: true
 			}
@@ -164,7 +180,7 @@ module.exports = function(grunt) {
 		// Copy all the files
 		copy: {
 			main: {
-				src:  includeCopyFilesDEV,
+				src:  excludeCopyFilesDEV,
 				dest: 'build/<%= pkg.name %>/'
 			},
 			wporg: {
