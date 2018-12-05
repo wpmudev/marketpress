@@ -48,7 +48,7 @@ class MP_Admin {
 			add_action( 'wp_ajax_mp_dismissed_deprecated_message', array( &$this, 'dismissed_deprecated_messag' ) );
 		}
 		// Display a native WP pointer after plugin activation
-		add_action( 'admin_footer', array( &$this, 'display_activation_pointer' ) );
+		// add_action( 'admin_footer', array( &$this, 'display_activation_pointer' ) );
 
 		// Show notice to run setup wizard.
 		if ( '1' === get_option( 'mp_needs_quick_setup', 1 ) && ( ( isset( $_GET['quick_setup_step'] ) && '3' !== $_GET['quick_setup_step'] ) || ! isset( $_GET['quick_setup_step'] ) ) ) {
