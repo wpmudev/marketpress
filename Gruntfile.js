@@ -172,7 +172,7 @@ module.exports = function(grunt) {
 				dest: 'build/wordpress-ecommerce/',
 				options: {
 					process: function (content, srcpath) {
-						return content.replace( /WDP ID:      144\n/, '' );
+						return content.replace( /WDP ID:\s*144(\r\n?|\n)/, '' );
 					}
 				}
 			}
