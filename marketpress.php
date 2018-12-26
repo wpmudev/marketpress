@@ -1,15 +1,18 @@
 <?php
-/*
-Plugin Name: MarketPress
-Plugin URI:  https://premium.wpmudev.org/project/e-commerce/
-Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
-Version:     3.2.9
-Author:      WPMU DEV
-Author URI:  http://premium.wpmudev.org
-Text Domain: mp
-
-@package Marketpress
-*/
+/**
+ * MarketPress
+ *
+ * @package     Marketpress
+ *
+ * @wordpress-plugin
+ * Plugin Name: MarketPress
+ * Plugin URI:  https://premium.wpmudev.org/project/e-commerce/
+ * Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
+ * Version:     3.2.9
+ * Author:      WPMU DEV
+ * Author URI:  http://premium.wpmudev.org
+ * Text Domain: mp
+ */
 
 /*
 Copyright 2009-2015 Incsub (http://incsub.com)
