@@ -151,6 +151,40 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 
 == Changelog ==
 
+= 3.2.9 =
+* Fix: Conflict with plugins WDP ID header and Dashboard 4.7
+* GDPR: Ability to erase user personal data
+* GDPR: Ability to export user personal data
+* GDPR: Plugin information to default "Private Policy" page during auto-creation of the page
+* GDPR: Checkbox with Privacy Policy during checkout
+* Enhance: Define DONOTCACHEPAGE constant on plugin pages
+* Fix: Paypal Error: 10413 - The totals of the cart item amounts do not match order amounts
+* Fix: Highlighting and selecting variation values
+* Fix: Add to cart showing Mixed Content error on mapped site in Domain Mapping plugin
+* Fix: "OOPS! THAT PAGE CAN’T BE FOUND." message after plugin installation
+* Fix: Validation not working for some fields in the Setup Wizard
+* Fix: Export to PDF fatal error
+* Fix: Remove plugin shortcodes from Customizer text fields
+* Fix: Typo in helpers file
+
+= 3.2.8 =
+* New: Options for sending all notification types
+* Enhance: Isle of Wight added to the country list
+* Enhance: Allow to deselect default variation in product edit screen
+* Enhance: Remove extra fields from checkout
+* Enhance: Users will not be able to order without filling out all required fields on checkout
+* Enhance: Add prefixes to css styles so they do not affect non MarketPress pages
+* Fix: Shipping tax calculated incorrectly
+* Fix: PHP notices when creating variations
+* Fix: Wrong symbol for Turkish Lira
+* Fix: Tax settings for Canada not being applied correctly
+* Fix: Error when adding coupon code on checkout page
+* Fix: Error when creating global MarketPress pages on multisite
+* Fix: Product page with variations will not auto select the first variation by default
+* Fix: Inability to deselect default variation for a product
+* Fix: Wrong sale price on products page for variable products
+* Fix: Conflict with Domain Mapping plugin
+
 = 3.2.7 =
 * Enhance: Update translation strings
 * Fixed: Potential php object injection vulnerability

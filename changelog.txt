@@ -6,7 +6,7 @@ Change Log:
 
 3.2.9
 ----------------------------------------------------------------------
-
+- Fix: Conflict with plugins WDP ID header and Dashboard 4.7
 - GDPR: Ability to erase user personal data
 - GDPR: Ability to export user personal data
 - GDPR: Plugin information to default "Private Policy" page during auto-creation of the page
