@@ -149,7 +149,7 @@ class Stripe_ApiRequestor
     $opts[CURLOPT_HTTPHEADER] = $headers;
     $opts[CURLOPT_USERPWD] = $myApiKey . ':';
     if (!Stripe::$verifySslCerts)
-      $opts[CURLOPT_SSL_VERIFYPEER] = false;
+      $opts[CURLOPT_SSL_VERIFYPEER] = true;
 
     curl_setopt_array($curl, $opts);
     $rbody = curl_exec($curl);
