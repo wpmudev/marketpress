@@ -172,7 +172,11 @@ module.exports = function(grunt) {
 				dest: 'build/wordpress-ecommerce/',
 				options: {
 					process: function (content, srcpath) {
-						return content.replace( /WDP ID:\s*144(\r\n?|\n)/, '' );
+						if (srcpath.includes('marketpress.php')) {
+							return content.replace(/\s*\*\s*WDP ID:\s*144/, '');
+						}
+
+						return content;
 					}
 				}
 			}
