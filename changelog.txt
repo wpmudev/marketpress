@@ -4,6 +4,10 @@ Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonat
 Change Log:
 ----------------------------------------------------------------------
 
+3.2.10-beta.1
+----------------------------------------------------------------------
+- Fix: always do TLS verification when making curl calls
+
 3.2.9
 ----------------------------------------------------------------------
 - Fix: Conflict with plugins WDP ID header and Dashboard 4.7
