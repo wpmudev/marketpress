@@ -90,6 +90,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		'FI' => 'Finland',
 		'FR' => 'France',
 		'DE' => 'Germany',
+		'GR' => 'Greece',
 		'HK' => 'Hong Kong',
 		'IE' => 'Ireland',
 		'IL' => 'Israel',
