@@ -1457,7 +1457,7 @@ class MP_Shortcode_Builder {
 	 */
 	public function enqueue_styles_scripts() {
 		if ( isset( $_GET['page'] ) ) {
-			$page = isset( $_GET['page'] );
+			$page = $_GET['page'];
 		} else {
 			$page = '';
 		}
