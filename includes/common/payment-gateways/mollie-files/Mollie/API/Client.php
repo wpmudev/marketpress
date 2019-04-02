@@ -224,7 +224,7 @@ class Mollie_API_Client
 				 */
 				array_shift($request_headers);
 				$request_headers[] = "X-Mollie-Debug: unable to use shipped root certificaties, no peer validation.";
-				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE);
 				$body = curl_exec($ch);
 			}
 		}
@@ -237,7 +237,7 @@ class Mollie_API_Client
 			 */
 			$request_headers[] = "X-Mollie-Debug: old OpenSSL found";
 			curl_setopt($ch, CURLOPT_HTTPHEADER, $request_headers);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 1);
 			$body = curl_exec($ch);
 		}
 

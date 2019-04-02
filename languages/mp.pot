@@ -1,14 +1,14 @@
-# Copyright (C) 2018 WPMU DEV
+# Copyright (C) 2019 WPMU DEV
 # This file is distributed under the same license as the MarketPress package.
 msgid ""
 msgstr ""
-"Project-Id-Version: MarketPress 3.2.9\n"
+"Project-Id-Version: MarketPress 3.2.10\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2018-12-10 15:58:17+00:00\n"
+"POT-Creation-Date: 2019-01-11 16:21:03+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2018-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2019-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "X-Generator: grunt-wp-i18n1.0.2\n"
@@ -82,7 +82,7 @@ msgid_plural "%s add-ons disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/addons/class-mp-addons-list-table.php:128 marketpress.php:608
+#: includes/addons/class-mp-addons-list-table.php:128 marketpress.php:607
 msgid "Settings"
 msgstr ""
 
@@ -281,7 +281,7 @@ msgstr ""
 
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:687
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:698
-#: marketpress.php:218
+#: marketpress.php:217
 msgid "Product"
 msgstr ""
 
@@ -333,7 +333,7 @@ msgstr ""
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:916
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:1015
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:1018
-#: includes/admin/class-mp-dashboard-widgets.php:305 marketpress.php:703
+#: includes/admin/class-mp-dashboard-widgets.php:305 marketpress.php:702
 msgid "Coupons"
 msgstr ""
 
@@ -371,7 +371,7 @@ msgstr ""
 
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:1022
 #: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-variations.php:258
-#: marketpress.php:224
+#: marketpress.php:223
 msgid "Edit"
 msgstr ""
 
@@ -689,7 +689,7 @@ msgstr ""
 #: includes/admin/class-mp-orders-admin.php:1041
 #: includes/admin/class-mp-orders-admin.php:1062
 #: includes/common/class-mp-gdpr.php:327 includes/common/class-mp-order.php:995
-#: includes/common/payment-gateways/payfast.php:244 marketpress.php:305
+#: includes/common/payment-gateways/payfast.php:244 marketpress.php:304
 msgid "Received"
 msgstr ""
 
@@ -710,7 +710,7 @@ msgstr ""
 #: includes/common/payment-gateways/pin.php:258
 #: includes/common/payment-gateways/simplify.php:181
 #: includes/common/payment-gateways/stripe.php:368
-#: includes/common/payment-gateways/wepay.php:269 marketpress.php:312
+#: includes/common/payment-gateways/wepay.php:269 marketpress.php:311
 msgid "Paid"
 msgstr ""
 
@@ -720,7 +720,7 @@ msgstr ""
 #: includes/admin/class-mp-orders-admin.php:1049
 #: includes/admin/class-mp-orders-admin.php:1064
 #: includes/common/class-mp-gdpr.php:329
-#: includes/common/class-mp-order.php:1002 marketpress.php:319
+#: includes/common/class-mp-order.php:1002 marketpress.php:318
 msgid "Shipped"
 msgstr ""
 
@@ -730,7 +730,7 @@ msgstr ""
 #: includes/admin/class-mp-orders-admin.php:1053
 #: includes/admin/class-mp-orders-admin.php:1065
 #: includes/common/class-mp-gdpr.php:330
-#: includes/common/class-mp-order.php:1019 marketpress.php:326
+#: includes/common/class-mp-order.php:1019 marketpress.php:325
 msgid "Closed"
 msgstr ""
 
@@ -805,6 +805,8 @@ msgid "Run Setup Wizard"
 msgstr ""
 
 #: includes/admin/class-mp-admin.php:398
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:248
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:289
 msgid "Dismiss"
 msgstr ""
 
@@ -1126,7 +1128,7 @@ msgid "Manage"
 msgstr ""
 
 #: includes/admin/class-mp-dashboard-widgets.php:301
-#: includes/admin/class-mp-orders-admin.php:989 marketpress.php:262
+#: includes/admin/class-mp-orders-admin.php:989 marketpress.php:261
 msgid "Orders"
 msgstr ""
 
@@ -1134,8 +1136,8 @@ msgstr ""
 #: includes/common/template-functions.php:173
 #: includes/common/template-functions.php:179
 #: includes/common/template-functions.php:902
-#: includes/multisite/template-functions.php:82 marketpress.php:217
-#: marketpress.php:220
+#: includes/multisite/template-functions.php:82 marketpress.php:216
+#: marketpress.php:219
 msgid "Products"
 msgstr ""
 
@@ -2844,6 +2846,102 @@ msgstr ""
 msgid "Import/Export"
 msgstr ""
 
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:223
+msgid "install"
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:230
+msgid ""
+"Important updates are available for <strong>%s</strong>. Install the free "
+"WPMU DEV Dashboard plugin now for updates and support!"
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:232
+msgid ""
+"<strong>%s</strong> is almost ready - install the free WPMU DEV Dashboard "
+"plugin for updates and support!"
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:236
+msgid ""
+"Important updates are available for your WPMU DEV plugins/themes. Install "
+"the free WPMU DEV Dashboard plugin now for updates and support!"
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:238
+msgid ""
+"Almost ready - install the free WPMU DEV Dashboard plugin for updates and "
+"support!"
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:244
+msgid "Install Plugin"
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:247
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:288
+msgid "Saving..."
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:264
+msgid "activate"
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:271
+msgid ""
+"Important updates are available for <strong>%s</strong>. Activate the WPMU "
+"DEV Dashboard to update now!"
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:273
+msgid "Just one more step to enable updates and support for <strong>%s</strong>!"
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:277
+msgid ""
+"Important updates are available for your WPMU DEV plugins/themes. Activate "
+"the WPMU DEV Dashboard to update now!"
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:279
+msgid ""
+"Just one more step - activate the WPMU DEV Dashboard plugin and you're all "
+"done!"
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:285
+msgid "Activate WPMU DEV Dashboard"
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:952
+msgid "We did not find any data for this plugin or theme..."
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:1131
+msgid "%s changelog"
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:1161
+msgid "Current"
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:1167
+#: includes/admin/store-settings/class-mp-store-settings-general.php:358
+msgid "New"
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:1184
+msgid "Version %s"
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:1202
+msgid "Show all changes"
+msgstr ""
+
+#: includes/admin/dash-notice/wpmudev-dash-notification.php:1203
+msgid "Hide details"
+msgstr ""
+
 #: includes/admin/store-settings/class-mp-store-settings-addons.php:47
 msgid "Store Settings: Add Ons: %s"
 msgstr ""
@@ -2997,10 +3095,6 @@ msgid ""
 "PayPal gateway for the most accurate data. <a target=\"_blank\" "
 "href=\"http://analytics.blogspot.com/2009/05/how-to-use-ecommerce-tracking-"
 "in-google.html\">More information &raquo;</a>"
-msgstr ""
-
-#: includes/admin/store-settings/class-mp-store-settings-general.php:358
-msgid "New"
 msgstr ""
 
 #: includes/admin/store-settings/class-mp-store-settings-general.php:359
@@ -3169,7 +3263,7 @@ msgstr ""
 #: includes/admin/store-settings/class-mp-store-settings-notifications.php:60
 #: includes/admin/store-settings/class-mp-store-settings-notifications.php:95
 #: includes/admin/store-settings/class-mp-store-settings-notifications.php:128
-#: marketpress.php:267
+#: marketpress.php:266
 msgid "New Order"
 msgstr ""
 
@@ -4018,13 +4112,13 @@ msgstr ""
 #: includes/common/class-mp-gdpr.php:71
 msgid ""
 "This site might be using third party services and tools to process payments "
-"or/and\n"
+"or/and\r\n"
 "\t\t           process shipping data when creating orders on the "
-"MarketPress store. These services include payment\n"
+"MarketPress store. These services include payment\r\n"
 "\t\t           gateways: 2Checkout, Authorize.net AIM, eWay shared "
-"payments, eWay Rapid 3.1 Payments, Mijireh,\n"
+"payments, eWay Rapid 3.1 Payments, Mijireh,\r\n"
 "\t\t           Mollie, Paymill, PayPal, PIN, Simplify Commerce by "
-"MasterCard, Stripe and WePay; shipping gateways:\n"
+"MasterCard, Stripe and WePay; shipping gateways:\r\n"
 "\t\t           Fedex, UPS, USPS."
 msgstr ""
 
@@ -4035,9 +4129,9 @@ msgstr ""
 #: includes/common/class-mp-gdpr.php:77
 msgid ""
 "The following information will be collected in order to process orders: "
-"your name,\n"
+"your name,\r\n"
 "\t\t           username, email address, avatar and profile URLs, address "
-"and phone number. This data can be\n"
+"and phone number. This data can be\r\n"
 "\t\t           exported and removed."
 msgstr ""
 
@@ -4048,7 +4142,7 @@ msgstr ""
 #: includes/common/class-mp-gdpr.php:81
 msgid ""
 "In addition to standard WordPress session cookies, this site might be "
-"setting an\n"
+"setting an\r\n"
 "\t\t           additional cookie to remember your cart settings. This "
 "cookie will last for one year."
 msgstr ""
@@ -4523,7 +4617,7 @@ msgid ""
 "\n"
 " ORDERNOTES\n"
 "\n"
-"\n"
+"\r\n"
 "You can track the latest status of your order here: TRACKINGURL\n"
 "\n"
 "Thanks again!"
@@ -7407,7 +7501,7 @@ msgid "The Stripe Token was not generated correctly. Please go back and try agai
 msgstr ""
 
 #: includes/common/payment-gateways/stripe.php:332
-#: includes/common/template-functions.php:872 marketpress.php:219
+#: includes/common/template-functions.php:872 marketpress.php:218
 msgid "Store"
 msgstr ""
 
@@ -9255,247 +9349,247 @@ msgstr ""
 msgid "Please fix the %s1 and then try submitting the form again."
 msgstr ""
 
-#: marketpress.php:152
+#: marketpress.php:151
 msgid "All Product Categories"
 msgstr ""
 
-#: marketpress.php:153
+#: marketpress.php:152
 msgid "Edit Product Category"
 msgstr ""
 
-#: marketpress.php:154
+#: marketpress.php:153
 msgid "View Product Category"
 msgstr ""
 
-#: marketpress.php:155
+#: marketpress.php:154
 msgid "Update Product Category"
 msgstr ""
 
-#: marketpress.php:156
+#: marketpress.php:155
 msgid "Add New Product Category"
 msgstr ""
 
-#: marketpress.php:157
+#: marketpress.php:156
 msgid "New Product Category Name"
 msgstr ""
 
-#: marketpress.php:158
+#: marketpress.php:157
 msgid "Parent Product Category"
 msgstr ""
 
-#: marketpress.php:159
+#: marketpress.php:158
 msgid "Parent Product Category:"
 msgstr ""
 
-#: marketpress.php:160
+#: marketpress.php:159
 msgid "Search Product Categories"
 msgstr ""
 
-#: marketpress.php:161
+#: marketpress.php:160
 msgid "Separate product categories with commas"
 msgstr ""
 
-#: marketpress.php:162
+#: marketpress.php:161
 msgid "Add or remove product categories"
 msgstr ""
 
-#: marketpress.php:163
+#: marketpress.php:162
 msgid "Choose from the most used product categories"
 msgstr ""
 
-#: marketpress.php:164
+#: marketpress.php:163
 msgid "No product categories found"
 msgstr ""
 
-#: marketpress.php:186
+#: marketpress.php:185
 msgid "All Product Tags"
 msgstr ""
 
-#: marketpress.php:187
+#: marketpress.php:186
 msgid "Edit Product Tag"
 msgstr ""
 
-#: marketpress.php:188
+#: marketpress.php:187
 msgid "View Product Tag"
 msgstr ""
 
-#: marketpress.php:189
+#: marketpress.php:188
 msgid "Update Product Tag"
 msgstr ""
 
-#: marketpress.php:190
+#: marketpress.php:189
 msgid "Add New Product Tag"
 msgstr ""
 
-#: marketpress.php:191
+#: marketpress.php:190
 msgid "New Product Tag Name"
 msgstr ""
 
-#: marketpress.php:192
+#: marketpress.php:191
 msgid "Parent Product Tag"
 msgstr ""
 
-#: marketpress.php:193
+#: marketpress.php:192
 msgid "Parent Product Tag:"
 msgstr ""
 
-#: marketpress.php:194
+#: marketpress.php:193
 msgid "Search Product Tags"
 msgstr ""
 
-#: marketpress.php:195
+#: marketpress.php:194
 msgid "Separate product tags with commas"
 msgstr ""
 
-#: marketpress.php:196
+#: marketpress.php:195
 msgid "Add or remove product tags"
 msgstr ""
 
-#: marketpress.php:197
+#: marketpress.php:196
 msgid "Choose from the most used product tags"
 msgstr ""
 
-#: marketpress.php:198
+#: marketpress.php:197
 msgid "No product tags found"
 msgstr ""
 
-#: marketpress.php:221 marketpress.php:222
+#: marketpress.php:220 marketpress.php:221
 msgid "Add New Product"
 msgstr ""
 
-#: marketpress.php:223
+#: marketpress.php:222
 msgid "Edit Product"
 msgstr ""
 
-#: marketpress.php:225
+#: marketpress.php:224
 msgid "New Product"
 msgstr ""
 
-#: marketpress.php:226 marketpress.php:230
+#: marketpress.php:225 marketpress.php:229
 msgid "View Product"
 msgstr ""
 
-#: marketpress.php:227
+#: marketpress.php:226
 msgid "Search Products"
 msgstr ""
 
-#: marketpress.php:228
+#: marketpress.php:227
 msgid "No Products Found"
 msgstr ""
 
-#: marketpress.php:229
+#: marketpress.php:228
 msgid "No Products found in Trash"
 msgstr ""
 
-#: marketpress.php:232
+#: marketpress.php:231
 msgid "Products for your e-commerce store."
 msgstr ""
 
-#: marketpress.php:263
+#: marketpress.php:262
 msgid "Order"
 msgstr ""
 
-#: marketpress.php:265
+#: marketpress.php:264
 msgid "Add New Order"
 msgstr ""
 
-#: marketpress.php:266
+#: marketpress.php:265
 msgid "Edit Order"
 msgstr ""
 
-#: marketpress.php:268
+#: marketpress.php:267
 msgid "View Order"
 msgstr ""
 
-#: marketpress.php:269
+#: marketpress.php:268
 msgid "Search Orders"
 msgstr ""
 
-#: marketpress.php:270
+#: marketpress.php:269
 msgid "No orders found"
 msgstr ""
 
-#: marketpress.php:271
+#: marketpress.php:270
 msgid "No orders found in trash"
 msgstr ""
 
-#: marketpress.php:272
+#: marketpress.php:271
 msgid "Parent Order"
 msgstr ""
 
-#: marketpress.php:274
+#: marketpress.php:273
 msgid "Orders from your e-commerce store."
 msgstr ""
 
-#: marketpress.php:307
+#: marketpress.php:306
 #. translators: %s: orders received
 msgid "Received <span class=\"count\">(%s)</span>"
 msgid_plural "Received <span class=\"count\">(%s)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: marketpress.php:314
+#: marketpress.php:313
 #. translators: %s: paid orders
 msgid "Paid <span class=\"count\">(%s)</span>"
 msgid_plural "Paid <span class=\"count\">(%s)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: marketpress.php:321
+#: marketpress.php:320
 #. translators: %s: shipped orders
 msgid "Shipped <span class=\"count\">(%s)</span>"
 msgid_plural "Shipped <span class=\"count\">(%s)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: marketpress.php:328
+#: marketpress.php:327
 #. translators: %s: orders closed
 msgid "Closed <span class=\"count\">(%s)</span>"
 msgid_plural "Closed <span class=\"count\">(%s)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: marketpress.php:437
+#: marketpress.php:436
 msgid "Add a Product"
 msgstr ""
 
-#: marketpress.php:669
+#: marketpress.php:668
 msgid "Your pages were created successfully."
 msgstr ""
 
-#: marketpress.php:683
+#: marketpress.php:682
 #. translators: %s: plugin title
 msgid ""
 "<strong>Welcome to %s</strong> &#8211; Install pages required by the plugin "
 "automatically."
 msgstr ""
 
-#: marketpress.php:688
+#: marketpress.php:687
 #. translators: %s: plugin title
 msgid "Install %s Pages"
 msgstr ""
 
-#: marketpress.php:704
+#: marketpress.php:703
 msgid "Offer and accept coupon codes"
 msgstr ""
 
-#: marketpress.php:712
+#: marketpress.php:711
 msgid "Pro Sites"
 msgstr ""
 
-#: marketpress.php:713
+#: marketpress.php:712
 msgid "Grant access to themes and gateways depending on the user's Pro Site level"
 msgstr ""
 
-#: marketpress.php:730
+#: marketpress.php:729
 msgid "Invoice PDF"
 msgstr ""
 
-#: marketpress.php:739
+#: marketpress.php:738
 msgid "Multiple Downloads"
 msgstr ""
 
-#: marketpress.php:740
+#: marketpress.php:739
 msgid "Enable multiple downloads per product"
 msgstr ""
 
@@ -9523,27 +9617,27 @@ msgstr ""
 msgid "http://premium.wpmudev.org"
 msgstr ""
 
-#: marketpress.php:150
+#: marketpress.php:149
 msgctxt "product_category"
 msgid "Product Categories"
 msgstr ""
 
-#: marketpress.php:151
+#: marketpress.php:150
 msgctxt "product_category"
 msgid "Product Category"
 msgstr ""
 
-#: marketpress.php:184
+#: marketpress.php:183
 msgctxt "product_tag"
 msgid "Product Tags"
 msgstr ""
 
-#: marketpress.php:185
+#: marketpress.php:184
 msgctxt "product_tag"
 msgid "Product Tag"
 msgstr ""
 
-#: marketpress.php:264
+#: marketpress.php:263
 msgctxt "mp_order"
 msgid "Add New"
 msgstr ""
