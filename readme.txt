@@ -151,6 +151,13 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 
 == Changelog ==
 
+= 3.2.11 =
+* New: Added new filter mp_media_buttons to disable/enable shortcode buttons in visual editor.
+* Fix: Fix conflict with Branda.
+
+= 3.2.10 =
+* Fix: Always do TLS verification when making curl calls.
+
 = 3.2.9 =
 * Fix: Conflict with plugins WDP ID header and Dashboard 4.7
 * GDPR: Ability to erase user personal data
