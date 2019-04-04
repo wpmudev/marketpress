@@ -151,7 +151,7 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 
 == Changelog ==
 
-= 3.2.11 =
+= 3.3.0 =
 * New: Added new filter mp_media_buttons to disable/enable shortcode buttons in visual editor.
 * Fix: Fix conflict with Branda.
 

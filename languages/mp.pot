@@ -2,16 +2,16 @@
 # This file is distributed under the same license as the MarketPress package.
 msgid ""
 msgstr ""
-"Project-Id-Version: MarketPress 3.2.10\n"
+"Project-Id-Version: MarketPress 3.3.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2019-01-11 16:21:03+00:00\n"
+"POT-Creation-Date: 2019-04-02 12:12:45+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2019-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"X-Generator: grunt-wp-i18n1.0.2\n"
+"X-Generator: grunt-wp-i18n 1.0.3\n"
 
 #: includes/addons/class-mp-addons-list-table.php:20
 #: includes/admin/class-mp-product-attributes-admin.php:129
@@ -705,8 +705,8 @@ msgstr ""
 #: includes/common/payment-gateways/free_orders.php:91
 #: includes/common/payment-gateways/mijireh.php:248
 #: includes/common/payment-gateways/paymill.php:273
-#: includes/common/payment-gateways/paypal-express.php:932
-#: includes/common/payment-gateways/paypal-express.php:966
+#: includes/common/payment-gateways/paypal-express.php:933
+#: includes/common/payment-gateways/paypal-express.php:967
 #: includes/common/payment-gateways/pin.php:258
 #: includes/common/payment-gateways/simplify.php:181
 #: includes/common/payment-gateways/stripe.php:368
@@ -2164,7 +2164,7 @@ msgid "Display a cloud or list of your global product tags."
 msgstr ""
 
 #: includes/admin/class-mp-shortcode-builder.php:216
-#: includes/admin/class-mp-shortcode-builder.php:1510
+#: includes/admin/class-mp-shortcode-builder.php:1522
 msgid "Add E-Commerce Short Code"
 msgstr ""
 
@@ -4112,13 +4112,13 @@ msgstr ""
 #: includes/common/class-mp-gdpr.php:71
 msgid ""
 "This site might be using third party services and tools to process payments "
-"or/and\r\n"
+"or/and\n"
 "\t\t           process shipping data when creating orders on the "
-"MarketPress store. These services include payment\r\n"
+"MarketPress store. These services include payment\n"
 "\t\t           gateways: 2Checkout, Authorize.net AIM, eWay shared "
-"payments, eWay Rapid 3.1 Payments, Mijireh,\r\n"
+"payments, eWay Rapid 3.1 Payments, Mijireh,\n"
 "\t\t           Mollie, Paymill, PayPal, PIN, Simplify Commerce by "
-"MasterCard, Stripe and WePay; shipping gateways:\r\n"
+"MasterCard, Stripe and WePay; shipping gateways:\n"
 "\t\t           Fedex, UPS, USPS."
 msgstr ""
 
@@ -4129,9 +4129,9 @@ msgstr ""
 #: includes/common/class-mp-gdpr.php:77
 msgid ""
 "The following information will be collected in order to process orders: "
-"your name,\r\n"
+"your name,\n"
 "\t\t           username, email address, avatar and profile URLs, address "
-"and phone number. This data can be\r\n"
+"and phone number. This data can be\n"
 "\t\t           exported and removed."
 msgstr ""
 
@@ -4142,7 +4142,7 @@ msgstr ""
 #: includes/common/class-mp-gdpr.php:81
 msgid ""
 "In addition to standard WordPress session cookies, this site might be "
-"setting an\r\n"
+"setting an\n"
 "\t\t           additional cookie to remember your cart settings. This "
 "cookie will last for one year."
 msgstr ""
@@ -4617,7 +4617,7 @@ msgid ""
 "\n"
 " ORDERNOTES\n"
 "\n"
-"\r\n"
+"\n"
 "You can track the latest status of your order here: TRACKINGURL\n"
 "\n"
 "Thanks again!"
@@ -4848,7 +4848,7 @@ msgstr ""
 #: includes/common/payment-gateways/eway.php:298
 #: includes/common/payment-gateways/eway31.php:267
 #: includes/common/payment-gateways/paymill.php:46
-#: includes/common/payment-gateways/paypal-express.php:971
+#: includes/common/payment-gateways/paypal-express.php:972
 #: includes/common/payment-gateways/paypal-payflow.php:60
 #: includes/common/payment-gateways/pin.php:46
 #: includes/common/payment-gateways/simplify.php:19
@@ -4901,7 +4901,7 @@ msgstr ""
 #: includes/common/payment-gateways/_ideal.php:307
 #: includes/common/payment-gateways/authorizenet-aim.php:230
 #: includes/common/payment-gateways/paypal-chained-payments.php:365
-#: includes/common/payment-gateways/paypal-express.php:694
+#: includes/common/payment-gateways/paypal-express.php:695
 #: includes/common/payment-gateways/paypal-payflow.php:387
 #: includes/common/payment-gateways/wepay.php:130
 #: includes/common/shipping-modules/mp-fedex.php:260
@@ -4912,7 +4912,7 @@ msgstr ""
 #: includes/common/payment-gateways/authorizenet-aim.php:233
 #: includes/common/payment-gateways/eway.php:375
 #: includes/common/payment-gateways/paypal-chained-payments.php:367
-#: includes/common/payment-gateways/paypal-express.php:697
+#: includes/common/payment-gateways/paypal-express.php:698
 #: includes/common/payment-gateways/paypal-payflow.php:390
 #: includes/common/shipping-modules/mp-fedex.php:263
 msgid "Sandbox"
@@ -4924,7 +4924,7 @@ msgstr ""
 #: includes/common/payment-gateways/eway.php:376
 #: includes/common/payment-gateways/payfast.php:315
 #: includes/common/payment-gateways/paypal-chained-payments.php:368
-#: includes/common/payment-gateways/paypal-express.php:698
+#: includes/common/payment-gateways/paypal-express.php:699
 #: includes/common/payment-gateways/paypal-payflow.php:391
 msgid "Live"
 msgstr ""
@@ -4932,7 +4932,7 @@ msgstr ""
 #: includes/common/payment-gateways/2checkout.php:345
 #: includes/common/payment-gateways/authorizenet-aim.php:239
 #: includes/common/payment-gateways/paymill.php:168
-#: includes/common/payment-gateways/paypal-express.php:703
+#: includes/common/payment-gateways/paypal-express.php:704
 #: includes/common/payment-gateways/simplify.php:80
 #: includes/common/payment-gateways/stripe.php:265
 #: includes/common/payment-gateways/wepay.php:158
@@ -4963,7 +4963,7 @@ msgstr ""
 #: includes/common/payment-gateways/mollie.php:91
 #: includes/common/payment-gateways/paymill.php:193
 #: includes/common/payment-gateways/paypal-chained-payments.php:356
-#: includes/common/payment-gateways/paypal-express.php:687
+#: includes/common/payment-gateways/paypal-express.php:688
 #: includes/common/payment-gateways/paypal-payflow.php:432
 #: includes/common/payment-gateways/pin.php:186
 #: includes/common/payment-gateways/skrill.php:152
@@ -5166,8 +5166,8 @@ msgstr ""
 #: includes/common/payment-gateways/_ideal.php:159
 #: includes/common/payment-gateways/eway.php:189
 #: includes/common/payment-gateways/paypal-chained-payments.php:634
-#: includes/common/payment-gateways/paypal-express.php:321
-#: includes/common/payment-gateways/paypal-express.php:472
+#: includes/common/payment-gateways/paypal-express.php:322
+#: includes/common/payment-gateways/paypal-express.php:473
 msgid "%s Store Purchase - Order ID: %s"
 msgstr ""
 
@@ -5260,7 +5260,7 @@ msgid "User Name"
 msgstr ""
 
 #: includes/common/payment-gateways/_payway.php:291
-#: includes/common/payment-gateways/paypal-express.php:717
+#: includes/common/payment-gateways/paypal-express.php:718
 #: includes/common/payment-gateways/paypal-payflow.php:423
 #: includes/common/shipping-modules/mp-ups.php:158
 #: includes/public/class-mp-checkout.php:1254
@@ -5507,7 +5507,7 @@ msgid "Live API Credentials"
 msgstr ""
 
 #: includes/common/payment-gateways/eway.php:387
-#: includes/common/payment-gateways/paypal-express.php:710
+#: includes/common/payment-gateways/paypal-express.php:711
 #: includes/common/shipping-modules/mp-usps.php:185
 #: includes/public/class-mp-checkout.php:1249
 msgid "Username"
@@ -5818,16 +5818,16 @@ msgstr ""
 #: includes/common/payment-gateways/payfast.php:519
 #: includes/common/payment-gateways/paypal-chained-payments.php:218
 #: includes/common/payment-gateways/paypal-chained-payments.php:498
-#: includes/common/payment-gateways/paypal-express.php:821
-#: includes/common/payment-gateways/paypal-express.php:1091
+#: includes/common/payment-gateways/paypal-express.php:822
+#: includes/common/payment-gateways/paypal-express.php:1092
 msgid ""
 "The payment has been completed, and the funds have been added successfully "
 "to your account balance."
 msgstr ""
 
 #: includes/common/payment-gateways/payfast.php:531
-#: includes/common/payment-gateways/paypal-express.php:809
-#: includes/common/payment-gateways/paypal-express.php:1076
+#: includes/common/payment-gateways/paypal-express.php:810
+#: includes/common/payment-gateways/paypal-express.php:1077
 msgid ""
 "The payment has failed. This happens only if the payment was made from your "
 "customer's bank account."
@@ -5835,7 +5835,7 @@ msgstr ""
 
 #: includes/common/payment-gateways/payfast.php:539
 #: includes/common/payment-gateways/paypal-chained-payments.php:254
-#: includes/common/payment-gateways/paypal-express.php:1138
+#: includes/common/payment-gateways/paypal-express.php:1139
 msgid "The payment is pending."
 msgstr ""
 
@@ -6037,8 +6037,8 @@ msgstr ""
 #: includes/common/payment-gateways/paypal-chained-payments.php:50
 #: includes/common/payment-gateways/paypal-chained-payments.php:53
 #: includes/common/payment-gateways/paypal-chained-payments.php:732
-#: includes/common/payment-gateways/paypal-express.php:499
-#: includes/common/payment-gateways/paypal-express.php:937
+#: includes/common/payment-gateways/paypal-express.php:500
+#: includes/common/payment-gateways/paypal-express.php:938
 msgid "PayPal"
 msgstr ""
 
@@ -6129,7 +6129,7 @@ msgid "Your PayPal transaction has been canceled."
 msgstr ""
 
 #: includes/common/payment-gateways/paypal-chained-payments.php:126
-#: includes/common/payment-gateways/paypal-express.php:779
+#: includes/common/payment-gateways/paypal-express.php:780
 msgid "You will be redirected to the PayPal site to finalize your payment."
 msgstr ""
 
@@ -6146,8 +6146,8 @@ msgstr ""
 
 #: includes/common/payment-gateways/paypal-chained-payments.php:212
 #: includes/common/payment-gateways/paypal-chained-payments.php:491
-#: includes/common/payment-gateways/paypal-express.php:813
-#: includes/common/payment-gateways/paypal-express.php:1081
+#: includes/common/payment-gateways/paypal-express.php:814
+#: includes/common/payment-gateways/paypal-express.php:1082
 msgid "The payment has been partially refunded."
 msgstr ""
 
@@ -6158,8 +6158,8 @@ msgstr ""
 
 #: includes/common/payment-gateways/paypal-chained-payments.php:230
 #: includes/common/payment-gateways/paypal-chained-payments.php:510
-#: includes/common/payment-gateways/paypal-express.php:842
-#: includes/common/payment-gateways/paypal-express.php:1114
+#: includes/common/payment-gateways/paypal-express.php:843
+#: includes/common/payment-gateways/paypal-express.php:1115
 msgid "You refunded the payment."
 msgstr ""
 
@@ -6179,8 +6179,8 @@ msgstr ""
 
 #: includes/common/payment-gateways/paypal-chained-payments.php:244
 #: includes/common/payment-gateways/paypal-chained-payments.php:524
-#: includes/common/payment-gateways/paypal-express.php:853
-#: includes/common/payment-gateways/paypal-express.php:1127
+#: includes/common/payment-gateways/paypal-express.php:854
+#: includes/common/payment-gateways/paypal-express.php:1128
 msgid ""
 "The payment is pending because it was made by an eCheck that has not yet "
 "cleared."
@@ -6188,8 +6188,8 @@ msgstr ""
 
 #: includes/common/payment-gateways/paypal-chained-payments.php:245
 #: includes/common/payment-gateways/paypal-chained-payments.php:525
-#: includes/common/payment-gateways/paypal-express.php:854
-#: includes/common/payment-gateways/paypal-express.php:1128
+#: includes/common/payment-gateways/paypal-express.php:855
+#: includes/common/payment-gateways/paypal-express.php:1129
 msgid ""
 "The payment is pending because you hold a non-U.S. account and do not have "
 "a withdrawal mechanism. You must manually accept or deny this payment from "
@@ -6198,8 +6198,8 @@ msgstr ""
 
 #: includes/common/payment-gateways/paypal-chained-payments.php:246
 #: includes/common/payment-gateways/paypal-chained-payments.php:526
-#: includes/common/payment-gateways/paypal-express.php:855
-#: includes/common/payment-gateways/paypal-express.php:1129
+#: includes/common/payment-gateways/paypal-express.php:856
+#: includes/common/payment-gateways/paypal-express.php:1130
 msgid ""
 "You do not have a balance in the currency sent, and you do not have your "
 "Payment Receiving Preferences set to automatically convert and accept this "
@@ -6208,15 +6208,15 @@ msgstr ""
 
 #: includes/common/payment-gateways/paypal-chained-payments.php:247
 #: includes/common/payment-gateways/paypal-chained-payments.php:527
-#: includes/common/payment-gateways/paypal-express.php:857
-#: includes/common/payment-gateways/paypal-express.php:1131
+#: includes/common/payment-gateways/paypal-express.php:858
+#: includes/common/payment-gateways/paypal-express.php:1132
 msgid "The payment is pending while it is being reviewed by PayPal for risk."
 msgstr ""
 
 #: includes/common/payment-gateways/paypal-chained-payments.php:248
 #: includes/common/payment-gateways/paypal-chained-payments.php:528
-#: includes/common/payment-gateways/paypal-express.php:858
-#: includes/common/payment-gateways/paypal-express.php:1132
+#: includes/common/payment-gateways/paypal-express.php:859
+#: includes/common/payment-gateways/paypal-express.php:1133
 msgid ""
 "The payment is pending because it was made to an email address that is not "
 "yet registered or confirmed."
@@ -6224,8 +6224,8 @@ msgstr ""
 
 #: includes/common/payment-gateways/paypal-chained-payments.php:249
 #: includes/common/payment-gateways/paypal-chained-payments.php:529
-#: includes/common/payment-gateways/paypal-express.php:859
-#: includes/common/payment-gateways/paypal-express.php:1133
+#: includes/common/payment-gateways/paypal-express.php:860
+#: includes/common/payment-gateways/paypal-express.php:1134
 msgid ""
 "The payment is pending because it was made via credit card and you must "
 "upgrade your account to Business or Premier status in order to receive the "
@@ -6235,8 +6235,8 @@ msgstr ""
 
 #: includes/common/payment-gateways/paypal-chained-payments.php:250
 #: includes/common/payment-gateways/paypal-chained-payments.php:530
-#: includes/common/payment-gateways/paypal-express.php:860
-#: includes/common/payment-gateways/paypal-express.php:1134
+#: includes/common/payment-gateways/paypal-express.php:861
+#: includes/common/payment-gateways/paypal-express.php:1135
 msgid ""
 "The payment is pending because you are not yet verified. You must verify "
 "your account before you can accept this payment."
@@ -6244,8 +6244,8 @@ msgstr ""
 
 #: includes/common/payment-gateways/paypal-chained-payments.php:251
 #: includes/common/payment-gateways/paypal-chained-payments.php:531
-#: includes/common/payment-gateways/paypal-express.php:861
-#: includes/common/payment-gateways/paypal-express.php:1135
+#: includes/common/payment-gateways/paypal-express.php:862
+#: includes/common/payment-gateways/paypal-express.php:1136
 msgid ""
 "The payment is pending for an unknown reason. For more information, contact "
 "PayPal customer service."
@@ -6277,17 +6277,17 @@ msgid "Email Address"
 msgstr ""
 
 #: includes/common/payment-gateways/paypal-chained-payments.php:470
-#: includes/common/payment-gateways/paypal-express.php:1052
+#: includes/common/payment-gateways/paypal-express.php:1053
 msgid "There was a problem verifying the IPN string with PayPal. Please try again."
 msgstr ""
 
 #: includes/common/payment-gateways/paypal-chained-payments.php:534
-#: includes/common/payment-gateways/paypal-express.php:864
+#: includes/common/payment-gateways/paypal-express.php:865
 msgid "The payment is pending"
 msgstr ""
 
 #: includes/common/payment-gateways/paypal-chained-payments.php:698
-#: includes/common/payment-gateways/paypal-express.php:148
+#: includes/common/payment-gateways/paypal-express.php:149
 msgid "There was a problem connecting to PayPal. Please try again."
 msgstr ""
 
@@ -6336,7 +6336,7 @@ msgstr ""
 
 #: includes/common/payment-gateways/paypal-chained-payments.php:818
 #: includes/common/payment-gateways/paypal-chained-payments.php:840
-#: includes/common/payment-gateways/paypal-express.php:704
+#: includes/common/payment-gateways/paypal-express.php:705
 msgid ""
 "You must login to PayPal and create an API signature to get your "
 "credentials. <a target=\"_blank\" "
@@ -6382,17 +6382,17 @@ msgid ""
 "register\">More Information &raquo;</a>"
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:498
-#: includes/common/payment-gateways/paypal-express.php:1162
+#: includes/common/payment-gateways/paypal-express.php:499
+#: includes/common/payment-gateways/paypal-express.php:1163
 msgid "PayPal Express Checkout"
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:602
+#: includes/common/payment-gateways/paypal-express.php:603
 msgid "Paypal Express Network Settings"
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:604
-#: includes/common/payment-gateways/paypal-express.php:646
+#: includes/common/payment-gateways/paypal-express.php:605
+#: includes/common/payment-gateways/paypal-express.php:647
 msgid ""
 "Express Checkout is PayPal's premier checkout solution, which streamlines "
 "the checkout process for buyers and keeps them on your site after making a "
@@ -6403,28 +6403,28 @@ msgid ""
 "apiCredentials/\">More Info &raquo;</a>"
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:623
-#: includes/common/payment-gateways/paypal-express.php:657
+#: includes/common/payment-gateways/paypal-express.php:624
+#: includes/common/payment-gateways/paypal-express.php:658
 msgid "Merchant Email"
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:644
+#: includes/common/payment-gateways/paypal-express.php:645
 msgid "Paypal Express Checkout Settings"
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:679
+#: includes/common/payment-gateways/paypal-express.php:680
 msgid "Locale"
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:724
+#: includes/common/payment-gateways/paypal-express.php:725
 msgid "Signature"
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:733
+#: includes/common/payment-gateways/paypal-express.php:734
 msgid "Header Image"
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:734
+#: includes/common/payment-gateways/paypal-express.php:735
 msgid ""
 "URL for an image you want to appear at the top left of the payment page. "
 "The image has a maximum size of 750 pixels wide by 90 pixels high. PayPal "
@@ -6432,112 +6432,112 @@ msgid ""
 "server. If you do not specify an image, the business name is displayed."
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:738
+#: includes/common/payment-gateways/paypal-express.php:739
 msgid "Header Border Color"
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:739
+#: includes/common/payment-gateways/paypal-express.php:740
 msgid ""
 "Sets the border color around the header of the payment page. The border is "
 "a 2-pixel perimeter around the header space, which is 750 pixels wide by 90 "
 "pixels high. By default, the color is black."
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:743
+#: includes/common/payment-gateways/paypal-express.php:744
 msgid "Header Background Color"
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:744
+#: includes/common/payment-gateways/paypal-express.php:745
 msgid ""
 "Sets the background color for the header of the payment page. By default, "
 "the color is white."
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:748
+#: includes/common/payment-gateways/paypal-express.php:749
 msgid "Page Background Color"
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:749
+#: includes/common/payment-gateways/paypal-express.php:750
 msgid ""
 "Sets the background color for the payment page. By default, the color is "
 "white."
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:797
-#: includes/common/payment-gateways/paypal-express.php:1061
+#: includes/common/payment-gateways/paypal-express.php:798
+#: includes/common/payment-gateways/paypal-express.php:1062
 msgid ""
 "A reversal has been canceled; for example, when you win a dispute and the "
 "funds for the reversal have been returned to you."
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:801
-#: includes/common/payment-gateways/paypal-express.php:1066
+#: includes/common/payment-gateways/paypal-express.php:802
+#: includes/common/payment-gateways/paypal-express.php:1067
 msgid "The authorization period for this payment has been reached."
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:805
-#: includes/common/payment-gateways/paypal-express.php:1071
+#: includes/common/payment-gateways/paypal-express.php:806
+#: includes/common/payment-gateways/paypal-express.php:1072
 msgid "An authorization for this transaction has been voided."
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:817
-#: includes/common/payment-gateways/paypal-express.php:1086
+#: includes/common/payment-gateways/paypal-express.php:818
+#: includes/common/payment-gateways/paypal-express.php:1087
 msgid ""
 "The transaction has not terminated, e.g. an authorization may be awaiting "
 "completion."
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:825
-#: includes/common/payment-gateways/paypal-express.php:1096
+#: includes/common/payment-gateways/paypal-express.php:826
+#: includes/common/payment-gateways/paypal-express.php:1097
 msgid "A payment has been accepted."
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:829
+#: includes/common/payment-gateways/paypal-express.php:830
 msgid ""
 "A payment was reversed due to a chargeback or other type of reversal. The "
 "funds have been removed from your account balance and returned to the buyer"
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:832
-#: includes/common/payment-gateways/paypal-express.php:1103
+#: includes/common/payment-gateways/paypal-express.php:833
+#: includes/common/payment-gateways/paypal-express.php:1104
 msgid ""
 "A reversal has occurred on this transaction due to a chargeback by your "
 "customer."
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:833
-#: includes/common/payment-gateways/paypal-express.php:1104
+#: includes/common/payment-gateways/paypal-express.php:834
+#: includes/common/payment-gateways/paypal-express.php:1105
 msgid ""
 "A reversal has occurred on this transaction due to your customer triggering "
 "a money-back guarantee."
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:834
-#: includes/common/payment-gateways/paypal-express.php:1105
+#: includes/common/payment-gateways/paypal-express.php:835
+#: includes/common/payment-gateways/paypal-express.php:1106
 msgid ""
 "A reversal has occurred on this transaction due to a complaint about the "
 "transaction from your customer."
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:835
-#: includes/common/payment-gateways/paypal-express.php:1106
+#: includes/common/payment-gateways/paypal-express.php:836
+#: includes/common/payment-gateways/paypal-express.php:1107
 msgid ""
 "A reversal has occurred on this transaction because you have given the "
 "customer a refund."
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:836
-#: includes/common/payment-gateways/paypal-express.php:1107
+#: includes/common/payment-gateways/paypal-express.php:837
+#: includes/common/payment-gateways/paypal-express.php:1108
 msgid "A reversal has occurred on this transaction due to an unknown reason."
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:846
-#: includes/common/payment-gateways/paypal-express.php:1119
+#: includes/common/payment-gateways/paypal-express.php:847
+#: includes/common/payment-gateways/paypal-express.php:1120
 msgid "You denied the payment when it was marked as pending."
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:851
-#: includes/common/payment-gateways/paypal-express.php:1125
+#: includes/common/payment-gateways/paypal-express.php:852
+#: includes/common/payment-gateways/paypal-express.php:1126
 msgid ""
 "The payment is pending because your customer did not include a confirmed "
 "shipping address and your Payment Receiving Preferences is set such that "
@@ -6545,21 +6545,21 @@ msgid ""
 "preference, go to the Preferences\t section of your Profile."
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:852
-#: includes/common/payment-gateways/paypal-express.php:1126
+#: includes/common/payment-gateways/paypal-express.php:853
+#: includes/common/payment-gateways/paypal-express.php:1127
 msgid ""
 "The payment is pending because it has been authorized but not settled. You "
 "must capture the funds first."
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:856
-#: includes/common/payment-gateways/paypal-express.php:1130
+#: includes/common/payment-gateways/paypal-express.php:857
+#: includes/common/payment-gateways/paypal-express.php:1131
 msgid ""
 "The payment is pending because it is part of an order that has been "
 "authorized but not settled."
 msgstr ""
 
-#: includes/common/payment-gateways/paypal-express.php:1100
+#: includes/common/payment-gateways/paypal-express.php:1101
 msgid ""
 "A payment was reversed due to a chargeback or other type of reversal. The "
 "funds have been removed from your account balance and returned to the buyer:"

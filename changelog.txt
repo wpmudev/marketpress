@@ -4,7 +4,7 @@ Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonat
 Change Log:
 ----------------------------------------------------------------------
 
-3.2.11
+3.3.0
 ----------------------------------------------------------------------
 - Added: Added new filter mp_media_buttons to disable/enable shortcode buttons in visual editor.
 - Fix: Always do TLS verification when making curl calls.
