@@ -7,6 +7,7 @@ Change Log:
 3.3.0
 ----------------------------------------------------------------------
 - Added: Added new filter mp_media_buttons to disable/enable shortcode buttons in visual editor.
+- Added: Greece to PayPal countries list.
 - Fix: Always do TLS verification when making curl calls.
 - Fix: Fix conflict with Branda.
 

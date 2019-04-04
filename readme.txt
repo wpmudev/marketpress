@@ -153,6 +153,7 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 
 = 3.3.0 =
 * New: Added new filter mp_media_buttons to disable/enable shortcode buttons in visual editor.
+* New: Added Greece to PayPal countries list.
 * Fix: Fix conflict with Branda.
 
 = 3.2.10 =
