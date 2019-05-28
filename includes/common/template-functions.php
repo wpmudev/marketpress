@@ -634,41 +634,41 @@ if ( ! function_exists( '_mp_products_html' ) ) :
 			$html .= '
 				<div class="mp_product_item' . ( ( 'grid' == $view ) ? ' mp_product_item-col-' . $per_row : '' ) . '">
 					<div itemscope itemtype="http://schema.org/Product" class="mp_product' . ( ( strlen( $img ) > 0 ) ? ' mp_product-has-image' . $align_class : '' ) . ' ' . implode( $class, ' ' ) . '">
-					
+
 						<div class="mp_product_images">
 							' . $img . '
 						</div><!-- end mp_product_images -->
-						
+
 						<div class="mp_product_details">
- 
+
 							<div class="mp_product_meta">
 								<h3 class="mp_product_name entry-title" itemprop="name">
 	 								<a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a>
 	 							</h3>
 								' . $product->display_price( false ) . '
  								' . $mp_product_list_content . '
- 								
+
  								<div class="mp_social_shares">
 									' . $pinit . '
 									' . $fb . '
 									' . $twitter . '
 								</div><!-- end mp_social_shares -->
- 								
+
 							</div><!-- end mp_product_meta -->
 
 							<div class="mp_product_callout">
 								' . $product->buy_button( false, 'list', array(), true ) . '
 								' . apply_filters( 'mp_product_list_meta', '', $product->ID ) . '
 							</div><!-- end mp_product_callout -->
-							
+
  						</div><!-- end mp_product_details -->
-	
+
 						<div style="display:none">
 							<span class="entry-title">' . $product->title( false ) . '</span> was last modified:
 							<time class="updated">' . get_the_time( 'Y-m-d\TG:i' ) . '</time> by
 							<span class="author vcard"><span class="fn">' . get_the_author_meta( 'display_name' ) . '</span></span>
 						</div>
-						
+
 					</div><!-- end mp_product -->
 				</div><!-- end mp_product_item -->';
 
@@ -987,13 +987,13 @@ if ( ! function_exists( 'mp_format_currency' ) ) :
 		if ( empty( $currency ) ) {
 			$currency = ( is_multisite() && mp_cart()->is_global ) ? mp_get_network_setting( 'global_currency', 'USD' ) : mp_get_setting( 'currency', 'USD' );
 		}
-		
+
 		$curr_symbol_position = mp_get_setting( 'curr_symbol_position' );
 
 		// If multisite use global currency symbol
 		if( is_multisite() && mp_cart()->is_global ) {
 			$global_currency = mp_get_network_setting( 'global_curr_symbol_position' );
-			
+
 			// Check if we have global currency symbol
 			if( ! empty( $global_currency ) ) {
 				$curr_symbol_position = $global_currency;
@@ -1758,7 +1758,7 @@ if ( ! function_exists( 'mp_tax_rate' ) ) :
 				}
 				break;
 		}
-        
+
         //$tax_rate = (float) mp_get_setting( 'tax->rate' );
 
 		if ( empty( $tax_rate ) ) {
@@ -2120,7 +2120,7 @@ if ( ! function_exists( 'mp_order_lookup_form' ) ) :
 		}
 
 		$guest_email = '';
-		
+
 		//Add guest email field
 		if( ! is_user_logged_in() ){
 			$guest_email = '<br/><input type="text" class="mp_form_input" id="mp-guest_email-input" name="guest_email" placeholder="' . __( 'Guest Email', 'mp' ) . '">';
@@ -2281,7 +2281,7 @@ if ( ! function_exists( 'mp_featured_products' ) ) :
 		// force featured to true to filter only featured in mp_list_products()
 		$args['echo'] 	  = false;
 		$args['nopaging'] = false;
-		$args['featured'] = true;		
+		$args['featured'] = true;
 		$content = mp_list_products($args);
 
 		/**
@@ -2373,7 +2373,7 @@ endif;
 if ( ! function_exists( 'mp_product' ) ) {
 	/*
 	 * Displays a single product according to preference
-	 * 
+	 *
 	 * @param bool $echo Optional, whether to echo or return
 	 * @param int $product_id the ID of the product to display. Optional if in the loop.
 	 * @param bool $title Whether to display the title
@@ -2468,7 +2468,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 											});
 										}";
 		}
-        
+
         $lightbox_code = apply_filters( 'mp_single_product_image_lightbox', $lightbox_code );
 
 		$post = get_post();
@@ -2505,9 +2505,8 @@ if ( ! function_exists( 'mp_product' ) ) {
 							if ( preg_match( '/http:|https:/', $value ) ) {
 								$img_url = array( esc_url( $value ) );
 							} else {
-								//$img_url = wp_get_attachment_image_src( $value, $size );
+								$img_url = wp_get_attachment_image_src( $value, $size );
 								$original_image = wp_get_attachment_image_src( $value, 'full' );
-								$img_url        = mp_resize_image( $value, $original_image[0], $size );
 							}
 
 							$return .= '<li data-thumb="' . $img_url[0] . '" data-src ="' . $original_image[0] . '"><img src="' . $img_url[0] . '"></li>';
@@ -2518,8 +2517,8 @@ if ( ! function_exists( 'mp_product' ) ) {
 							if ( preg_match( '/http:|https:/', $values[0] ) ) {
 								$img_url = array( esc_url( $values[0] ) );
 							} else {
+								$img_url = wp_get_attachment_image_src( $values[0], $size );
 								$original_image = wp_get_attachment_image_src( $values[0], 'full' );
-								$img_url        = mp_resize_image( $values[0], $original_image[0], $size );
 							}
 
 							$return .= '<li data-thumb="' . $img_url[0] . '" data-src ="' . $original_image[0] . '"><img src="' . $img_url[0] . '"></li>';
@@ -2687,8 +2686,8 @@ if ( ! function_exists( 'mp_product' ) ) {
 		}
 
 		$return .= '
-			
-</div><!-- end mp_product/mp_single_product -->	
+
+</div><!-- end mp_product/mp_single_product -->
 </section><!-- end mp-single-product -->';
 
 		/**
@@ -2901,7 +2900,7 @@ if ( ! function_exists( 'mp_products_filter' ) ) :
 		<!-- Products Filter -->
 		<section class="mp_products_filter">
 			<form id="mp-products-filter-form" name="mp_products_filter_form" class="mp_form mp_form-products-filter" method="get">
-			
+
 				<div class="mp_form_fields">
 					<div class="mp_form_field mp_products_filter_field mp_products_filter_category" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
 						<label for="mp_product_category" class="mp_form_label">' . __( 'Category', 'mp' ) . '</label>
@@ -2915,10 +2914,10 @@ if ( ! function_exists( 'mp_products_filter' ) ) :
 						</select>
 					</div><!-- mp_products_filter_orderby -->
 				</div>
-				
+
 				' . ( ( is_null( $per_page ) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '">' ) . '
 				<input type="hidden" name="page" value="' . max( get_query_var( 'paged' ), 1 ) . '">
-			
+
 			</form><!-- mp_products_filter_form -->
 		</section><!-- end mp_products_filter -->
 		';
