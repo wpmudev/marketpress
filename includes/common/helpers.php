@@ -103,14 +103,14 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 				//show download link if set
 				$download_link = false;
 				if ( $order->post_status != 'order_received' && ( $download_url = $item->download_url( $order->get_id(), false ) ) ) {
-					
+
 					//Handle multiple files
 					if( is_array( $download_url ) ){
 						//If we have more than one product file, we loop and add each to a new line
 						foreach ( $download_url as $key => $value ){
 							$download_link .= '<a target="_blank" href="' . $value . '">' . sprintf( __( 'Download %1$s', 'mp' ),( $key+1 ) ) . '</a><br/>';
 						}
-						
+
 					} else {
 						$download_link = '<a href="' . $download_url . '">' . __( 'Download', 'mp' ) . '</a>';
 					}
@@ -175,7 +175,7 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 			$zip = $order->get_meta( "mp_{$type}_info->zip" );
 
 			if( $type != "shipping" || !$cart->is_download_only() ) {
-				
+
 				$shipping_billing_info .= '<td><strong>' . $label . '</strong><br /><br />' . "\n";
 				$shipping_billing_info .= $order->get_name( $type ) . "<br />\n";
 				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->company_name" ) . "<br />\n";
@@ -191,12 +191,12 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 
 				if( ( ( $country = $order->get_meta( "mp_{$type}_info->country", '' ) ) && is_array( $all_countries ) && isset( $all_countries[$country] ) ) ){
 					$country = $all_countries[$country];
-				}				
-				
+				}
+
 				if( ! empty( $city ) && ! empty( $state ) &&  ! empty( $zip ) && ! empty( $country ) ) {
 					$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->city" ) . ', ' . $state . ' ' . $order->get_meta( "mp_{$type}_info->zip" ) . ' ' . $country . "<br /><br />\n";
 				}
-				
+
 				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->email" ) . "<br />\n";
 
 				if ( $order->get_meta( "mp_{$type}_info->phone" ) ) {
@@ -208,10 +208,10 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 		}
 
 		$shipping_billing_info .= '</tr></table><br /><br />';
-		
+
 		$custom_carriers = mp_get_setting( 'shipping->custom_method', array() );
 		$method = $order->get_meta( 'mp_shipping_info->method' );
-		
+
 		if( isset( $custom_carriers[ $method ] ) && !empty( $custom_carriers[ $method ] ) ) {
 			$carrier = $custom_carriers[ $method ];
 		} else {
@@ -437,7 +437,7 @@ if ( ! function_exists( 'mp_countries' ) ) :
 		 *
 		 * @param array $countries The default countries.
 		 */
-		return apply_filters( 'mp_countries', $countries );		
+		return apply_filters( 'mp_countries', $countries );
 	}
 
 endif;
@@ -1376,7 +1376,7 @@ if ( ! function_exists( 'mp_get_store_caps' ) ) :
 				if( $cap == "read" ) {
 					continue;
 				}
-				
+
 				$store_caps[ $cap ] = $cap;
 			}
 		}
@@ -1402,72 +1402,9 @@ if ( ! function_exists( 'mp_get_single_site_cart' ) ) {
 	}
 }
 
-if ( ! function_exists( 'mp_resize_image' ) ) {
-	/**
-	 * @param $image_id
-	 * @param $image_url
-	 * @param string $size
-	 *
-	 * @return mixed|void
-	 */
-	function mp_resize_image( $image_id, $image_url, $size = 'thumbnail' ) {
-		$img_path = get_attached_file($image_id);
-
-		$image = wp_get_image_editor( $img_path );
-
-		if ( ! is_wp_error( $image ) ) {
-			if ( is_array( $size ) ) {
-				$size_data = $size;
-			} else {
-				// Get the image sizes from options
-				$size_data = array(
-					get_option( $size . '_size_w' ),
-					get_option( $size . '_size_h' ),
-				);
-			}
-			//build the path name, and try to check if
-			$filename_data = pathinfo( $image_url );
-			$upload_dir    = wp_upload_dir();
-			$image_path    = $upload_dir['path'] . '/' . $filename_data['filename'] . '-' . $size_data[0] . 'x' . $size_data[1] . '.' . $filename_data['extension'];
-			$image_url     = str_replace( $upload_dir['path'], $upload_dir['url'], $image_path );
-			if ( file_exists( $image_path ) ) {
-				//we will check the time of this image
-				$cache_time = apply_filters( 'mp_image_resize_cache_duration', 3 );
-				if ( strtotime( '+' . $cache_time . ' days', filemtime( $image_path ) ) <= time() ) {
-					unlink( $image_path );
-				}
-			}
-
-			if ( ! file_exists( $image_path ) ) {
-				$is_crop = false;
-				if ( $size == 'thumbnail' ) {
-					$is_crop = array( 'left', 'top' );
-				}
-				$is_crop = apply_filters( 'mp_image_crop_position', $is_crop, $image, $image_path, $image_url, $size );
-				$image->resize( $size_data[0], $size_data[1], $is_crop );
-				$image->save( $image_path );
-			}
-
-			$image = apply_filters( 'image_downsize', array(
-				$image_url,
-				$size_data[0],
-				$size_data[1]
-			), $image_id, array( $size_data[0], $size_data[1] ) );
-
-			return apply_filters( 'mp_image_after_resize', $image );
-		}
-
-		return false;
-	}
-}
-
-if ( ! function_exists( 'mp_get_the_thumbnail' ) ) {
-
-}
-
 if (! function_exists( 'mp_array_column' ) ) {
     function mp_array_column( array $input, $columnKey, $indexKey = null ) {
-    	
+
     	if( function_exists( 'array_column' ) ){
     		return array_column( $input, $columnKey, $indexKey );
     	}
