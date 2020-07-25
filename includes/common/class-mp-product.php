@@ -599,7 +599,7 @@ class MP_Product {
 		$disabled 			= '';
 		$error				= '';
 
-		$max_max = $this->max_product_quantity( $product_id, false, false );			
+		$max_max = $this->max_product_quantity( $product_id, false, false );
 		extract($this->max_product_quantity( $product_id, false, true ), EXTR_PREFIX_ALL, "max");
 
 		$max = 'max="' . esc_attr( $max_qty ) . '" ';
@@ -654,7 +654,7 @@ class MP_Product {
 		if( (! mp_doing_ajax() && ! $product->in_stock( 1, true ) ) || $max_qty == 0 ){
 			$error = '<label class="mp_form_label mp_product_options_att_input_label" for="' . $input_id . '"><span id="mp_product_options_att_quantity-error" class="mp_form_input_error">' . $max_msg . $max_msg_2 . '</span></label>';
 		}
-		
+
 
 		return $error . '<input id="' . $input_id . '" class="mp_form_input mp_form_input-qty required digits" min="' . esc_attr( $min_value ) . '" ' . $max . ' type="number" name="product_quantity" value="' . $product_quantity . '" ' . $disabled . '>';
 	}
@@ -1473,7 +1473,7 @@ class MP_Product {
 				}
 
 			}
-			
+
 		}
 
 		/**
@@ -2075,8 +2075,7 @@ class MP_Product {
 		if ( ( $context == 'single' || $context == 'list' ) && ! empty( $image ) ) {
 			//if single case, we will get the better graphic
 			$image_id          = get_post_thumbnail_id( $image_post_id );
-			$image_orignal_url = wp_get_attachment_image_src( $image_id, 'full' );
-			$image_url         = mp_resize_image( $image_id, $image_orignal_url[0], $size );
+			$image_url         = wp_get_attachment_image_src( $image_id, $size );
 			if ( $image_url ) {
 				$atts = '';
 				foreach (

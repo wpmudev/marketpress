@@ -4,6 +4,11 @@ Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonat
 Change Log:
 ----------------------------------------------------------------------
 
+3.4.0
+----------------------------------------------------------------------
+- Fix: Product image caching system littering the monthly upload tree
+
+
 3.3.0
 ----------------------------------------------------------------------
 - Added: Added new filter mp_media_buttons to disable/enable shortcode buttons in visual editor.
@@ -230,11 +235,11 @@ Change Log:
 3.0.0.7
 ----------------------------------------------------------------------
 - Fixed: Issue with PDF Invoice add-on after complete order
-- Fixed: Issues with ProSites add-on on multisite/network 
+- Fixed: Issues with ProSites add-on on multisite/network
 - Fixed: Adding related product to cart
 - Fixed: Compatibilities issues with Select2 and themes
-- Fixed: Products not showing on main/sub-sites on multisite/network 
-- Fixed: Various issues with Global widgets 
+- Fixed: Products not showing on main/sub-sites on multisite/network
+- Fixed: Various issues with Global widgets
 - Fixed: Missing company information on orders
 - Fixed: Issue with 2Checkout finishing the order
 - Fixed: Issues with PayPal chained payments
@@ -258,7 +263,7 @@ Change Log:
 - Tweaked: Added new option for Digital Products, collect full or basic customer details
 - Tweaked: Hide shipping details if collect basic customer details is selected for Digital Products
 - Tweaked: Added a notice when quick-setup is not completed
-- Tweaked: Quick-setup now runs on new subsites on multisite/network 
+- Tweaked: Quick-setup now runs on new subsites on multisite/network
 - Tweaked: More order detailed values on order page (admin)
 - Tweaked: Added option to hide/show products filter on products archives pages
 - Tweaked: Removed unused CSS files
@@ -384,7 +389,7 @@ Adding notice for deprecated gateways Cubepoints, Bitpay, iDEAL, Skrill, Google 
 
 2.9.6.2
 ----------------------------------------------------------------------
-- Fixed issue with collecting billing address for digital products (when "Collect Address on Downloadable Only Cart" is checked and shipping method is not set) 
+- Fixed issue with collecting billing address for digital products (when "Collect Address on Downloadable Only Cart" is checked and shipping method is not set)
 
 2.9.6.1
 ----------------------------------------------------------------------
@@ -469,7 +474,7 @@ Adding notice for deprecated gateways Cubepoints, Bitpay, iDEAL, Skrill, Google 
 ----------------------------------------------------------------------
 - Fixed: File download issue that some users were reporting
 - Fixed: Conflicts with Ultimatum theme http://wp.mu/9tt
-- Fixed: Global Product Widget is showing a description under each product even when "content to show" is set to none http://wp.mu/9u8 
+- Fixed: Global Product Widget is showing a description under each product even when "content to show" is set to none http://wp.mu/9u8
 - Fixed: Shipping not being calculated correctly when using global cart and multiple shipping methods http://wp.mu/a0a
 - Fixed: Issue with shipping/billing fields displaying incorrect values in admin http://wp.mu/a0b
 - Fixed: Double escaping in global product list widget title http://wp.mu/a0e
@@ -479,7 +484,7 @@ Adding notice for deprecated gateways Cubepoints, Bitpay, iDEAL, Skrill, Google 
 - Added Coupons for individual categories/products
 - Added compatibility with Google Universal Analytics
 - Added Stripe embedded form button
-- Added Pinterest "Rich Pins" w/advanced oembed endpoint 
+- Added Pinterest "Rich Pins" w/advanced oembed endpoint
 - Added show related products option
 - Added Pickup in-store shipping option
 - Added ability to assign a custom per-order limit to a product
