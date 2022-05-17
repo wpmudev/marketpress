@@ -1008,12 +1008,13 @@ class WPMUDEV_Metabox {
 			if ( wp_is_post_revision( $post_id ) ) {
 				return;
 			}
-
+			
+			// Checking this using cache ends up to not saving on set ups with cache
 			// Make sure we only run once
-			if ( wp_cache_get( 'save_fields', 'wpmudev_metaboxes' ) ) {
-				return;
-			}
-			wp_cache_set( 'save_fields', true, 'wpmudev_metaboxes' );
+			//if ( wp_cache_get( 'save_fields', 'wpmudev_metaboxes' ) ) {
+			//	return;
+			//}
+			//wp_cache_set( 'save_fields', true, 'wpmudev_metaboxes' );
 
 			/**
 			 * Fires after the appropriate nonce's have been verified for fields to tie into.
