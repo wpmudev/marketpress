@@ -3,8 +3,8 @@ Contributors: WPMUDEV
 Tags: E-commerce, ecommerce, storefront, sell, store, shopping, cart, payment gateways, digital downloads, online store
 Requires at least: 3.7
 Requires PHP: 5.2
-Tested up to: 4.9.6
-Stable tag: trunk
+Tested up to: 5.2
+Stable tag: 3.4.0
 
 Full-power ecommerce marketplace for WordPress and Multisite. 100% free and no extensions required.
 
@@ -20,7 +20,7 @@ No need to spend hundreds of dollars purchasing add-ons or special licenses. Mar
 
 [youtube http://www.youtube.com/watch?v=4QX1P7e-9dw&hd=1]
 
-= Features = 
+= Features =
 
 Setting up your own online store couldn't be easier with MarketPress. Features include:
 
@@ -52,7 +52,7 @@ Setting up your own online store couldn't be easier with MarketPress. Features i
 * Checkout without having to be a site user
 
 
-= Customize Without Code = 
+= Customize Without Code =
 
 MarketPress is built to work flawlessly with any well-coded WordPress theme.
 
@@ -62,7 +62,7 @@ MarketPress is built to work flawlessly with any well-coded WordPress theme.
 
 Or go download one of our Upfront themes with built-in MarketPress styles and a powerful drag-and-drop front end visual theme editor.
 
-= Multisite and BuddyPress Compatible = 
+= Multisite and BuddyPress Compatible =
 
 Set up your own eBay or Etsy-style network of stores and take a percentage of each sale.
 
@@ -98,7 +98,7 @@ Ship anywhere in the world with confidence. Use flat rate shipping or cater to s
 
 = Google Analytics =
 MarketPress is both Google Universal Analytics and Google Analytics eCommerce compatible. Track sales and site activity and grow your business
- 
+
 = Social Sharing =
 Go viral with the included Pinterest, Facebook and Twitter share buttons. MarketPress makes it easy for your customers to share your products with their friends and family.
 
@@ -150,6 +150,9 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 3. Descriptions and Reviews.
 
 == Changelog ==
+
+= 3.4.0 =
+* Fix: Product image caching system littering the monthly upload tree
 
 = 3.3.0 =
 * New: Added new filter mp_media_buttons to disable/enable shortcode buttons in visual editor.
@@ -312,10 +315,10 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 = 2.9.5 =
 * Fixed: When using global cart admin some times loses the ability to change shipping methods
 
-= 2.9.4.9 = 
+= 2.9.4.9 =
 * Fixed: File download issue that some users were reporting
 * Fixed: Conflicts with Ultimatum theme http://wp.mu/9tt
-* Fixed: Global Product Widget is showing a description under each product even when "content to show" is set to none http://wp.mu/9u8 
+* Fixed: Global Product Widget is showing a description under each product even when "content to show" is set to none http://wp.mu/9u8
 * Fixed: Shipping not being calculated correctly when using global cart and multiple shipping methods http://wp.mu/a0a
 * Fixed: Issue with shipping/billing fields displaying incorrect values in admin http://wp.mu/a0b
 * Fixed: Double escaping in global product list widget title http://wp.mu/a0e
@@ -323,17 +326,17 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 = 2.9.4.8 =
 * Fixed: Fatal error in some of the payment gateways
 
-= 2.9.4.7 = 
+= 2.9.4.7 =
 * Fixed: errors when checking out using PayPal and global cart is enabled
 * Fixed: incorrect shipping calculations when using tax inclusive pricing and calculated shipping options
 * Fixed: when toggling global cart on/off PayPal settings get wiped out
 * Fixed: PHP warning when checking out using UPS shipping gateway
 
-=  2.9.4.6 = 
+=  2.9.4.6 =
 * Fixed: Product and category specific coupons could be used for any product with a mal-formed coupon code http://wp.mu/9qe
 * Fixed: Fatal "Cannot use string offset as an array" error in network admin when enabling global cart http://wp.mu/9qf
 
-= 2.9.4.5 = 
+= 2.9.4.5 =
 * Fixed: display issue on product category templates http://wp.mu/9ek
 * Fixed: when checking out every UPS shipping service shows as available instead of only the ones that are selected
 * Fixed: order status links generate page-not-found errors http://wp.mu/9em
@@ -342,7 +345,7 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 
 =  2.9.4.4 =
 * Fixed: [mp_related_products] some times causes product categories/tags to not display http://wp.mu/9ce
-* Fixed: errors when checking out when using global cart 
+* Fixed: errors when checking out when using global cart
 * Fixed: shopping cart shows PHP warning
 * Fixed: some arguments in [mp_list_global_products] don't work http://wp.mu/9dm
 * Fixed: during checkout the shipping name field isn't being validated that a full name was entered http://wp.mu/9e8
@@ -350,7 +353,7 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 * Removed Parcel Post shipping option from USPS shipping gateway as this only available through retail outlets
 * New: emails are now sent as HTML - fixes issues with html entities displaying improperly in emails
 
-= 2.9.4.3 = 
+= 2.9.4.3 =
 * Fixed: admin bar shows wrong site than what is currently being viewed in multisite setup
 * Fixed: receiving errors when checking out using Fedex http://wp.mu/9c2
 * Fixed: when using UPS shipping, cart is showing one shipping rate while a different rate is being applied to the orders http://wp.mu/9c3
@@ -361,14 +364,14 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 * Fixed: item price in cart is wrong http://wp.mu/9cj
 * Fixed: when using prices inclusive of tax and also taxing shipping fees the total tax is calculated incorrectly http://wp.mu/9cs
 
-= 2.9.4.2 = 
+= 2.9.4.2 =
 * Fixed: dashboard stats widget includes orders that are trashed
 * Fixed: can't edit user shipping/billing info on user edit screen
 * Fixed: tax breakdown doesn't display when using tax-inclusive pricing http://wp.mu/9bu
 * Fixed: special characters show as html entities in emails
 * Fixed: errors when checking out using Authorize.net gateway http://wp.mu/9bv
 
-= 2.9.4.1 = 
+= 2.9.4.1 =
 * Fixed: product list widget doesn't show price for products with variations http://wp.mu/9ai
 * Fixed: spelling error in shipping settings http://wp.mu/9aj
 * Fixed: lightbox no longer works on product images
@@ -395,7 +398,7 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 = 2.9.3.8 =
 * Fixed: prices not showing up after 2.9.3.7 release
 
-= 2.9.3.7 = 
+= 2.9.3.7 =
 * Fixed: deprecated use of the $wpdb->escape() function
 * Fixed: wrong link in PayPal Express settings
 * Fixed: subtotal text appending for each item
@@ -404,71 +407,71 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 * Added: support for Google rich snippets NOTE: PLEASE CHECK YOUR PRODUCT PAGES AFTER UPDATING AS SOME ADDITIONAL TAGS HAVE BEEN ADDED
 * Deprecated: mp_product_price_tag filter - use mp_product_price_html instead
 
-= 2.9.3.6 =  
+= 2.9.3.6 =
 * Fixed: product list shortcode not using correct "per_page" setting
 * Fixed: product list scroll-to-top not working when product filters are hidden
 * Fixed: not able to check off destination countries in IE 11
 
-= 2.9.3.5 =  
+= 2.9.3.5 =
 * Fixed a bug with certain settings not saving http://wp.mu/91u
 
-= 2.9.3.4 = 
+= 2.9.3.4 =
 * Fixed a bug with certain gateways and checkout totals some times not matching up and causing errors http://wp.mu/91n
 
-= 2.9.3.3 = 
+= 2.9.3.3 =
 * Fixed bug with not being able to deselect target countries once selected http://wp.mu/91g
 * Fixed bug when clicking вЂњEUвЂќ target countries wouldnвЂ™t always work
 * Fixed bug with tax not showing up on order pages in admin when using tax inclusive prices
 
-= 2.9.3.2 = 
+= 2.9.3.2 =
 * Fixed: bug with per-order download limits http://wp.mu/912
 * Fixed: bug with checkout when tax inclusive pricing was enabled http://wp.mu/913
 * Fixed: order confirmation emails were not reflecting coupon discounts
 
-= 2.9.3.1 = 
+= 2.9.3.1 =
 * Fixed: when using USPS shipping all shipping options would be available instead of only the ones selected in settings
 * Fixed: Taxes were being added to cart when they shouldn't have been
 
-= 2.9.3 = 
-* Fixed fatal error on checkout page that some users were reporting (specific to PHP version 5.3.1) 
+= 2.9.3 =
+* Fixed fatal error on checkout page that some users were reporting (specific to PHP version 5.3.1)
 
-= 2.9.2.9 = 
+= 2.9.2.9 =
 * Added MP_IMPORT_ALLOW_NO_PRICE constant to allow importing of products with no price
 
-= 2.9.2.8 = 
+= 2.9.2.8 =
 * Updated order status screens to reflect new coupon changes from 2.9.2.7
 * Added coupon code to discount column in admin orders screen
 
-= 2.9.2.7 = 
+= 2.9.2.7 =
 * Fixed: In USPS shipping settings, services could not be unchecked
 * Sessions are now only initialized when needed instead of on globally
 * Coupon discounts are now applied to each applicable product instead of the cart as a whole (fixes "applies to" rules not working correctly)
 
-= 2.9.2.6 = 
+= 2.9.2.6 =
 * Fixed: "Uncaught TypeError: Object [object Object] has no method 'ColorPicker'" on network settings screen http://wp.mu/900
 * Fixed: Undefined variables notices on network settings screen
 * Fixed: Low stock notifications were being sent for products that didn't have inventory tracking enabled http://wp.mu/905
 * Fixed: On checkout screen errors would show above breadcrumb whereas update messages would show below http://wp.mu/904
 * Code cleanup for PayPal Express gateway
 
-= 2.9.2.5 = 
+= 2.9.2.5 =
 * Fixed: When using [mp_list_global_products] pagination would not work http://wp.mu/8z9
 * Fixed: When editing a product-specific coupon, the product dropdown would not show up initially
 
-= 2.9.2.4 = 
+= 2.9.2.4 =
 * Fixed: Coupon codes would not honor the "applies to" setting http://wp.mu/8z8
 * Fixed: Simplify gateway would display an "Simplify token not generated correctly" error when not activated with any other gateway plugins http://wp.mu/8yo
 * Fixed: Compatibility bug with WordPress HTTPS http://wp.mu/8y3
 * Fixed: Bug with low stock notifications
 
-= 2.9.2.3 = 
+= 2.9.2.3 =
 * Fixed: Low-stock notifications wouldn't send at expected threshold
 * Fixed: Fixed a bug with not being able to use "services" as a page slug http://wp.mu/8xw
 * Fixed: Javascript for Pinterest pin-it button would not be generated correctly
 * Fixed: When switching shipping methods, table-rate data would be wiped out http://wp.mu/8xy
 * New: Updated the Pinterest Rich Pins oEmbed endpoint to use http://www.yourdomain.com/wp-admin/admin-ajax.php?action=mp_oembed&type=pinterest&url=* instead of http://www.yourdomain.com/services/oembed?url=*
 
-= 2.9.2.2 = 
+= 2.9.2.2 =
 * Fixed: Bug where store page wasn't being created on activation http://wp.mu/8wl
 * Fixed: Bug when adding coupons to specific products on sites with many (~10k+) products http://wp.mu/8wj
 * Fixed: Hide postal/zip code field when checking out for ship-to countries that don't use postal/zip codes
@@ -480,7 +483,7 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 * Added: "mp_orders_cap" filter which allows developers to easily change the capability type required to view the orders menu
 * Fixed: Divide by zero warning in USPS gateway
 * Fixed: Mixed-content warnings in wp-admin
-* Fixed: Session handling code that caused issues with PayPal Express checkout 
+* Fixed: Session handling code that caused issues with PayPal Express checkout
 * Fixed: Conflict with WordPress Social Invitations plugin http://wp.mu/8ul
 * Fixed: When using WPML and [mp_product] shortcode the non-translated version of the product would be returned
 * Fixed: GA E-Commerce bug http://wp.mu/8ve
@@ -513,7 +516,7 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 * Added Coupons for individual categories/products
 * Added compatibility with Google Universal Analytics
 * Added Stripe embedded form button
-* Added Pinterest "Rich Pins" w/advanced oembed endpoint 
+* Added Pinterest "Rich Pins" w/advanced oembed endpoint
 * Added show related products option
 * Added Pickup in-store shipping option
 * Added ability to assign a custom per-order limit to a product
