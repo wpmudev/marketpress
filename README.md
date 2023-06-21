@@ -196,7 +196,7 @@ Take full advantage of the 100+ premium plugins included with your WPMU DEV memb
 
 ### To Get Started:
 
-If you're new to WordPress, you'll want to start off by reading the [Installing Plugins](https://premium.wpmudev.org/wpmu-manual/installing-regular-plugins-on-wpmu/) section in our comprehensive [WordPress and WordPress Multisite Manual](https://premium.wpmudev.org/wpmu-manual/), so you can get MarketPress installed on your site properly. Once you've got MarketPress installed and activated, you'll be presented with our Quick Setup wizard. You can skip it if you _really_ want to, but we highly recommend that you follow it all the way through (as it'll make the setup of your store easier): 
+If you're new to WordPress, you'll want to start off by reading the [Installing Plugins](https://wpmudev.com/docs/using-wordpress/installing-wordpress-plugins/) section in our comprehensive [WordPress and WordPress Multisite Manual](https://premium.wpmudev.org/wpmu-manual/), so you can get MarketPress installed on your site properly. Once you've got MarketPress installed and activated, you'll be presented with our Quick Setup wizard. You can skip it if you _really_ want to, but we highly recommend that you follow it all the way through (as it'll make the setup of your store easier): 
 
 ![MarketPress - Quick Setup Start](https://premium.wpmudev.org/wp-content/uploads/2010/06/mp-3006-quick-setup-start.png)
 
