@@ -352,10 +352,10 @@ class MP_Cart {
 			return $products;
 		}
 		$cache_key = implode( ',', $items );
-
-		if ( $_posts = wp_cache_get( $cache_key, 'mp_cart' ) ) {
-			$posts = $_posts;
-		} else {
+		// Using cached values here causes wrong products shown in cart
+		//if ( $_posts = wp_cache_get( $cache_key, 'mp_cart' ) ) {
+		//	$posts = $_posts;
+		//} else {
 			$posts = get_posts( array(
 				'post__in'       => array_keys( $items ),
 				'posts_per_page' => - 1,
@@ -363,8 +363,8 @@ class MP_Cart {
 				'post_status'    => array( 'publish', 'out_of_stock', 'trash' ),
 				'orderby'        => 'post__in'
 			) );
-			wp_cache_set( $cache_key, $posts, 'mp_cart' );
-		}
+		//	wp_cache_set( $cache_key, $posts, 'mp_cart' );
+		//}
 
 		foreach ( $posts as $post ) {
 			$product      = new MP_Product( $post );
